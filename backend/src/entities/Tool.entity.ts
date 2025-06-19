@@ -19,7 +19,7 @@ export class EntityTool {
     categoryId: number;
 
     @ManyToOne(() => EntityCategory, category => category.categoryId)
-    @JoinColumn({ name: "categoryId" }) // Nombre de la columna en la tabla Category
+    @JoinColumn({ name: "categoryId" }) // Nombre de la columna en la tabla Category donde se une
     category: EntityCategory;
 
     @Column()
