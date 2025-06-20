@@ -1,40 +1,48 @@
 import { Injectable } from "@nestjs/common";
 import {ConfigService} from "@nestjs/config";
+import { exit } from "node:process";
+
+
 
 @Injectable()
 export class DbUtilService_Cls {
     
-    hostname: string;
-    username: string;
-    password: string;
-    databasename: string
-    type : string;
+    hostname?: string;
+    username?: string;
+    password?: string;
+    databasename?: string;
+    type: string;
     databaseEntities: any[];
     databaseMigrations: any[];
     migrationFolder:any;
 
     constructor(private readonly ConfigService: ConfigService) {
-        this.hostname = 'localhost';
-        this.username = 'postgres';
-        this.password = 'root';
-        this.databasename = 'postgres';
-        this.type = 'postgres';
+        this.hostname = process.env.DB_HOST; 
+        this.username = process.env.DB_USER;
+        this.password = process.env.DB_PASSWORD;
+        this.databasename = process.env.DB_NAME;
+        this.type = process.env.DB_TYPE || 'postgres';
 
         this.databaseEntities = ["src/entities/*.entity.js", "dist/entities/*.entity.js"];
         this.migrationFolder = "**/migrations/postgres";
         this.databaseMigrations = [this.migrationFolder + "/*.ts"]
+
+        if(undefined == this.hostname || undefined == this.username || undefined == this.password || undefined == this.databasename){
+            console.log('something is wrong with the database config');
+            exit(1);
+        }
     }
 
-    getHost():string{
+    getHost(){
         return this.hostname;
     }
-     getUser():string{
+     getUser(){
         return  this.username;
     }
-     getPass():string{
+     getPass(){
         return  this.password;
     }
-     getDbName():string{
+     getDbName(){
         return this.databasename;
     }
 

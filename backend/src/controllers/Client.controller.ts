@@ -3,7 +3,7 @@ import { ServiceClient } from 'src/services/Client.service';
 import { EntityClient } from 'src/entities/Client.entity';
 
 @Controller('client')
-export class ClientController {
+export class  ControllerClient {
   constructor(private readonly ServiceClient: ServiceClient) {}
 
   @Get()
