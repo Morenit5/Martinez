@@ -10,6 +10,10 @@ import { ClientModule } from './modules/Client.module';
 import { InvoiceDetailModule } from './modules/InvoiceDetail.module';
 import { ServiceDetailModule } from './modules/ServiceDetail.module';
 import { ColumnNumericTransformer } from './utils/ColumnNumericTransformer';
+import { InvoiceModule } from './modules/Invoice.module';
+import { PaymentModule } from './modules/Payment.module';
+import { ServiceModule } from './modules/Service.module';
+import { ToolModule } from './modules/Tool.module';
 //import { TypeOrmModule } from '@nestjs/typeorm';
 //import { provideHttpClient } from '@angular/common/http';
 
@@ -22,7 +26,11 @@ let importModules =[
   CategoryModule,
   ClientModule,
   InvoiceDetailModule,
-  ServiceDetailModule
+  ServiceDetailModule, 
+  InvoiceModule,
+  PaymentModule,
+  ServiceModule,
+  ToolModule,
 ];
 
 @Module({

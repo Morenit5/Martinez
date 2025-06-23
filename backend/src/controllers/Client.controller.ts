@@ -4,25 +4,25 @@ import { EntityClient } from 'src/entities/Client.entity';
 
 @Controller('client')
 export class  ControllerClient {
-  constructor(private readonly ServiceClient: ServiceClient) {}
+  constructor(private readonly serviceClient: ServiceClient) {}
 
   @Get()
   findAll(): Promise<EntityClient[]> {
-    return this.ServiceClient.findAll();
+    return this.serviceClient.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string): Promise<EntityClient|null> {
-    return this.ServiceClient.findOne(+id);
+    return this.serviceClient.findOne(+id);
   }
 
   @Post()
   create(@Body() client: EntityClient): Promise<EntityClient> {
-    return this.ServiceClient.create(client);
+    return this.serviceClient.create(client);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string): Promise<void> {
-    return this.ServiceClient.remove(+id);
+    return this.serviceClient.remove(+id);
   }
 }
