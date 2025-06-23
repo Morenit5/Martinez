@@ -1,5 +1,7 @@
 import { ColumnNumericTransformer } from 'src/utils/ColumnNumericTransformer';
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { EntityInvoiceDetails } from './InvoiceDetails.entity';
+import { EntityPayment } from './Payment.entity';
 
 @Entity()
 export class EntityInvoice {
@@ -22,7 +24,10 @@ export class EntityInvoice {
     })
     totalAmount: number;
 
-    @Column()
-    paymentId: number;
+    @OneToMany(() => EntityPayment, payment => payment.paymentId)
+    payment: EntityPayment[];
+
+    @OneToMany(() => EntityInvoiceDetails, invoiceDetail => invoiceDetail.invoiceId)
+    invoiceDetail: EntityInvoiceDetails[];
 
 }
