@@ -1,5 +1,6 @@
 import { ColumnNumericTransformer } from 'src/utils/ColumnNumericTransformer';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { EntityInvoice } from './Invoice.entity';
 
 @Entity()
 export class EntityPayment {
@@ -9,25 +10,22 @@ export class EntityPayment {
   @Column()
   paymentDate: Date;
 
-@Column('numeric', {
+  @Column('numeric', {
     precision: 7,
     scale: 2,
     transformer: new ColumnNumericTransformer(),
   })
-   paymentAmount: number;
+  paymentAmount: number;
 
   @Column()
   paymentMethod: string;
 
 
-  @ManyToOne(() => EntityPayment, payment => payment.invoiceId)
-      @JoinColumn({ name: "invoiceId" }) // Nombre de la columna en la tabla donde se une
-      payment: EntityPayment;
+  @ManyToOne(() => EntityInvoice, invoice => invoice.invoiceId)
+  @JoinColumn({ name: "invoiceId" }) // Nombre de la columna en la tabla donde se une
+  invoice: EntityInvoice;
 
-  @Column()
-  invoiceId: number;
-
-@Column('numeric', {
+  @Column('numeric', {
     precision: 7,
     scale: 2,
     transformer: new ColumnNumericTransformer(),

@@ -27,7 +27,6 @@ export class EntityInvoice {
     @OneToMany(() => EntityPayment, payment => payment.paymentId)
     payment: EntityPayment[];
 
-    @OneToMany(() => EntityInvoiceDetails, invoiceDetail => invoiceDetail.invoiceId)
+    @OneToMany(() => EntityInvoiceDetails, invoiceDetail => invoiceDetail.invoiceDetailId)
     invoiceDetail: EntityInvoiceDetails[];
-
 }
