@@ -1,13 +1,15 @@
 import { ColumnNumericTransformer } from 'src/utils/ColumnNumericTransformer';
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { EntityService } from './Service.entity';
 
 @Entity()
 export class EntityServiceDetail {
     @PrimaryGeneratedColumn()
     serviceDetailsId: number;
 
-    @Column()
-    serviceId: number;
+    @ManyToOne(() => EntityService, service => service.serviceId)
+    @JoinColumn({ name: "serviceId" }) // Nombre de la columna en la tabla donde se une
+    category: EntityService;
 
     @Column()
     serviceType: string;

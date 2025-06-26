@@ -1,14 +1,16 @@
 import { ColumnNumericTransformer } from 'src/utils/ColumnNumericTransformer';
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { EntityInvoice } from './Invoice.entity';
 
 @Entity()
 export class EntityInvoiceDetails {
     @PrimaryGeneratedColumn()
     invoiceDetailId: number;
 
-    @Column()
-    invoiceId: number;
-
+    @ManyToOne(() => EntityInvoice, invoice => invoice.invoiceId)
+    @JoinColumn({ name: "invoiceId" }) // Nombre de la columna en la tabla donde se une
+    category: EntityInvoice;
+    
     @Column()
     concept: string;
 

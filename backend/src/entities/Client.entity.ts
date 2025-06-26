@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { EntityService } from './Service.entity';
 
 @Entity()
 export class EntityClient {
@@ -25,4 +26,7 @@ export class EntityClient {
 
     @Column()
     registryDate: Date;
+
+    @OneToMany(() => EntityService, service => service.serviceId)
+    service: EntityClient[];
 }
