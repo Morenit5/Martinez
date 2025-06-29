@@ -1,14 +1,15 @@
 import { TypeOrmModuleAsyncOptions, TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { DbUtilService_Cls } from "./db-util.service";
+import { DataSource } from "typeorm";
 
-export const typeOrmConfig: TypeOrmModuleAsyncOptions={
+export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
     inject: [DbUtilService_Cls],
     extraProviders: [DbUtilService_Cls],
-    useFactory: (dbUtil: DbUtilService_Cls)=>{
-        if(dbUtil.getPersistentceType()==="postgres"){
+    useFactory: (dbUtil: DbUtilService_Cls) => {
+        if (dbUtil.getPersistentceType() === "postgres") {
             return postgresFactory(dbUtil);
         }
-        else{
+        else {
             return postgresFactory(dbUtil);
         }
     }
@@ -25,6 +26,22 @@ function postgresFactory(dbUtil: DbUtilService_Cls): TypeOrmModuleOptions {
         entities: dbUtil.getEntities(),
         synchronize: false,
         autoLoadEntities: false,
+
+        poolErrorHandler: async (err) => {
+            const reconnection = setInterval(async () => {
+                console.log('Retrying connection...');
+                const connection = new DataSource({
+                    type: 'postgres',
+                    host: dbUtil.getHost(),
+                    port: 5432,
+                    username: dbUtil.getUser(),
+                    password: dbUtil.getPass(),
+                    database: dbUtil.getDbName(),
+                });
+                const db = await connection.initialize();
+                if (db.isInitialized) clearInterval(reconnection);
+            }, 1000);
+        },
     }
 
     return postgresConfig;

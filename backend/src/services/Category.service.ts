@@ -24,4 +24,28 @@ export class ServiceCategory {
   async remove(id: number): Promise<void> {
     await this.categoryRepository.delete(id);
   }
+
+  update(categoryId: string, category: EntityCategory) {
+
+     let cualquieraServices: any = '';
+    try
+    {
+      cualquieraServices = this.categoryRepository.update(categoryId, category);
+      //return this.categoryRepository.update(categoryId, category);
+
+      cualquieraServices.then((value) => {
+        console.log(value); // Logs "Data from Promise" after 1 second
+      });
+
+      return cualquieraServices;
+    }
+    catch(error)
+    {
+      console.log("Atrapando la calabaceada :D en el service ");
+      console.log(error);
+      return error;
+    }
+    
+  }
+
 }

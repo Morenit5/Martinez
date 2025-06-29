@@ -29,4 +29,7 @@ export class EntityInvoice {
 
     @OneToMany(() => EntityInvoiceDetails, invoiceDetail => invoiceDetail.invoiceDetailId)
     invoiceDetail: EntityInvoiceDetails[];
+
+    @Column()
+    enabled: boolean;
 }

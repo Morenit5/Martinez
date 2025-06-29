@@ -33,4 +33,7 @@ export class EntityTool {
 
     @Column()
     acquisitionDate: Date;
+
+    @Column()
+    enabled: boolean;
 }

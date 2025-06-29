@@ -15,4 +15,7 @@ export class EntityCategory {
   @OneToMany(() => EntityTool, tool => tool.categoryId)
   tool: EntityTool[];
 
+  @Column()
+  enabled: boolean;
+
 }

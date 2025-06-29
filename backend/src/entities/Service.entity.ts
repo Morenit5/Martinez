@@ -13,9 +13,6 @@ export class EntityService {
     @Column()
     serviceDate: Date;
 
-    /*@Column()
-    clientId: number;*/
-
     @Column()
     invoiceId: number;
 
@@ -31,4 +28,7 @@ export class EntityService {
 
     @OneToMany(() => EntityServiceDetail, servicedetail => servicedetail.serviceDetailsId)
     servicedetail: EntityServiceDetail[];
+
+    @Column()
+    enabled: boolean;
 }

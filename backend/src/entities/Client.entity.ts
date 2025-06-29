@@ -29,4 +29,7 @@ export class EntityClient {
 
     @OneToMany(() => EntityService, service => service.serviceId)
     service: EntityClient[];
+
+    @Column()
+    enabled: boolean;
 }
