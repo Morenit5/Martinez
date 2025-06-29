@@ -10,7 +10,7 @@ export class EntityInvoiceDetails {
     @ManyToOne(() => EntityInvoice, invoice => invoice.invoiceId)
     @JoinColumn({ name: "invoiceId" }) // Nombre de la columna en la tabla donde se une
     category: EntityInvoice;
-    
+
     @Column()
     concept: string;
 
@@ -30,4 +30,7 @@ export class EntityInvoiceDetails {
         transformer: new ColumnNumericTransformer(),
     })
     subtotal: number;
+
+    @Column()
+    enabled: boolean;
 }

@@ -24,8 +24,24 @@ function postgresFactory(dbUtil: DbUtilService_Cls) {
         cli: {
             migrationsDir: dbUtil.getMigrationsDir()
         },
-        synchronize: false,
-        autoLoadEntities: false,
+        synchronize: true,//false,
+        autoLoadEntities: true, //false,
+
+        poolErrorHandler: async (err) => {
+          const reconnection = setInterval(async () => {
+            console.log('Retrying connection...');
+            const connection = new DataSource({
+              type: 'postgres',
+              host: dbUtil.getHost(),
+              port: 5432,
+              username: dbUtil.getUser(),
+              password: dbUtil.getPass(),
+              database: dbUtil.getDbName(),
+            });
+            const db = await connection.initialize();
+            if (db.isInitialized) clearInterval(reconnection);
+          }, 1000);
+        },
     }
 
     return postgresConfig;

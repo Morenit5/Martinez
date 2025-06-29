@@ -30,4 +30,7 @@ export class EntityServiceDetail {
     })
     price: number;
 
+    @Column()
+    enabled: boolean;
+
 }

@@ -20,7 +20,6 @@ export class EntityPayment {
   @Column()
   paymentMethod: string;
 
-
   @ManyToOne(() => EntityInvoice, invoice => invoice.invoiceId)
   @JoinColumn({ name: "invoiceId" }) // Nombre de la columna en la tabla donde se une
   invoice: EntityInvoice;
@@ -34,5 +33,8 @@ export class EntityPayment {
 
   @Column()
   paymentStatus: string;
+
+  @Column()
+  enabled: boolean;
 }
 
