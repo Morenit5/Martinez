@@ -1,20 +1,18 @@
 import { ColumnNumericTransformer } from 'src/utils/ColumnNumericTransformer';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne } from 'typeorm';
 import { EntityInvoiceDetails } from './InvoiceDetails.entity';
 import { EntityPayment } from './Payment.entity';
+import { EntityService } from './Service.entity';
 
 @Entity()
 export class EntityInvoice {
     @PrimaryGeneratedColumn()
     invoiceId: number;
 
-    @Column()
-    clientId: number;
-
-    @Column()
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     invoiceDate: Date;
 
-    @Column()
+    @Column({type: 'varchar', length: 40 })
     invoiceNumber: string;
 
     @Column('numeric', {
@@ -30,6 +28,9 @@ export class EntityInvoice {
     @OneToMany(() => EntityInvoiceDetails, invoiceDetail => invoiceDetail.invoiceDetailId)
     invoiceDetail: EntityInvoiceDetails[];
 
-    @Column()
+    @OneToOne(() => EntityService, service => service.serviceId)
+    service: EntityService;
+
+    @Column({ type: 'boolean', default: true })
     enabled: boolean;
 }

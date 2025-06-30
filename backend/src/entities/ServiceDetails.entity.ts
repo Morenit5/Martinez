@@ -11,17 +11,17 @@ export class EntityServiceDetail {
     @JoinColumn({ name: "serviceId" }) // Nombre de la columna en la tabla donde se une
     category: EntityService;
 
-    @Column()
+    @Column({ type: 'varchar', length: 150 })
     serviceType: string;
 
-    @Column()
+    @Column({ type: 'varchar', length: 400 })
     description: string;
 
-    @Column()
+    @Column() // unidad de medida litros, metros, piezas
     unitMeasurement: number;
 
-    @Column()
-    quantity: string;
+    @Column() // la cantidad que se uso de cada servicio
+    quantity: number;
 
     @Column('numeric', {
         precision: 7,
@@ -30,7 +30,6 @@ export class EntityServiceDetail {
     })
     price: number;
 
-    @Column()
+    @Column({ type: 'boolean', default: true })
     enabled: boolean;
-
 }

@@ -11,7 +11,7 @@ export class EntityInvoiceDetails {
     @JoinColumn({ name: "invoiceId" }) // Nombre de la columna en la tabla donde se une
     category: EntityInvoice;
 
-    @Column()
+    @Column({ type: 'varchar', length: 300 })
     concept: string;
 
     @Column('numeric', {
@@ -31,6 +31,6 @@ export class EntityInvoiceDetails {
     })
     subtotal: number;
 
-    @Column()
+    @Column({ type: 'boolean', default: true })
     enabled: boolean;
 }
