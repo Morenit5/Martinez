@@ -20,12 +20,12 @@ export class AppComponent implements OnInit, OnDestroy {
   title = 'angular-boilerplate';
 
   constructor(
-    private readonly _router: Router,
-    private readonly _titleService: Title,
-    private readonly _translateService: TranslateService,
-    private readonly _i18nService: I18nService,
-    private readonly _socketService: SocketIoService,
-    private readonly _updateService: AppUpdateService,
+    private readonly router: Router,
+    private readonly titleService: Title,
+    private readonly translateService: TranslateService,
+    private readonly i18nService: I18nService,
+    private readonly socketService: SocketIoService,
+    private readonly updateService: AppUpdateService,
   ) {}
 
   ngOnInit() {
@@ -35,21 +35,19 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     // Initialize i18nService with default language and supported languages
-    this._i18nService.init(environment.defaultLanguage, environment.supportedLanguages);
+    this.i18nService.init(environment.defaultLanguage, environment.supportedLanguages);
 
-    const onNavigationEnd = this._router.events.pipe(filter((event) => event instanceof NavigationEnd));
+    const onNavigationEnd = this.router.events.pipe(filter((event) => event instanceof NavigationEnd));
 
-    merge(this._translateService.onLangChange, onNavigationEnd)
-      .pipe(untilDestroyed(this))
-      .subscribe((event) => {
-        const titles = this.getTitle(this._router.routerState, this._router.routerState.root);
+    merge(this.translateService.onLangChange, onNavigationEnd).pipe(untilDestroyed(this)).subscribe((event) => {
+        const titles = this.getTitle(this.router.routerState, this.router.routerState.root);
 
         if (titles.length === 0) {
-          this._titleService.setTitle(this._translateService.instant('Home'));
+          this.titleService.setTitle(this.translateService.instant('Home'));
         } else {
-          const translatedTitles = titles.map((titlePart) => this._translateService.instant(titlePart));
+          const translatedTitles = titles.map((titlePart) => this.translateService.instant(titlePart));
           const allTitlesSame = translatedTitles.every((title, _, arr) => title === arr[0]);
-          this._titleService.setTitle(allTitlesSame ? translatedTitles[0] : translatedTitles.join(' | '));
+          this.titleService.setTitle(allTitlesSame ? translatedTitles[0] : translatedTitles.join(' | '));
         }
 
         if (event['lang']) {
@@ -59,10 +57,10 @@ export class AppComponent implements OnInit, OnDestroy {
       });
 
     // Connect to Socket
-    this._socketService.connect();
+    this.socketService.connect();
 
     // update service
-    this._updateService.subscribeForUpdates();
+    this.updateService.subscribeForUpdates();
   }
 
   getTitle(state: any, parent: any): any[] {
@@ -78,6 +76,6 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this._i18nService.destroy();
+    this.i18nService.destroy();
   }
 }

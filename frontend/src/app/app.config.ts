@@ -8,7 +8,7 @@ import { ShellModule } from './shell/shell.module';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { ApiPrefixInterceptor, ErrorHandlerInterceptor } from '@core/interceptors';
 import { RouteReusableStrategy } from '@core/helpers';
-import { provideServiceWorker } from '@angular/service-worker';
+//import { provideServiceWorker } from '@angular/service-worker';
 import { provideHotToastConfig } from '@ngneat/hot-toast';
 import { SocketIoModule } from '@core/socket-io';
 
@@ -33,12 +33,12 @@ export const appConfig: ApplicationConfig = {
       }),
     ),
 
-    // provideServiceWorker is required for Angular's service workers
+    /* provideServiceWorker is required for Angular's service workers
     provideServiceWorker('ngsw-worker.js', {
       enabled: environment.production,
       scope: '/',
       registrationStrategy: 'registerWhenStable:30000',
-    }),
+    }),*/
     // provideRouter is required for Angular's router with additional configuration
     provideRouter(
       routes,

@@ -1,28 +1,3 @@
-# <p align="center" style="font-size:40px; font-weight: bold;">Angular Boilerplate</p>
-
-<p align="center">
-     <img src="public/icons/icon-512x512.png" alt="angular" width="90">
-     <img src="https://cdn-icons-png.flaticon.com/512/1408/1408941.png" alt="document" width="90">
-</p>
-
-> ### A Fully-Configured Angular 19 Boilerplate for Enterprise-Grade Applications
-
----
-
-[![Netlify Status](https://api.netlify.com/api/v1/badges/3f3d0969-3549-4300-863d-06a1d6785cd0/deploy-status)](https://app.netlify.com/sites/angular-boiler-palte/deploys)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![commitizen](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg?style=flat-square)]()
-[![PRs](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)]()
-
-## [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/arslanameer)
-
-- ⬇️ Older Versions
-  - [Angular 18 Branch](https://github.com/ArslanAmeer/angular-boilerplate/tree/angular-v18)
-  - [Angular 16 Branch](https://github.com/ArslanAmeer/angular-boilerplate/tree/angular-v16)
-
-Get started fast with this **Angular 19** boilerplate, crafted for **enterprise-level scalability**. It integrates critical features like **authentication**, **lazy loading**, **real-time socket communication**, **service workers**, **shell layout (header+sidebar)** making it ready to handle everything from SaaS platforms to enterprise dashboards. Built on the latest **Angular 19**, this template is packed with the newest capabilities and ensures that you adhere to **modern development best practices**.
-
-With a solid foundation of **PWA (Progressive Web App)**, **authentication**, **role-based permissions**, **HTTP interceptors**, **socket integration**, and more, this boilerplate takes care of the core setup so you can focus on building features.
 
 ### Key Features:
 
@@ -69,17 +44,6 @@ This boilerplate enforces **strict best practices** and includes a configured **
 - **Error Prevention**: Detects common issues early on, such as missing type declarations or direct DOM manipulations.
 - **Security Focused**: The configuration includes security-related rules to avoid risky code patterns.
 
-### Why Choose This Boilerplate?
-
-This Angular 19 boilerplate goes beyond just being a starting template—it's a **fully equipped foundation** for any **enterprise-level project**. From **fully configured authentication** and **lazy loading** to **role-based permissions** and **real-time communication**, it covers the most common requirements out-of-the-box.
-
-By enforcing **best coding practices** and strict **ESLint rules**, the boilerplate guarantees that every contributor to your project adheres to **high development standards**. Plus, the **modular, scalable architecture** and **cutting-edge Angular features** ensure that this project grows with you.
-
-Whether you’re developing a SaaS platform, building a dynamic web app, or designing an enterprise-level solution, this boilerplate gives you the tools you need—fast.
-
-### Continuous Updates
-
-This project will be regularly updated with the latest **Angular** releases, ensuring compatibility with the latest features and security updates. Stay tuned for new enhancements and features as they are added based on evolving development needs.
 
 ### Demo:
 
@@ -136,32 +100,3 @@ We have several documented helper and utility functions that play a big part of 
 
 ---
 
-## 📜 Change Logs:
-
-_(Latest)_
-
-<p align="right"> &nbsp;</p>
-
-## [Version 0.0.0] - 2024-10-05
-
-### Added
-
-### Changed
-
-### Fixed
-
----
-
-<p align="right"> &nbsp;</p>
-
-_You can see all change logs [Here](/CHANGELOG.md)._
-
-<p align="right"> &nbsp;</p>
-
----
-
-Author:
-
-[Arslan Ameer](www.arslanameer.com) | [GitHub](https://github.com/ArslanAmeer)
-
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/arslanameer)
