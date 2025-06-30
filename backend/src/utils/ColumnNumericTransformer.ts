@@ -4,6 +4,16 @@ export class ColumnNumericTransformer {
     return data;
   }
   from(data: string): number {
-    return parseFloat(data);
+
+    //trycatch revisar si falla el  parseFloat
+    try
+    {
+      return parseFloat(data);
+    }
+    catch (error)
+    {
+      console.log(error);
+      return 0;
+    }
   }
 }

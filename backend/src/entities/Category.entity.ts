@@ -6,16 +6,15 @@ export class EntityCategory {
   @PrimaryGeneratedColumn()
   categoryId: number;
 
-  @Column()
+  @Column({ type: 'varchar', length: 50 })
   categoryType: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 80 })
   name: string;
 
   @OneToMany(() => EntityTool, tool => tool.categoryId)
   tool: EntityTool[];
 
-  @Column()
+  @Column({ type: 'boolean', default: true })
   enabled: boolean;
-
 }
