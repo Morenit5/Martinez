@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, HttpException, HttpStatus } from '@nestjs/common';
 import { ServiceCategory } from 'src/services/Category.service';
 import { EntityCategory } from 'src/entities/Category.entity';
+import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 
 @Controller('category')
 export class ControllerCategory {
-  constructor(private readonly serviceCategory: ServiceCategory) { }
+  newCategory: EntityCategory;
+
+  constructor(private readonly serviceCategory: ServiceCategory, private readonly exceptions: TypeORMExceptions) { }
 
   @Get()
   findAll(): Promise<EntityCategory[]> {
@@ -29,34 +32,31 @@ export class ControllerCategory {
   remove(@Param('categoryId') id: string): Promise<void> {
     return this.serviceCategory.remove(+id);
   }
-  // a ver si está bien :(
+
+
   @Put(':id')
-  update(@Param('id') categoryId: string, @Body() category /*: EntityCategory*/) {
+  async update(@Param('id') categoryId: string, @Body() category) {
 
-    // como recibimos el objeto
-    /*console.log(categoryId); // SI NO ES OBJETO NO SE CONVIERTE, SE PONEN DIRECTAMENTE
-    //console.log(JSON.stringify(category)); //SI ES UN OBJETO LO CONVERTIMOS EN JASON*/
+    try {
+      this.newCategory = category;
+    } catch (error) {
+      throw new HttpException({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: "Internal error while updating"
+      },
+        HttpStatus.INTERNAL_SERVER_ERROR, {
+        cause: error
+      });
+    }
 
-    let bObjeto: any = '';
-    //let newCategory: EntityCategory = category;
-    try
-    {
-      let newCategory: EntityCategory = category;
-      //return this.serviceCategory.update(categoryId, newCategory);
-      bObjeto = this.serviceCategory.update(categoryId, newCategory);
-      console.log(bObjeto);
-      bObjeto.then((value) => { console.log(value); /* Logs "Data from Promise" after 1 second*/ });
-    }
-    catch (error)
-    {
-      //verificamos si el cuerpo se encuentra vacio 
-      if (bObjeto.affected === 0) { throw new NotFoundException('Categoría ${id} no existe'); }
-      //record inexistente //no hay record para actualizar porque no existe
-      if (!bObjeto) { throw new NotFoundException('Categoría con ${id} no encontrada'); }
-      // el valor a cotejar es de otro tipo al esperado
-      if(bObjeto != category) { throw new NotFoundException('La Categoría ${id} no puede ser actualizada.'); }
-      console.log(error);
-    }
-    return bObjeto;
+    await this.serviceCategory.update(categoryId, this.newCategory)
+      .then((result: any) => {
+        console.log("Result:", result);
+        return result;
+      }).catch((error: any) => {
+        this.exceptions.sendException(error);
+      });
+
   }
+
 }

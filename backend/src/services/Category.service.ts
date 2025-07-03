@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { EntityCategory } from '../entities/Category.entity';
 
 @Injectable()
@@ -25,26 +25,22 @@ export class ServiceCategory {
     await this.categoryRepository.delete(id);
   }
 
-  update(categoryId: string, category: EntityCategory) {
+  async update(categoryId: string, category: EntityCategory): Promise<UpdateResult> {
 
-     let cualquieraServices: any = '';
-    try
-    {
-      cualquieraServices = this.categoryRepository.update(categoryId, category);
-      //return this.categoryRepository.update(categoryId, category);
+     return await this.categoryRepository.update(categoryId, category);
+     /*.catch(error => {
+        //console.error("Ocurrio un error:", error);
+        throw new HttpException({
+          status: HttpStatus.FORBIDDEN,
+          error: 'Mensaje customizado del service'
+        },
+          HttpStatus.FORBIDDEN, {
+          cause: error
+        }
+        );
 
-      cualquieraServices.then((value) => {
-        console.log(value); // Logs "Data from Promise" after 1 second
-      });
+      });*/
 
-      return cualquieraServices;
-    }
-    catch(error)
-    {
-      console.log("Atrapando la calabaceada :D en el service ");
-      console.log(error);
-      return error;
-    }
     
   }
 

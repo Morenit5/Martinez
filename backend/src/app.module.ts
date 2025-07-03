@@ -14,8 +14,8 @@ import { InvoiceModule } from './modules/Invoice.module';
 import { PaymentModule } from './modules/Payment.module';
 import { ServiceModule } from './modules/Service.module';
 import { ToolModule } from './modules/Tool.module';
+import { TypeORMExceptions } from './exceptions/TypeORMExceptions';
 import { UserModule } from './modules/User.module';
-
 //import { TypeOrmModule } from '@nestjs/typeorm';
 //import { provideHttpClient } from '@angular/common/http';
 
@@ -41,7 +41,7 @@ let importModules =[
     ...importModules
   ],
   controllers: [AppController],
-  providers: [AppService, DbUtilService_Cls,ColumnNumericTransformer], /*Para que otras clases los puedan encontrar */
+  providers: [AppService, DbUtilService_Cls,ColumnNumericTransformer,TypeORMExceptions], /*Para que otras clases los puedan encontrar */
 })
 
 export class AppModule {
