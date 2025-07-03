@@ -3,6 +3,7 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne } from 'typ
 import { EntityInvoiceDetails } from './InvoiceDetails.entity';
 import { EntityPayment } from './Payment.entity';
 import { EntityService } from './Service.entity';
+import { IsBoolean, IsNotEmpty } from 'class-validator';
 
 @Entity()
 export class EntityInvoice {
@@ -13,6 +14,7 @@ export class EntityInvoice {
     invoiceDate: Date;
 
     @Column({type: 'varchar', length: 40 })
+    @IsNotEmpty({ message: 'El número de factura es obligatorio.' })
     invoiceNumber: string;
 
     @Column('numeric', {
@@ -32,5 +34,6 @@ export class EntityInvoice {
     service: EntityService;
 
     @Column({ type: 'boolean', default: true })
+    @IsBoolean({ message: 'El campo "activo" debe ser verdadero o falso' })
     enabled: boolean;
 }
