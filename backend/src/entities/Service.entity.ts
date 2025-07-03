@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { EntityClient } from './Client.entity';
 import { EntityServiceDetail } from './ServiceDetails.entity';
+import { EntityInvoice } from './Invoice.entity';
 
 @Entity()
 export class EntityService {
@@ -13,8 +14,8 @@ export class EntityService {
     @Column()
     serviceDate: Date;
 
-    @Column()
-    invoiceId: number;
+    @OneToOne(() => EntityInvoice, invoice => invoice.invoiceId)
+    invoice: EntityInvoice;
 
     @Column()
     status: string;

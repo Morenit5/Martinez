@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
+//import { UsersModule } from './users/users.module';
 import { DatabaseModule_Cls } from './modules/database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { DbUtilService_Cls } from './db/db-util.service';
@@ -15,6 +15,7 @@ import { PaymentModule } from './modules/Payment.module';
 import { ServiceModule } from './modules/Service.module';
 import { ToolModule } from './modules/Tool.module';
 import { TypeORMExceptions } from './exceptions/TypeORMExceptions';
+import { UserModule } from './modules/User.module';
 //import { TypeOrmModule } from '@nestjs/typeorm';
 //import { provideHttpClient } from '@angular/common/http';
 
@@ -23,7 +24,7 @@ let importModules =[
     isGlobal :true,
   }),
   DatabaseModule_Cls,
-  UsersModule,
+  /*UsersModule,*/
   CategoryModule,
   ClientModule,
   InvoiceDetailModule,
@@ -32,6 +33,7 @@ let importModules =[
   PaymentModule,
   ServiceModule,
   ToolModule,
+  UserModule
 ];
 
 @Module({

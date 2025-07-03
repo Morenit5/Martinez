@@ -7,7 +7,7 @@ export class EntityPayment {
   @PrimaryGeneratedColumn()
   paymentId: number;
 
-  @Column()
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   paymentDate: Date;
 
   @Column('numeric', {
@@ -17,7 +17,7 @@ export class EntityPayment {
   })
   paymentAmount: number;
 
-  @Column()
+  @Column({ type: 'varchar', length: 30 })
   paymentMethod: string;
 
   @ManyToOne(() => EntityInvoice, invoice => invoice.invoiceId)
@@ -31,10 +31,10 @@ export class EntityPayment {
   })
   taxAmount: number;
 
-  @Column()
+  @Column({ type: 'varchar', length: 40 })
   paymentStatus: string;
 
-  @Column()
+  @Column({ type: 'boolean', default: true })
   enabled: boolean;
 }
 

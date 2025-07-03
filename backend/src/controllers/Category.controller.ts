@@ -21,6 +21,10 @@ export class ControllerCategory {
 
   @Post()
   create(@Body() category: EntityCategory): Promise<EntityCategory> {
+
+    /*if (error.code === '23505') {
+        throw new BadRequestException('Categoría duplicada.');
+      }*/
     return this.serviceCategory.create(category);
   }
 
@@ -28,6 +32,7 @@ export class ControllerCategory {
   remove(@Param('categoryId') id: string): Promise<void> {
     return this.serviceCategory.remove(+id);
   }
+
 
   @Put(':id')
   async update(@Param('id') categoryId: string, @Body() category) {
@@ -51,6 +56,7 @@ export class ControllerCategory {
       }).catch((error: any) => {
         this.exceptions.sendException(error);
       });
+
   }
 
 }
