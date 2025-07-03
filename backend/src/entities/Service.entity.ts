@@ -2,13 +2,15 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMan
 import { EntityClient } from './Client.entity';
 import { EntityServiceDetail } from './ServiceDetails.entity';
 import { EntityInvoice } from './Invoice.entity';
+import { IsBoolean, IsNotEmpty } from 'class-validator';
 
 @Entity()
 export class EntityService {
     @PrimaryGeneratedColumn()
     serviceId: number;
 
-    @Column()
+    @Column({ type: 'varchar', length: 150 })
+    @IsNotEmpty({ message: 'El nombre del servicio es obligatorio.' })
     serviceName: string;
 
     @Column()
@@ -17,10 +19,12 @@ export class EntityService {
     @OneToOne(() => EntityInvoice, invoice => invoice.invoiceId)
     invoice: EntityInvoice;
 
-    @Column()
+    @Column({ type: 'varchar', length: 60 })
+    @IsNotEmpty({ message: 'El estatus del servicio es obligatorio.' })
     status: string;
 
-    @Column()
+    @Column({ type: 'varchar', length: 10 })
+    @IsNotEmpty({ message: 'El precio del servicio es obligatorio.' })
     price: string;
 
     @ManyToOne(() => EntityClient, client => client.clientId)
@@ -30,6 +34,8 @@ export class EntityService {
     @OneToMany(() => EntityServiceDetail, servicedetail => servicedetail.serviceDetailsId)
     servicedetail: EntityServiceDetail[];
 
-    @Column()
+    @Column({ type: 'boolean', default: true })
+    @IsBoolean({ message: 'El campo "activo" debe ser verdadero o falso' })
     enabled: boolean;
+  
 }
