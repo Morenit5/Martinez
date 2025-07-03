@@ -10,6 +10,9 @@ async function bootstrap() {
   //const app = await NestFactory.create(AppModule);
   const app = await NestFactory.create(AppModule, { cors: true });
   await app.listen(process.env.PORT ?? 3001);
+  process.on('unhandledRejection', (e) => {
+    console.log(e);
+   });
   console.log('La aplicación ya esta corriendo http://localhost:3001/');
 }
 
