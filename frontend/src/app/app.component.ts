@@ -6,8 +6,8 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { environment } from '@env/environment';
 import { filter, merge } from 'rxjs';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { AppUpdateService, Logger } from '@core/services';
-import { SocketIoService } from '@core/socket-io';
+import { Logger } from '@core/services';
+
 
 @UntilDestroy()
 @Component({
@@ -17,16 +17,11 @@ import { SocketIoService } from '@core/socket-io';
   styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'angular-boilerplate';
+  title = 'Martinez Landscaping';
 
-  constructor(
-    private readonly _router: Router,
-    private readonly _titleService: Title,
-    private readonly _translateService: TranslateService,
-    private readonly _i18nService: I18nService,
-    private readonly _socketService: SocketIoService,
-    private readonly _updateService: AppUpdateService,
-  ) {}
+  constructor(private readonly router: Router, private readonly titleService: Title, private readonly translateService: TranslateService, private readonly i18nService: I18nService,) {
+    //metodo constructor
+  }
 
   ngOnInit() {
     // Setup logger
@@ -35,21 +30,19 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     // Initialize i18nService with default language and supported languages
-    this._i18nService.init(environment.defaultLanguage, environment.supportedLanguages);
+    this.i18nService.init(environment.defaultLanguage, environment.supportedLanguages);
 
-    const onNavigationEnd = this._router.events.pipe(filter((event) => event instanceof NavigationEnd));
+    const onNavigationEnd = this.router.events.pipe(filter((event) => event instanceof NavigationEnd));
 
-    merge(this._translateService.onLangChange, onNavigationEnd)
-      .pipe(untilDestroyed(this))
-      .subscribe((event) => {
-        const titles = this.getTitle(this._router.routerState, this._router.routerState.root);
+    merge(this.translateService.onLangChange, onNavigationEnd).pipe(untilDestroyed(this)).subscribe((event) => {
+        const titles = this.getTitle(this.router.routerState, this.router.routerState.root);
 
         if (titles.length === 0) {
-          this._titleService.setTitle(this._translateService.instant('Home'));
+          this.titleService.setTitle(this.translateService.instant('Home'));
         } else {
-          const translatedTitles = titles.map((titlePart) => this._translateService.instant(titlePart));
+          const translatedTitles = titles.map((titlePart) => this.translateService.instant(titlePart));
           const allTitlesSame = translatedTitles.every((title, _, arr) => title === arr[0]);
-          this._titleService.setTitle(allTitlesSame ? translatedTitles[0] : translatedTitles.join(' | '));
+          this.titleService.setTitle(allTitlesSame ? translatedTitles[0] : translatedTitles.join(' | '));
         }
 
         if (event['lang']) {
@@ -57,12 +50,7 @@ export class AppComponent implements OnInit, OnDestroy {
           // window.location.reload();
         }
       });
-
-    // Connect to Socket
-    this._socketService.connect();
-
-    // update service
-    this._updateService.subscribeForUpdates();
+    
   }
 
   getTitle(state: any, parent: any): any[] {
@@ -78,6 +66,6 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this._i18nService.destroy();
+    this.i18nService.destroy();
   }
 }

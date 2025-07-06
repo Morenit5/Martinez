@@ -3,38 +3,31 @@
 ## Requirements
 
 - Node 20+
-- Yarn 1.22+
 
 ## Install dependencies
 
 To install all dependencies, run:
 
 ```bash
-yarn install
+npm install
 ```
 
 ### Compiles and serve for development
 
 ```bash
-yarn start
+npm start
 ```
 
 ### Compiles and serve for development with app accessible over network
 
 ```bash
-yarn serve
+npm serve
 ```
 
 ### Compiles and minifies for production
 
 ```bash
-yarn build
-```
-
-### Lints and fixes files
-
-```bash
-yarn lint
+npm build
 ```
 
 ---
