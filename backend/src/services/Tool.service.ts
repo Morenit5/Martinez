@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { EntityTool } from '../entities/Tool.entity';
 
 @Injectable()
@@ -21,7 +21,11 @@ export class ServiceTool {
     return this.toolRepository.save(tool);
   }
 
-  async remove(id: number): Promise<void> {
+  async delete(id: number): Promise<void> {
     await this.toolRepository.delete(id);
+  }
+
+  async update(id: string, entity: EntityTool): Promise<UpdateResult> {
+    return await this.toolRepository.update(id, entity);
   }
 }

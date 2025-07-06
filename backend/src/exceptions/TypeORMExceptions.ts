@@ -39,7 +39,7 @@ export class TypeORMExceptions {
 
         } else if (error instanceof QueryFailedError) { // Handle specific database query errors
             this.httpStatus = HttpStatus.BAD_REQUEST;
-            this.errMsg = "Query failed with error";
+            this.errMsg = "Query failed with error "+ error;
             this.cause = error;
             //console.error('TypeORM QueryFailedError:', error.message); // find out what is the error QueryFailedErrors
         

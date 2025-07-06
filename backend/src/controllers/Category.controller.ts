@@ -1,12 +1,12 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, HttpException, HttpStatus, NotFoundException, InternalServerErrorException, ParseIntPipe } from '@nestjs/common';
 import { ServiceCategory } from 'src/services/Category.service';
 import { EntityCategory } from 'src/entities/Category.entity';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
+import { Console } from 'console';
 
 @Controller('category')
 export class ControllerCategory {
   newCategory: EntityCategory;
-
   constructor(private readonly serviceCategory: ServiceCategory, private readonly exceptions: TypeORMExceptions) { }
 
   @Get()
@@ -20,19 +20,33 @@ export class ControllerCategory {
   }
 
   @Post()
-  create(@Body() category: EntityCategory): Promise<EntityCategory> {
+  async create(@Body() category: EntityCategory) {
+
+    try {
+      this.newCategory = category;
+    } catch (error) {
+      throw new HttpException({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: "Internal error while creating"
+      },
+        HttpStatus.INTERNAL_SERVER_ERROR, {
+        cause: error
+      });
+    }
+
+    await this.serviceCategory.create(this.newCategory)
+      .then((result: any) => {
+        console.log("Result:", result);
+        return result;
+      }).catch((error: any) => {
+        this.exceptions.sendException(error);
+      });
 
     /*if (error.code === '23505') {
         throw new BadRequestException('Categoría duplicada.');
-      }*/
-    return this.serviceCategory.create(category);
+      }
+    return this.serviceCategory.create(category);*/
   }
-
-  @Delete(':categoryId')
-  remove(@Param('categoryId') id: string): Promise<void> {
-    return this.serviceCategory.remove(+id);
-  }
-
 
   @Put(':id')
   async update(@Param('id') categoryId: string, @Body() category) {
@@ -56,7 +70,24 @@ export class ControllerCategory {
       }).catch((error: any) => {
         this.exceptions.sendException(error);
       });
-
   }
+   
+  /*@Delete(':id') // Este metodo no se usara
+  async remove(@Param('id') categoryId: string)
+  {
+    console.log("si entra aqui" + categoryId);
+     try
+     {
+      await this.serviceCategory.delete(categoryId); // También puedes usar `remove(entity)` si lo necesitas
+      return `Categoria ${categoryId} eliminada correctamente`;
 
+    } catch (error){
+      console.error('Error al eliminar categoria:', error);
+
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Error interno al eliminar la categoria');
+    }
+  }*/
 }
