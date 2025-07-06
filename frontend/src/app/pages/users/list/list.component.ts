@@ -17,6 +17,7 @@ export class ListComponent implements OnInit {
   private readonly _toast = inject(HotToastService);
 
   ngOnInit() {
+    
     this._useRandomUser.getAllUsers().subscribe({
       next: (users) => {
         this.users = users;
@@ -29,6 +30,6 @@ export class ListComponent implements OnInit {
   }
 
   userClicked() {
-    this._toast.show('User clicked');
+    this._toast.show('Se hizo click en el usuario, aqui se debe mostar mas info tal vez centrar el toast');
   }
 }

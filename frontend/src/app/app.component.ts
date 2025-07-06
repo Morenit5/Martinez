@@ -6,8 +6,8 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { environment } from '@env/environment';
 import { filter, merge } from 'rxjs';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { AppUpdateService, Logger } from '@core/services';
-import { SocketIoService } from '@core/socket-io';
+import { Logger } from '@core/services';
+
 
 @UntilDestroy()
 @Component({
@@ -17,16 +17,11 @@ import { SocketIoService } from '@core/socket-io';
   styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'angular-boilerplate';
+  title = 'Martinez Landscaping';
 
-  constructor(
-    private readonly router: Router,
-    private readonly titleService: Title,
-    private readonly translateService: TranslateService,
-    private readonly i18nService: I18nService,
-    private readonly socketService: SocketIoService,
-    private readonly updateService: AppUpdateService,
-  ) {}
+  constructor(private readonly router: Router, private readonly titleService: Title, private readonly translateService: TranslateService, private readonly i18nService: I18nService,) {
+    //metodo constructor
+  }
 
   ngOnInit() {
     // Setup logger
@@ -55,12 +50,7 @@ export class AppComponent implements OnInit, OnDestroy {
           // window.location.reload();
         }
       });
-
-    // Connect to Socket
-    this.socketService.connect();
-
-    // update service
-    this.updateService.subscribeForUpdates();
+    
   }
 
   getTitle(state: any, parent: any): any[] {

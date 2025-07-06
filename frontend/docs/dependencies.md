@@ -11,7 +11,7 @@ This app has third-party dependencies (both production and development). These d
 - [@ngx-translate/http-loader](https://www.npmjs.com/package/@ngx-translate/http-loader): A library to load translations from HTTP requests.
 - [bootstrap](https://www.npmjs.com/package/bootstrap): Popular front-end framework for responsive design.
 - [sanitize.css](https://github.com/csstools/sanitize.css): A modern CSS reset.
-- [socket.io-client](https://www.npmjs.com/package/socket.io-client): Socket.IO client for real-time bidirectional communication.
+
 
 ## Dev Dependencies
 
