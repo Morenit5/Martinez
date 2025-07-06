@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, HttpException, HttpStatus, Put } from '@nestjs/common';
 import { ServiceDetailService } from 'src/services/ServiceDetail.service';
 import { EntityServiceDetail } from 'src/entities/ServiceDetails.entity';
+import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 
 @Controller('servicedetail')
 export class ControllerServiceDetail {
-  constructor(private readonly serviceDetailService:ServiceDetailService) {}
+
+  newServiceDetail: EntityServiceDetail;
+  constructor(private readonly serviceDetailService: ServiceDetailService, private readonly exceptions: TypeORMExceptions) { }
 
   @Get()
   findAll(): Promise<EntityServiceDetail[]> {
@@ -12,17 +15,61 @@ export class ControllerServiceDetail {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<EntityServiceDetail|null> {
+  findOne(@Param('id') id: string): Promise<EntityServiceDetail | null> {
     return this.serviceDetailService.findOne(+id);
   }
 
   @Post()
-  create(@Body() invoiceDetail: EntityServiceDetail): Promise<EntityServiceDetail> {
-    return this.serviceDetailService.create(invoiceDetail);
+  async create(@Body() serviceDetail: EntityServiceDetail): Promise<undefined> {
+    
+    try {
+      this.newServiceDetail = serviceDetail;
+    } catch (error) {
+      throw new HttpException({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: "Internal error while creating"
+      },
+        HttpStatus.INTERNAL_SERVER_ERROR, {
+        cause: error
+      });
+    }
+
+    await this.serviceDetailService.create(this.newServiceDetail)
+      .then((result: any) => {
+        console.log("Result:", result);
+        return result;
+      }).catch((error: any) => {
+        this.exceptions.sendException(error);
+      });
+
   }
 
-  @Delete(':id')
+ /* @Delete(':id')
   remove(@Param('id') id: string): Promise<void> {
-    return this.serviceDetailService.remove(+id);
-  }
+    return this.serviceDetailService.delete(+id);
+  }*/
+
+  @Put(':id')
+    async update(@Param('id') serviceDetailId: string, @Body() serviceDetail) {
+  
+      try {
+        this.newServiceDetail = serviceDetail;
+      } catch (error) {
+        throw new HttpException({
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: "Internal error while updating"
+        },
+          HttpStatus.INTERNAL_SERVER_ERROR, {
+          cause: error
+        });
+      }
+  
+      await this.serviceDetailService.update(serviceDetailId, this.newServiceDetail)
+        .then((result: any) => {
+          console.log("Result:", result);
+          return result;
+        }).catch((error: any) => {
+          this.exceptions.sendException(error);
+        });
+    }
 }

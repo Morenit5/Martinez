@@ -41,6 +41,6 @@ export class EntityClient {
     service: EntityClient[];
 
     @Column({ type: 'boolean', default: true })
-    @IsBoolean({ message: 'El campo "activo" debe ser verdadero o falso' })
+    /*@IsBoolean({ message: 'El campo "activo" debe ser verdadero o falso' })*/
     enabled: boolean;
 }

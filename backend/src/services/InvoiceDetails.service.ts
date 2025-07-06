@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { EntityInvoiceDetails } from '../entities/InvoiceDetails.entity';
 
 @Injectable()
@@ -20,7 +20,11 @@ export class ServiceInvoiceDetail {
     return this.invoiceDetailRepository.save(invoiceDetail);
   }
 
-  async remove(id: number): Promise<void> {
+  async delete(id: number): Promise<void> {
     await this.invoiceDetailRepository.delete(id);
+  }
+
+  async update(id: string, entity: EntityInvoiceDetails): Promise<UpdateResult> {
+    return await this.invoiceDetailRepository.update(id, entity);
   }
 }
