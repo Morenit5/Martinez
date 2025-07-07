@@ -22,7 +22,7 @@ export class EntityPayment {
   @IsNotEmpty({ message: 'El método de pago es obligatorio.' })
   paymentMethod: string;
 
-  @ManyToOne(() => EntityInvoice, invoice => invoice.invoiceId)
+  @ManyToOne(() => EntityInvoice, invoice => invoice.invoiceId, { onDelete: "CASCADE" })
   @JoinColumn({ name: "invoiceId" }) // Nombre de la columna en la tabla donde se une
   invoice: EntityInvoice;
 
@@ -38,7 +38,7 @@ export class EntityPayment {
   paymentStatus: string;
 
   @Column({ type: 'boolean', default: true })
-  @IsBoolean({ message: 'El campo "activo" debe ser verdadero o falso' })
+  /*@IsBoolean({ message: 'El campo "activo" debe ser verdadero o falso' })*/
   enabled: boolean;
 }
 

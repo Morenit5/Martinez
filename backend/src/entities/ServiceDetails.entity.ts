@@ -8,7 +8,7 @@ export class EntityServiceDetail {
     @PrimaryGeneratedColumn()
     serviceDetailsId: number;
 
-    @ManyToOne(() => EntityService, service => service.serviceId)
+    @ManyToOne(() => EntityService, service => service.serviceId, { onDelete: "CASCADE" })
     @JoinColumn({ name: "serviceId" }) // Nombre de la columna en la tabla donde se une
     category: EntityService;
 
@@ -36,6 +36,6 @@ export class EntityServiceDetail {
     price: number;
 
     @Column({ type: 'boolean', default: true })
-    @IsBoolean({ message: 'El campo "activo" debe ser verdadero o falso' })
+    /*@IsBoolean({ message: 'El campo "activo" debe ser verdadero o falso' })*/
     enabled: boolean;
 }
