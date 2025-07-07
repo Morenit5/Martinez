@@ -8,7 +8,7 @@ export class EntityInvoiceDetails {
     @PrimaryGeneratedColumn()
     invoiceDetailId: number;
 
-    @ManyToOne(() => EntityInvoice, invoice => invoice.invoiceId)
+    @ManyToOne(() => EntityInvoice, invoice => invoice.invoiceId, { onDelete: "CASCADE" })
     @JoinColumn({ name: "invoiceId" }) // Nombre de la columna en la tabla donde se une
     category: EntityInvoice;
 
@@ -35,6 +35,6 @@ export class EntityInvoiceDetails {
     subtotal: number;
 
     @Column({ type: 'boolean', default: true })
-    @IsBoolean({ message: 'El campo "activo" debe ser verdadero o falso' })
+    /*@IsBoolean({ message: 'El campo "activo" debe ser verdadero o falso' })*/
     enabled: boolean;
 }

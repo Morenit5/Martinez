@@ -27,7 +27,7 @@ export class EntityService {
     @IsNotEmpty({ message: 'El precio del servicio es obligatorio.' })
     price: string;
 
-    @ManyToOne(() => EntityClient, client => client.clientId)
+    @ManyToOne(() => EntityClient, client => client.clientId, { onDelete: "CASCADE" })
     @JoinColumn({ name: "clientId" }) // Nombre de la columna en la tabla donde se une
     client: EntityClient;
 
@@ -35,7 +35,7 @@ export class EntityService {
     servicedetail: EntityServiceDetail[];
 
     @Column({ type: 'boolean', default: true })
-    @IsBoolean({ message: 'El campo "activo" debe ser verdadero o falso' })
+    /*@IsBoolean({ message: 'El campo "activo" debe ser verdadero o falso' })*/
     enabled: boolean;
   
 }
