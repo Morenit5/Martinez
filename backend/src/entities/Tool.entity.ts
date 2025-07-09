@@ -22,7 +22,7 @@ export class EntityTool {
     @Column() //manyToOne
     categoryId: number;
 
-    @ManyToOne(() => EntityCategory, category => category.categoryId, { onDelete: "CASCADE" })
+    @ManyToOne(() => EntityCategory, category => category.categoryId, { onUpdate: "CASCADE" })
     @JoinColumn({ name: "categoryId" }) // Nombre de la columna en la tabla Category donde se une
     category: EntityCategory;
 

@@ -8,7 +8,7 @@ export class EntityServiceDetail {
     @PrimaryGeneratedColumn()
     serviceDetailsId: number;
 
-    @ManyToOne(() => EntityService, service => service.serviceId, { onDelete: "CASCADE" })
+    @ManyToOne(() => EntityService, service => service.serviceId, { onUpdate: "CASCADE" })
     @JoinColumn({ name: "serviceId" }) // Nombre de la columna en la tabla donde se une
     category: EntityService;
 
