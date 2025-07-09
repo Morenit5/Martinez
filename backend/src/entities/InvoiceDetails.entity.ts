@@ -8,7 +8,7 @@ export class EntityInvoiceDetails {
     @PrimaryGeneratedColumn()
     invoiceDetailId: number;
 
-    @ManyToOne(() => EntityInvoice, invoice => invoice.invoiceId, { onDelete: "CASCADE" })
+    @ManyToOne(() => EntityInvoice, invoice => invoice.invoiceId, { onUpdate: "CASCADE" })
     @JoinColumn({ name: "invoiceId" }) // Nombre de la columna en la tabla donde se une
     category: EntityInvoice;
 

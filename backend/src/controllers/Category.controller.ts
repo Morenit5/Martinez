@@ -1,12 +1,13 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, HttpException, HttpStatus, NotFoundException, InternalServerErrorException, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, HttpException, HttpStatus, NotFoundException, InternalServerErrorException, ParseIntPipe, Patch } from '@nestjs/common';
 import { ServiceCategory } from 'src/services/Category.service';
 import { EntityCategory } from 'src/entities/Category.entity';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
-import { Console } from 'console';
+import { ServiceTool } from 'src/services/Tool.service';
 
 @Controller('category')
 export class ControllerCategory {
   newCategory: EntityCategory;
+  newPartialCategory : Partial<EntityCategory>;
   constructor(private readonly serviceCategory: ServiceCategory, private readonly exceptions: TypeORMExceptions) { }
 
   @Get()
@@ -64,6 +65,32 @@ export class ControllerCategory {
     }
 
     await this.serviceCategory.update(categoryId, this.newCategory)
+      .then((result: any) => {
+        console.log("Result:", result);
+        return result;
+      }).catch((error: any) => {
+        this.exceptions.sendException(error);
+      });
+  }
+
+  /*Deshabilitar la categoria*/
+  @Patch(':id')
+  async patchCategory(@Param('id') categoryId: string, @Body() partialCategory: Partial<EntityCategory>) {
+
+    //console.log("ESTO LLEGA "+ categoryId + " " + JSON.stringify(partialCategory));
+    try {
+      this.newPartialCategory = partialCategory;
+    } catch (error) {
+      throw new HttpException({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: "Internal error while updating"
+      },
+        HttpStatus.INTERNAL_SERVER_ERROR, {
+        cause: error
+      });
+    }
+
+    await this.serviceCategory.patchCategory(categoryId, this.newPartialCategory)
       .then((result: any) => {
         console.log("Result:", result);
         return result;

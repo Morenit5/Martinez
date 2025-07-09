@@ -22,7 +22,7 @@ export class EntityPayment {
   @IsNotEmpty({ message: 'El método de pago es obligatorio.' })
   paymentMethod: string;
 
-  @ManyToOne(() => EntityInvoice, invoice => invoice.invoiceId, { onDelete: "CASCADE" })
+  @ManyToOne(() => EntityInvoice, invoice => invoice.invoiceId, { onUpdate: "CASCADE" })
   @JoinColumn({ name: "invoiceId" }) // Nombre de la columna en la tabla donde se une
   invoice: EntityInvoice;
 

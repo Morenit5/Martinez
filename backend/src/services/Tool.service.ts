@@ -28,4 +28,9 @@ export class ServiceTool {
   async update(id: string, entity: EntityTool): Promise<UpdateResult> {
     return await this.toolRepository.update(id, entity);
   }
+
+  findAllCat(categoryId: number) {
+   return this.toolRepository.find({ where: { categoryId: categoryId } });
+    //return this.toolRepository.find();
+  }
 }

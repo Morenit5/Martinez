@@ -20,7 +20,7 @@ export class EntityClient {
     address: string;
 
     @Column()
-    @IsNotEmpty({ message: 'Favor de escribir la Dirección es un campo obligatorio.' })
+    @IsNotEmpty({ message: 'Favor de escribir el Número Telefónico es un campo obligatorio.' })
     phone: number;
 
     @Column({ unique: true }) //para que el correo no se repita en la bd

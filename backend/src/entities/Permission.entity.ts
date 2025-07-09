@@ -14,7 +14,7 @@ export class EntityPermission {
     @Column({ type: 'boolean', default: true })
     active: boolean;
 
-    @ManyToOne(() => EntityRol, rol => rol.rolId, { onDelete: "CASCADE" })
+    @ManyToOne(() => EntityRol, rol => rol.rolId, { onUpdate: "CASCADE" })
     @JoinColumn({ name: "rolId" }) // Nombre de la columna en la tabla donde se une
     rol: EntityRol;
 

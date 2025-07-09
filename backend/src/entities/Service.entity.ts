@@ -27,7 +27,7 @@ export class EntityService {
     @IsNotEmpty({ message: 'El precio del servicio es obligatorio.' })
     price: string;
 
-    @ManyToOne(() => EntityClient, client => client.clientId, { onDelete: "CASCADE" })
+    @ManyToOne(() => EntityClient, client => client.clientId, { onUpdate: "CASCADE" })
     @JoinColumn({ name: "clientId" }) // Nombre de la columna en la tabla donde se une
     client: EntityClient;
 
