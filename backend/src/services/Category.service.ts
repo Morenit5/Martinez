@@ -1,10 +1,8 @@
-import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { EntityCategory } from '../entities/Category.entity';
 import { EntityTool } from 'src/entities/Tool.entity';
-import { stringify } from 'querystring';
-import { json } from 'stream/consumers';
 
 @Injectable()
 export class ServiceCategory {
@@ -23,11 +21,6 @@ export class ServiceCategory {
     return this.categoryRepository.save(category);
   }
 
-  /*async delete(categoryId: string) /*: Promise<undefined>* / 
-  {
-    await this.categoryRepository.delete(categoryId);
-  }*/
-
   async update(categoryId: string, category: EntityCategory): Promise<UpdateResult> {
 
     return await this.categoryRepository.update(categoryId, category);
@@ -35,6 +28,7 @@ export class ServiceCategory {
 
   async patchCategory(categoryId: string, partialCategory: Partial<EntityCategory>) {
 
+    // verificamos si la categoria cuenta con herramientas relacionadas
     const tools: EntityTool[] = await this.toolRepository.find({ where: [{ categoryId: Number(categoryId) }] }).then((result: any) => {
       // console.log(JSON.stringify(result));
       return result;
@@ -42,17 +36,20 @@ export class ServiceCategory {
       this.exceptions.sendException(error);
     });
 
+    //si la categoria es diferente o nulla, tiene herramientas relacionadas con categoria
     if (tools != undefined || tools != null) {
       //console.log(JSON.stringify(tools));
 
+      //realizamos un recorrido y actualizamos las herramientas a la categoria GENERAL (1)
       tools.forEach(async (tool) => {
         //console.log(`Tool : ${tool.categoryId}`);
-        var eTool : EntityTool = new EntityTool();
-        eTool.categoryId=1;
-        await this.toolRepository.update( tool.toolId, eTool);
+        var eTool: EntityTool = new EntityTool();
+        eTool.categoryId = 1;
+        //actualizamos la herramienta a categoria GENERAL
+        await this.toolRepository.update(tool.toolId, eTool);
       });
     }
-     return this.categoryRepository.update(categoryId, partialCategory);
+    return this.categoryRepository.update(categoryId, partialCategory);
 
   }
 }
