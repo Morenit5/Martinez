@@ -10,4 +10,9 @@ import { UntilDestroy } from '@ngneat/until-destroy';
 })
 export class HeaderComponent {
   menuHidden = true;
+
+
+  hide(){
+
+  }
 }
