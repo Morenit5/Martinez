@@ -12,8 +12,8 @@ import { Logger } from '@core/services';
 @UntilDestroy()
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, TranslateModule],
-  template: '<router-outlet></router-outlet>',
+  imports: [TranslateModule, RouterOutlet],
+  templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit, OnDestroy {

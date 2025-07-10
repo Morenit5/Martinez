@@ -22,23 +22,16 @@ export class SidebarComponent implements OnInit {
   sidebarExtendedItem = -1;
   navExpanded = true;
 
-  constructor(
-    private readonly _router: Router,
-    private readonly _credentialsService: CredentialsService,
-    public shellService: ShellService,
-  ) {
+  constructor(private readonly _router: Router, private readonly _credentialsService: CredentialsService, public shellService: ShellService) {
     this.sidebarItems = webSidebarMenuItems;
   }
 
   ngOnInit(): void {
     this.shellService.activeNavTab(this.sidebarItems, this.sidebarExtendedItem);
 
-    this._router.events
-      .pipe(untilDestroyed(this))
-      .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe(() => {
-        this.shellService.activeNavTab(this.sidebarItems, this.sidebarExtendedItem);
-      });
+    this._router.events.pipe(untilDestroyed(this)).pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
+      this.shellService.activeNavTab(this.sidebarItems, this.sidebarExtendedItem);
+    });
 
     this.shellService.navMode$.pipe(untilDestroyed(this)).subscribe((mode) => {
       /**

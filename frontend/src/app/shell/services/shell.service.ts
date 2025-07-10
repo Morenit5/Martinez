@@ -27,19 +27,16 @@ export class Shell {
   }
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class ShellService {
   navicon = new BehaviorSubject<NavMode>(NavMode.Free);
   navModeSubject = new BehaviorSubject<NavMode>(NavMode.Free);
   navMode$ = this.navModeSubject.asObservable();
   navicon$ = this.navModeSubject.asObservable();
 
-  constructor(
-    private readonly _router: Router,
-    public readonly _permissionService: PermissionService,
-  ) {}
+  constructor(private readonly _router: Router, public readonly _permissionService: PermissionService) {
+
+  }
 
   allowedAccess(item: NavMenuItem): boolean {
     if (item.roles && item.roles.length) {

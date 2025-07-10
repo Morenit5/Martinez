@@ -28,19 +28,19 @@ export const webSidebarMenuItems: NavMenuItem[] = [
     permissions: [PERMISSIONS.ACCESS_SALE],
   },
   {
-    href: '/products',
-    title: 'Productos', //Products
+    href: '/inventory',
+    title: 'Invetario', //Products
     active: false,
     icon: 'fa-box',
     subItems: [
       {
-        href: '/product-categories',
-        title: 'Categorías', //Product Categories
+        href: '/category',
+        title: 'Categoría', //Product Categories
         active: false,
       },
       {
-        href: '/product-types',
-        title: 'Herramientas', //Product Types
+        href: '/tool',
+        title: 'Herramienta', //Product Types
         active: false,
       },
       /*{
