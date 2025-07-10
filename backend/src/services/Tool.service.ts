@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { EntityTool } from '../entities/Tool.entity';
@@ -13,16 +13,16 @@ export class ServiceTool {
     return this.toolRepository.find();
   }
 
-  findOne(toolId: number): Promise<EntityTool|null> {
-    return this.toolRepository.findOneBy({ toolId });
+  async findOne(toolId: number): Promise<EntityTool|null> {
+  const toolExist = await this.toolRepository.findOne({ where: { toolId: toolId } });
+
+    //console.log("ERROR ToolService "+toolExist)
+    if (!toolExist) throw new NotFoundException('La herramienta no existe');
+    return toolExist;
   }
 
   create(tool: EntityTool): Promise<EntityTool> {
     return this.toolRepository.save(tool);
-  }
-
-  async delete(id: number): Promise<void> {
-    await this.toolRepository.delete(id);
   }
 
   async update(id: string, entity: EntityTool): Promise<UpdateResult> {
@@ -31,6 +31,5 @@ export class ServiceTool {
 
   findAllCat(categoryId: number) {
    return this.toolRepository.find({ where: { categoryId: categoryId } });
-    //return this.toolRepository.find();
   }
 }
