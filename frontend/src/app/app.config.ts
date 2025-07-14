@@ -28,8 +28,10 @@ import {
   ErrorHandlerInterceptor,
 } from '@core/interceptors';
 import { RouteReusableStrategy } from '@core/helpers';
+
 //import { provideHotToastConfig } from '@ngneat/hot-toast';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { IconsModule } from './icons/icons.module';
 
 if (environment.production) {
   enableProdMode();
@@ -41,8 +43,14 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
 
     // import providers from other modules (e.g. TranslateModule, ShellModule, socketModule), which follow the older pattern to import modules
-    importProvidersFrom(TranslateModule.forRoot(), ShellModule, NgbModule),
 
+    importProvidersFrom(
+      TranslateModule.forRoot(),
+      ShellModule,
+      NgbModule,
+      IconsModule
+    ),
+    
     // provideRouter is required for Angular's router with additional configuration
     provideRouter(
       routes,

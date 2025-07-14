@@ -11,18 +11,13 @@ import { SidebarComponent } from '@app/shell/components/sidebar/sidebar.componen
 import { HeaderComponent } from '@app/shell/components/header/header.component';
 import { PagesModule } from '@pages/pages.module';
 import { LanguageSelectorComponent } from '@app/i18n';
+import { BootstrapIconsModule } from "ng-bootstrap-icons";
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    TranslateModule,
-    AuthModule,
-    RouterModule,
-    HumanizePipe,
-    FormsModule,
-    PagesModule,
-    LanguageSelectorComponent,
-  ],
+
+  imports: [CommonModule, TranslateModule, AuthModule, RouterModule, HumanizePipe, 
+            FormsModule, PagesModule, LanguageSelectorComponent, BootstrapIconsModule, NgbModule],
   declarations: [ShellComponent, HeaderComponent, SidebarComponent],
 })
 export class ShellModule {}
