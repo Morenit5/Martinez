@@ -26,16 +26,22 @@ export class DateTimeUtility {
    * of the month, and the `number` property represents the number of the month (1 for January, 2 for
    * February, and so on).
    */
-  static getMonths(translateService?: TranslateService): { name: string; number: number }[] {
+  static getMonths(
+    translateService?: TranslateService,
+  ): { name: string; number: number }[] {
     const months = [
       {
-        name: translateService ? translateService.instant('calendar.' + 'all') : 'All',
+        name: translateService
+          ? translateService.instant('calendar.' + 'all')
+          : 'All',
         number: 0,
       },
     ];
     for (let i = 0; i < 12; i++) {
       const name = new Date(0, i).toLocaleString('en', { month: 'long' });
-      const txName = translateService ? translateService.instant('calendar.' + name.toLowerCase()) : name;
+      const txName = translateService
+        ? translateService.instant('calendar.' + name.toLowerCase())
+        : name;
       months.push({
         name: txName,
         number: i + 1,
@@ -55,7 +61,12 @@ export class DateTimeUtility {
    * @param keyValue - The `keyValue` parameter is an optional boolean that determines whether the array returned is number or key value pair.
    * @returns an array of numbers or strings representing the days of the specified month and year.
    */
-  static getDays(translateService: TranslateService, month?: number, year?: number, keyValue = true): (number | string | { name: string; number: number })[] {
+  static getDays(
+    translateService: TranslateService,
+    month?: number,
+    year?: number,
+    keyValue = true,
+  ): (number | string | { name: string; number: number })[] {
     const now = new Date();
     month = month ?? now.getMonth(); // 0-indexed
     year = year ?? now.getFullYear();
@@ -63,17 +74,24 @@ export class DateTimeUtility {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const daysArray: (number | string | { name: string; number: number })[] = [
       {
-        name: translateService ? translateService.instant('calendar.' + 'all') : 'All',
+        name: translateService
+          ? translateService.instant('calendar.' + 'all')
+          : 'All',
         number: 0,
       },
     ];
 
     for (let i = 1; i <= daysInMonth; i++) {
-      const isToday = i === now.getDate() && month === now.getMonth() && year === now.getFullYear();
+      const isToday =
+        i === now.getDate() &&
+        month === now.getMonth() &&
+        year === now.getFullYear();
 
       if (keyValue) {
         const dayObj = {
-          name: isToday ? translateService.instant('calendar.' + 'current') : i.toString().toLowerCase(),
+          name: isToday
+            ? translateService.instant('calendar.' + 'current')
+            : i.toString().toLowerCase(),
           number: i,
         };
         daysArray.push(dayObj);
@@ -92,9 +110,19 @@ export class DateTimeUtility {
    * The function `getWeekDays` returns an array of objects containing the names and numbers of the days
    * @param translateService
    */
-  static getWeekDays(translateService: TranslateService): { name: string; number: number }[] {
+  static getWeekDays(
+    translateService: TranslateService,
+  ): { name: string; number: number }[] {
     const daysArray: { name: string; number: number }[] = [];
-    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const days = [
+      'sunday',
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+    ];
     for (let i = 0; i < days.length; i++) {
       const dayObj = {
         name: translateService.instant('calendar.' + days[i]),
@@ -114,7 +142,9 @@ export class DateTimeUtility {
     const dateObj = new Date(date);
     const day = dateObj.getDate();
     if (translateService) {
-      return translateService.instant('calendar.' + day.toString().toLowerCase());
+      return translateService.instant(
+        'calendar.' + day.toString().toLowerCase(),
+      );
     }
     return `${day}`;
   }
@@ -127,7 +157,9 @@ export class DateTimeUtility {
   static getMonth(date: string, translateService?: TranslateService): string {
     const dateObj = new Date(date);
     const month = dateObj.getMonth();
-    const monthName = new Date(0, month).toLocaleString('en', { month: 'long' });
+    const monthName = new Date(0, month).toLocaleString('en', {
+      month: 'long',
+    });
     if (translateService) {
       return translateService.instant('calendar.' + monthName.toLowerCase());
     }
@@ -157,14 +189,19 @@ export class DateTimeUtility {
    * @param endDateStr
    * @param translateService
    */
-  static getRemainingTime(endDateStr: string, translateService?: TranslateService): string {
+  static getRemainingTime(
+    endDateStr: string,
+    translateService?: TranslateService,
+  ): string {
     const endDate = new Date(endDateStr);
     const currentTime = new Date();
     const remainingTime = endDate.getTime() - currentTime.getTime();
 
     if (remainingTime <= 0) {
       // Assuming 'Expired' or its equivalent is also defined within your translations
-      return translateService ? translateService.instant('dates&filters.expired') : 'Expired';
+      return translateService
+        ? translateService.instant('dates&filters.expired')
+        : 'Expired';
     }
 
     // Helper function to translate labels
@@ -221,14 +258,19 @@ export class DateTimeUtility {
 
     // Check if the timestamp is in the future
     if (differenceMs < 0) {
-      return translateService ? translateService.instant('in the future') : 'in the future';
+      return translateService
+        ? translateService.instant('in the future')
+        : 'in the future';
     }
 
     // Calculate the difference in minutes
     const differenceMinutes = Math.round(differenceMs / (1000 * 60));
 
     // Helper function to translate time units
-    const translate = (key: string, value: string | number) => (translateService ? `${translateService.instant(key, { value })}` : `${value} ${key}`);
+    const translate = (key: string, value: string | number) =>
+      translateService
+        ? `${translateService.instant(key, { value })}`
+        : `${value} ${key}`;
 
     // Return a string indicating the time elapsed
     if (differenceMinutes < 1) {

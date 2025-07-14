@@ -7,19 +7,24 @@ import { environment } from '@env/environment';
 import { filter, merge } from 'rxjs';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Logger } from '@core/services';
-
+import { ReactiveFormsModule } from '@angular/forms';
 
 @UntilDestroy()
 @Component({
   selector: 'app-root',
-  imports: [TranslateModule, RouterOutlet],
+  imports: [TranslateModule, RouterOutlet, ReactiveFormsModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit, OnDestroy {
   title = 'Martinez Landscaping';
 
-  constructor(private readonly router: Router, private readonly titleService: Title, private readonly translateService: TranslateService, private readonly i18nService: I18nService,) {
+  constructor(
+    private readonly router: Router,
+    private readonly titleService: Title,
+    private readonly translateService: TranslateService,
+    private readonly i18nService: I18nService,
+  ) {
     //metodo constructor
   }
 
@@ -30,19 +35,35 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     // Initialize i18nService with default language and supported languages
-    this.i18nService.init(environment.defaultLanguage, environment.supportedLanguages);
+    this.i18nService.init(
+      environment.defaultLanguage,
+      environment.supportedLanguages,
+    );
 
-    const onNavigationEnd = this.router.events.pipe(filter((event) => event instanceof NavigationEnd));
+    const onNavigationEnd = this.router.events.pipe(
+      filter((event) => event instanceof NavigationEnd),
+    );
 
-    merge(this.translateService.onLangChange, onNavigationEnd).pipe(untilDestroyed(this)).subscribe((event) => {
-        const titles = this.getTitle(this.router.routerState, this.router.routerState.root);
+    merge(this.translateService.onLangChange, onNavigationEnd)
+      .pipe(untilDestroyed(this))
+      .subscribe((event) => {
+        const titles = this.getTitle(
+          this.router.routerState,
+          this.router.routerState.root,
+        );
 
         if (titles.length === 0) {
           this.titleService.setTitle(this.translateService.instant('Home'));
         } else {
-          const translatedTitles = titles.map((titlePart) => this.translateService.instant(titlePart));
-          const allTitlesSame = translatedTitles.every((title, _, arr) => title === arr[0]);
-          this.titleService.setTitle(allTitlesSame ? translatedTitles[0] : translatedTitles.join(' | '));
+          const translatedTitles = titles.map((titlePart) =>
+            this.translateService.instant(titlePart),
+          );
+          const allTitlesSame = translatedTitles.every(
+            (title, _, arr) => title === arr[0],
+          );
+          this.titleService.setTitle(
+            allTitlesSame ? translatedTitles[0] : translatedTitles.join(' | '),
+          );
         }
 
         if (event['lang']) {
@@ -50,7 +71,6 @@ export class AppComponent implements OnInit, OnDestroy {
           // window.location.reload();
         }
       });
-    
   }
 
   getTitle(state: any, parent: any): any[] {

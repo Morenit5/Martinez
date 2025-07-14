@@ -1,8 +1,11 @@
 <nav [class.pb]="navExpanded" [class.squeeze]="!navExpanded">
-  <span (click)="toggleSidebar(!navExpanded)" [ngClass]="{ open: navExpanded }" class="toggle-icon">
+  <span
+    (click)="toggleSidebar(!navExpanded)"
+    [ngClass]="{ open: navExpanded }"
+    class="toggle-icon"
+  >
     <!-- TODO: You can put any icon here, below span is just temporary for demo purpose  -->
     <span style="color: var(--gray-400)"><</span>
-    
   </span>
 
   <div class="logo-container" routerLink="/">
@@ -15,7 +18,13 @@
       <ng-container *ngIf="shellService.allowedAccess(item)">
         <div class="menu">
           <ng-container *ngIf="!item.divider; else divider">
-            <a (click)="activateSidebarItem(i)" [class.active]="item.active" [ngClass]="{ disabled: item.disabled }" class="menu-item" id="menu-item-{{ i }}">
+            <a
+              (click)="activateSidebarItem(i)"
+              [class.active]="item.active"
+              [ngClass]="{ disabled: item.disabled }"
+              class="menu-item"
+              id="menu-item-{{ i }}"
+            >
               <div class="item">
                 <ng-container *ngIf="item.icon">
                   <!-- TODO This below i tag is temporary for demo purposes replace with proper icon passed in menu item -->
@@ -28,12 +37,17 @@
                 <span>{{ item.title | translate }}</span>
               </div>
               <ng-container *ngIf="item.subItems && item.subItems.length">
-                <span [ngClass]="{ open: sidebarExtendedItem === i }" class="submenu-icon">
+                <span
+                  [ngClass]="{ open: sidebarExtendedItem === i }"
+                  class="submenu-icon"
+                >
                   <!-- TODO This below i tag is temporary for demo purposes, use any up down arrow icon -->
                   @if (item.subItems && item.subItems.length && item.active) {
                     <!-- Active Icon -->
                     <i style="color: var(--gray-400)">^</i>
-                  } @else if (item.subItems && item.subItems.length && !item.active) {
+                  } @else if (
+                    item.subItems && item.subItems.length && !item.active
+                  ) {
                     <!-- Inactive Icon -->
                     <i style="color: var(--sidebar-icon-color)">^</i>
                   }
@@ -41,16 +55,28 @@
               </ng-container>
             </a>
             <ng-container *ngIf="item.subItems && item.subItems.length">
-              <ul [style.display]="sidebarExtendedItem === i ? 'block' : 'none'" class="sub-menu-items">
+              <ul
+                [style.display]="sidebarExtendedItem === i ? 'block' : 'none'"
+                class="sub-menu-items"
+              >
                 <ng-container *ngFor="let subItem of item.subItems">
                   <ng-container *ngIf="shellService.allowedAccess(subItem)">
                     <li [class.disabled]="subItem.disabled">
-                      <a (click)="activateSidebarSubItem(i, subItem)" [ngClass]="{ disabled: subItem.disabled }" [routerLink]="subItem.href || undefined" routerLinkActive="active">
+                      <a
+                        (click)="activateSidebarSubItem(i, subItem)"
+                        [ngClass]="{ disabled: subItem.disabled }"
+                        [routerLink]="subItem.href || undefined"
+                        routerLinkActive="active"
+                      >
                         <!-- TODO This below i tag is temporary for demo purposes replace with proper icon passed in submenu item -->
-                        @if (item.subItems && item.subItems.length && item.active) {
+                        @if (
+                          item.subItems && item.subItems.length && item.active
+                        ) {
                           <!-- Active Icon -->
                           <i style="color: var(--gray-400)">^</i>
-                        } @else if (item.subItems && item.subItems.length && !item.active) {
+                        } @else if (
+                          item.subItems && item.subItems.length && !item.active
+                        ) {
                           <!-- Inactive Icon -->
                           <i style="color: var(--sidebar-icon-color)">^</i>
                         }

@@ -23,13 +23,17 @@ export class I18nService {
 
   constructor(private readonly _translateService: TranslateService) {
     // Initialize the BehaviorSubject with an initial value
-    this._languageSubject = new BehaviorSubject<string>(localStorage.getItem(languageKey) || environment.defaultLanguage || this._translateService.getBrowserCultureLang() || '');
+    this._languageSubject = new BehaviorSubject<string>(
+      localStorage.getItem(languageKey) ||
+        environment.defaultLanguage ||
+        this._translateService.getBrowserCultureLang() ||
+        '',
+    );
 
     // Embed languages to avoid extra HTTP requests
 
     _translateService.setTranslation('en-US', enUS);
     _translateService.setTranslation('es-ES', esES);
-
   }
 
   /**
@@ -55,7 +59,12 @@ export class I18nService {
    * @param language The IETF language code to set.
    */
   set language(language: string) {
-    let newLanguage = language || localStorage.getItem(languageKey) || environment.defaultLanguage || this._translateService.getBrowserCultureLang() || '';
+    let newLanguage =
+      language ||
+      localStorage.getItem(languageKey) ||
+      environment.defaultLanguage ||
+      this._translateService.getBrowserCultureLang() ||
+      '';
     let isSupportedLanguage = this.supportedLanguages.includes(newLanguage);
 
     if (language !== this._languageSubject.value) {
@@ -65,7 +74,10 @@ export class I18nService {
     // If no exact match is found, search without the region
     if (newLanguage && !isSupportedLanguage) {
       newLanguage = newLanguage.split('-')[0];
-      newLanguage = this.supportedLanguages.find((supportedLanguage) => supportedLanguage.startsWith(newLanguage)) || '';
+      newLanguage =
+        this.supportedLanguages.find((supportedLanguage) =>
+          supportedLanguage.startsWith(newLanguage),
+        ) || '';
       isSupportedLanguage = Boolean(newLanguage);
     }
 
@@ -93,9 +105,12 @@ export class I18nService {
     this.language = '';
 
     // Warning: this subscription will always be alive for the app's lifetime
-    this._langChangeSubscription = this._translateService.onLangChange.subscribe((event: LangChangeEvent) => {
-      localStorage.setItem(languageKey, event.lang);
-    });
+    this._langChangeSubscription =
+      this._translateService.onLangChange.subscribe(
+        (event: LangChangeEvent) => {
+          localStorage.setItem(languageKey, event.lang);
+        },
+      );
   }
 
   /**

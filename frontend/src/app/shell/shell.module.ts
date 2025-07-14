@@ -13,7 +13,16 @@ import { PagesModule } from '@pages/pages.module';
 import { LanguageSelectorComponent } from '@app/i18n';
 
 @NgModule({
-  imports: [CommonModule, TranslateModule, AuthModule, RouterModule, HumanizePipe, FormsModule, PagesModule, LanguageSelectorComponent],
+  imports: [
+    CommonModule,
+    TranslateModule,
+    AuthModule,
+    RouterModule,
+    HumanizePipe,
+    FormsModule,
+    PagesModule,
+    LanguageSelectorComponent,
+  ],
   declarations: [ShellComponent, HeaderComponent, SidebarComponent],
 })
 export class ShellModule {}

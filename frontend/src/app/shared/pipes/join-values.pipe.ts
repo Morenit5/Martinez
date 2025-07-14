@@ -20,7 +20,13 @@ export class JoinValuesPipe implements PipeTransform {
     }
 
     // Check if we're dealing with an array of objects and a propertyName is provided
-    if (propertyName && value.every((item) => typeof item === 'object' && item !== null && propertyName in item)) {
+    if (
+      propertyName &&
+      value.every(
+        (item) =>
+          typeof item === 'object' && item !== null && propertyName in item,
+      )
+    ) {
       return value.map((item) => item[propertyName]).join(separator);
     }
 

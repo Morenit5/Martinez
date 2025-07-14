@@ -12,7 +12,9 @@ const credentialsKey = 'credentials';
 })
 export class CredentialsService {
   constructor() {
-    const savedCredentials = sessionStorage.getItem(credentialsKey) || localStorage.getItem(credentialsKey);
+    const savedCredentials =
+      sessionStorage.getItem(credentialsKey) ||
+      localStorage.getItem(credentialsKey);
     if (savedCredentials) {
       this._credentials = JSON.parse(savedCredentials);
     }

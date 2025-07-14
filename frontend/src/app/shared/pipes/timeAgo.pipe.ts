@@ -25,11 +25,15 @@ export class TimeAgoPipe implements PipeTransform {
     } else if (diffInMin === 1) {
       return this._translateService.instant('a minute ago');
     } else if (diffInMin < 60) {
-      return this._translateService.instant('minutes ago', { minutes: diffInMin });
+      return this._translateService.instant('minutes ago', {
+        minutes: diffInMin,
+      });
     } else if (diffInHours === 1) {
       return this._translateService.instant('an hour ago');
     } else if (diffInHours < 24) {
-      return this._translateService.instant('hours ago', { hours: diffInHours });
+      return this._translateService.instant('hours ago', {
+        hours: diffInHours,
+      });
     } else if (diffInDays === 1) {
       return this._translateService.instant('yesterday');
     } else if (diffInDays < 7) {
@@ -37,7 +41,9 @@ export class TimeAgoPipe implements PipeTransform {
     } else if (diffInDays < 14) {
       return this._translateService.instant('a week ago');
     } else if (diffInDays < 30) {
-      return this._translateService.instant('weeks ago', { weeks: Math.floor(diffInDays / 7) });
+      return this._translateService.instant('weeks ago', {
+        weeks: Math.floor(diffInDays / 7),
+      });
     } else {
       return formatDate(date, 'dd/MM/yyyy', 'en-US');
     }

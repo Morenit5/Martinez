@@ -24,7 +24,10 @@ export class FriendlyDatePipe implements PipeTransform {
     } else if (this._isSameDate(value, yesterday)) {
       return `${this._translateService.instant('yesterday')}, ${this._getFormattedDate(value)}`;
     } else {
-      if (value.getFullYear() === today.getFullYear() && value.getMonth() === today.getMonth()) {
+      if (
+        value.getFullYear() === today.getFullYear() &&
+        value.getMonth() === today.getMonth()
+      ) {
         return this._getFormattedDate(value, forceYear);
       } else {
         return this._getFormattedDate(value, true);
@@ -33,11 +36,28 @@ export class FriendlyDatePipe implements PipeTransform {
   }
 
   private _isSameDate(date1: Date, date2: Date): boolean {
-    return date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth() && date1.getDate() === date2.getDate();
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
+    );
   }
 
   private _getFormattedDate(date: Date, includeYear = false): string {
-    const monthNamesShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthNamesShort = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
 
     const day = date.getDate();
     const monthIndex = date.getMonth();
