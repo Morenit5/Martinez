@@ -9,6 +9,8 @@ import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@a
 import { ApiPrefixInterceptor, ErrorHandlerInterceptor } from '@core/interceptors';
 import { RouteReusableStrategy } from '@core/helpers';
 import { provideHotToastConfig } from '@ngneat/hot-toast';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { IconsModule } from './icons/icons.module';
 
 
 if (environment.production) {
@@ -24,6 +26,8 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(
       TranslateModule.forRoot(),
       ShellModule,
+      NgbModule,
+      IconsModule
     ),
     
     // provideRouter is required for Angular's router with additional configuration
