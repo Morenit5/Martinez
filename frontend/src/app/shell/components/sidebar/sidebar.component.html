@@ -1,73 +1,56 @@
-<nav [class.pb]="navExpanded" [class.squeeze]="!navExpanded">
-  <span (click)="toggleSidebar(!navExpanded)" [ngClass]="{ open: navExpanded }" class="toggle-icon">
-    <!-- TODO: You can put any icon here, below span is just temporary for demo purpose  -->
-    <span style="color: var(--gray-400)"><</span>
+<div class="d-flex flex-sm-column flex-row h-100 flex-grow-1 align-items-center align-items-sm-start px-3 pt-2 ">
+  <a href="/" class="d-flex align-items-center pb-sm-3 mb-md-0 me-md-auto text-white text-decoration-none">
+    <span class="fs-5">M<span class="d-none d-sm-inline">artinez Gardening</span></span>
+  </a>
+  <ul
+    class="nav nav-pills flex-sm-column flex-row flex-nowrap flex-shrink-1 flex-sm-grow-0 flex-grow-1 mb-sm-auto mb-0 justify-content-center align-items-center align-items-sm-start"
+    id="menu">
+    <li class="nav-item">
+      <a href="#" class="nav-link px-sm-0 px-2 ">
+        <i style="color: #d9ef9f;" class="fs-5 bi-house"></i><span
+          class="ms-1 d-none d-sm-inline text-white">Home</span>
+      </a>
+    </li>
+    <li>
+      <a href="#submenu1" data-bs-toggle="collapse" class="nav-link px-sm-0 px-2">
+        <i style="color: #d9ef9f;" class="fs-5 bi-speedometer2"></i><span
+          class="ms-1 d-none d-sm-inline text-white">Dashboard</span> </a>
+    </li>
+    <li>
+      <a href="#" class="nav-link px-sm-0 px-2">
+        <i style="color: #d9ef9f;" class="fs-5 bi-table"></i><span
+          class="ms-1 d-none d-sm-inline text-white">Orders</span></a>
+    </li>
+    <div style="margin-top: 5px; margin-bottom: 5px;"class="nav-item" ngbDropdown>
+      <a style="color: #d9ef9f; text-decoration: none;" class="px-sm-0 px-2 " ngbDropdownToggle id="navbarDropdown1" role="button">
+        <i style="color: #d9ef9f;" class="fs-5 bi-bootstrap"></i>
+        <span class="ms-1 d-none d-sm-inline text-white">Bootstrap</span>
+      </a>
+      <div ngbDropdownMenu aria-labelledby="navbarDropdown1" class="dropdown-menu">
+        <a ngbDropdownItem href="#" (click)="$event.preventDefault()">New project...</a>
+        <a ngbDropdownItem href="#" (click)="$event.preventDefault()">Settings</a>
+        <a ngbDropdownItem href="#" (click)="$event.preventDefault()">Profile</a>
+      </div>
+    </div>
+    <li>
+      <a href="#" class="nav-link px-sm-0 px-2">
+        <i style="color: #d9ef9f;" class="fs-5 bi-grid"></i><span
+          class="ms-1 d-none d-sm-inline text-white">Products</span></a>
+    </li>
+    <li>
+      <a href="#" class="nav-link px-sm-0 px-2">
+        <i style="color: #d9ef9f;" class="fs-5 bi-people"></i><span
+          class="ms-1 d-none d-sm-inline text-white">Customers</span> </a>
+    </li>
+  </ul>
+  <div ngbDropdown class="dropdown py-sm-3 mt-sm-auto ms-auto ms-sm-0 flex-shrink-1">
+    <a style="color: #d9ef9f;" class="px-sm-0 px-2 nav-link" ngbDropdownToggle id="dropdownUser1" role="button">
+      <img src="https://github.com/mdo.png" alt="hugenerd" width="35" height="35" class="rounded-circle">
+      <span class="d-none d-sm-inline mx-1">Joe</span>
+    </a>
+    <div ngbDropdownMenu aria-labelledby="dropdownUser1" class="dropdown-menu">
+        <a class="dropdown-item" href="#">Sign out</a>
+    </div>
     
-  </span>
-
-  <div class="logo-container" routerLink="/">
-    <img alt="Logo" class="logo" src="images/placeholder.png" />
-    <h4>Mart&iacute;nez</h4>
   </div>
-
-  <div class="navbar-menu-items" dir="auto">
-    <ng-container *ngFor="let item of sidebarItems; let i = index">
-      <ng-container *ngIf="shellService.allowedAccess(item)">
-        <div class="menu">
-          <ng-container *ngIf="!item.divider; else divider">
-            <a (click)="activateSidebarItem(i)" [class.active]="item.active" [ngClass]="{ disabled: item.disabled }" class="menu-item" id="menu-item-{{ i }}">
-              <div class="item">
-                <ng-container *ngIf="item.icon">
-                  <!-- TODO This below i tag is temporary for demo purposes replace with proper icon passed in menu item -->
-                  @if (item.active) {
-                    <i style="color: var(--gray-400)">^</i>
-                  } @else {
-                    <i style="color: var(--sidebar-icon-color)">^</i>
-                  }
-                </ng-container>
-                <span>{{ item.title | translate }}</span>
-              </div>
-              <ng-container *ngIf="item.subItems && item.subItems.length">
-                <span [ngClass]="{ open: sidebarExtendedItem === i }" class="submenu-icon">
-                  <!-- TODO This below i tag is temporary for demo purposes, use any up down arrow icon -->
-                  @if (item.subItems && item.subItems.length && item.active) {
-                    <!-- Active Icon -->
-                    <i style="color: var(--gray-400)">^</i>
-                  } @else if (item.subItems && item.subItems.length && !item.active) {
-                    <!-- Inactive Icon -->
-                    <i style="color: var(--sidebar-icon-color)">^</i>
-                  }
-                </span>
-              </ng-container>
-            </a>
-            <ng-container *ngIf="item.subItems && item.subItems.length">
-              <ul [style.display]="sidebarExtendedItem === i ? 'block' : 'none'" class="sub-menu-items">
-                <ng-container *ngFor="let subItem of item.subItems">
-                  <ng-container *ngIf="shellService.allowedAccess(subItem)">
-                    <li [class.disabled]="subItem.disabled">
-                      <a (click)="activateSidebarSubItem(i, subItem)" [ngClass]="{ disabled: subItem.disabled }" [routerLink]="subItem.href || undefined" routerLinkActive="active">
-                        <!-- TODO This below i tag is temporary for demo purposes replace with proper icon passed in submenu item -->
-                        @if (item.subItems && item.subItems.length && item.active) {
-                          <!-- Active Icon -->
-                          <i style="color: var(--gray-400)">^</i>
-                        } @else if (item.subItems && item.subItems.length && !item.active) {
-                          <!-- Inactive Icon -->
-                          <i style="color: var(--sidebar-icon-color)">^</i>
-                        }
-                        <span>{{ subItem.title | translate }}</span>
-                      </a>
-                    </li>
-                  </ng-container>
-                </ng-container>
-              </ul>
-            </ng-container>
-          </ng-container>
-        </div>
-      </ng-container>
-    </ng-container>
-  </div>
-</nav>
-
-<ng-template #divider>
-  <span class="divider"></span>
-</ng-template>
+</div>

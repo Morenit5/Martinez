@@ -6,26 +6,27 @@
 
 // Sanitize.css
 //@use "sanitize.css/sanitize.css";
-@use "sanitize.css";
+//@use "sanitize.css";
 
 // Theme variables
-@use "theme/variables";
+//@use "theme/variables";
 
 // Base and layout styles
-@use "theme/base";
-@use "theme/layout";
+//@use "theme/base";
+//@use "theme/layout";
 
 // 3rd party libraries
+@use "bootstrap/scss/bootstrap";
 @use "bootstrap/scss/bootstrap-grid";
 
 // Mixins
-@use "theme/mixins";
+//@use "theme/mixins";
 
 // Overrides
 @use "theme/overrides";
 
 // Utilities
-@use "theme/utilities";
+//@use "theme/utilities";
 
 // theme customization
-@use "theme/theme";
+//@use "theme/theme";
