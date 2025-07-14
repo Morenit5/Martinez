@@ -17,7 +17,12 @@ import { SafeHtml } from '@angular/platform-browser';
   standalone: true,
 })
 export class TruncateTextPipe implements PipeTransform {
-  transform(value: string, limit = 100, completeWords = false, ellipsis = '...'): SafeHtml {
+  transform(
+    value: string,
+    limit = 100,
+    completeWords = false,
+    ellipsis = '...',
+  ): SafeHtml {
     if (!value) {
       return '';
     }
@@ -25,7 +30,8 @@ export class TruncateTextPipe implements PipeTransform {
     if (completeWords) {
       limit = value.substring(0, limit).lastIndexOf(' ');
     }
-    truncatedText = value.length > limit ? value.substring(0, limit) + ellipsis : value;
+    truncatedText =
+      value.length > limit ? value.substring(0, limit) + ellipsis : value;
     return truncatedText;
   }
 }

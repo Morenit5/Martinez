@@ -24,7 +24,11 @@ const log = new Logger('Array Utility');
  * index to another within the array.
  * @example MoveItemInArray([1, 2, 3, 4, 5], 1, 3) => [1, 3, 4, 2, 5]
  */
-export function MoveItemInArray<T>(workArray: T[], fromIndex: number, toIndex: number): T[] {
+export function MoveItemInArray<T>(
+  workArray: T[],
+  fromIndex: number,
+  toIndex: number,
+): T[] {
   if (toIndex === fromIndex) {
     return workArray;
   }
@@ -125,8 +129,17 @@ export function EnumToStringArray<T>(enumObj: T, keyArray = false): string[] {
  * `value` property is the corresponding value of the enum object.
  * @example EnumToKeyValueArray({ A: 1, B: 2, C: 3 }) => [{ key: 'A', value: 1 }, { key: 'B', value: 2 }, { key: 'C', value: 3 }]
  */
-export function EnumToKeyValueArray<T>(enumObj: T, translateService?: TranslateService, keyCaseSpilt = true): { key: string; value: string }[] {
+export function EnumToKeyValueArray<T>(
+  enumObj: T,
+  translateService?: TranslateService,
+  keyCaseSpilt = true,
+): { key: string; value: string }[] {
   return Object.keys(enumObj)
     .filter((key) => isNaN(Number(key)))
-    .map((key) => ({ key: translateService ? translateService.instant(humanize(key, keyCaseSpilt)) : humanize(key, keyCaseSpilt), value: enumObj[key] }));
+    .map((key) => ({
+      key: translateService
+        ? translateService.instant(humanize(key, keyCaseSpilt))
+        : humanize(key, keyCaseSpilt),
+      value: enumObj[key],
+    }));
 }

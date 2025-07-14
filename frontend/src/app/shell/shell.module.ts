@@ -15,6 +15,7 @@ import { BootstrapIconsModule } from "ng-bootstrap-icons";
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
+
   imports: [CommonModule, TranslateModule, AuthModule, RouterModule, HumanizePipe, 
             FormsModule, PagesModule, LanguageSelectorComponent, BootstrapIconsModule, NgbModule],
   declarations: [ShellComponent, HeaderComponent, SidebarComponent],

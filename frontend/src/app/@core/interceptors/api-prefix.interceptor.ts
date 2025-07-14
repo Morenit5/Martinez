@@ -1,5 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import {
+  HttpErrorResponse,
+  HttpEvent,
+  HttpHandler,
+  HttpInterceptor,
+  HttpRequest,
+} from '@angular/common/http';
 import { Observable, Subject, takeUntil, throwError } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { catchError, finalize } from 'rxjs/operators';
@@ -16,7 +22,10 @@ export class ApiPrefixInterceptor implements HttpInterceptor {
     private readonly _translateService: TranslateService,
   ) {}
 
-  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  intercept(
+    request: HttpRequest<any>,
+    next: HttpHandler,
+  ): Observable<HttpEvent<any>> {
     // If the request has the 'noauth' header, don't add the Authorization header
     if (request.headers.get('noauth')) {
       return next.handle(request);
@@ -32,7 +41,10 @@ export class ApiPrefixInterceptor implements HttpInterceptor {
       }
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
-    headers = headers.set('Accept-Language', currentLang).set('Content-Language', currentLang).set('lang', currentLang);
+    headers = headers
+      .set('Accept-Language', currentLang)
+      .set('Content-Language', currentLang)
+      .set('lang', currentLang);
 
     request = request.clone({ headers });
 

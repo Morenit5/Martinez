@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { UseRandomUser } from '@core/usecases';
 import { RandomUserEntity } from '@core/entities';
-import { HotToastService } from '@ngneat/hot-toast';
+//import { HotToastService } from '@ngneat/hot-toast';
 
 @Component({
   selector: 'app-list',
@@ -14,10 +14,9 @@ export class ListComponent implements OnInit {
   isLoading = true;
 
   private readonly _useRandomUser = new UseRandomUser();
-  private readonly _toast = inject(HotToastService);
+  //private readonly _toast = inject(HotToastService);
 
   ngOnInit() {
-    
     this._useRandomUser.getAllUsers().subscribe({
       next: (users) => {
         this.users = users;
@@ -30,6 +29,8 @@ export class ListComponent implements OnInit {
   }
 
   userClicked() {
-    this._toast.show('Se hizo click en el usuario, aqui se debe mostar mas info tal vez centrar el toast');
+    /*this._toast.show(
+      'Se hizo click en el usuario, aqui se debe mostar mas info tal vez centrar el toast',
+    );*/
   }
 }

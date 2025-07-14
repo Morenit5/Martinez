@@ -8,7 +8,14 @@ import { LogoutComponent } from './logout/logout.component';
 import { LanguageSelectorComponent } from '@app/i18n';
 
 @NgModule({
-  imports: [CommonModule, ReactiveFormsModule, TranslateModule, AuthRouting, FormsModule, LanguageSelectorComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    TranslateModule,
+    AuthRouting,
+    FormsModule,
+    LanguageSelectorComponent,
+  ],
   declarations: [LoginComponent, LogoutComponent],
 })
 export class AuthModule {}

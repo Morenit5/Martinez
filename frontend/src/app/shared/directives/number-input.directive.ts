@@ -1,4 +1,12 @@
-import { Directive, ElementRef, HostListener, Input, OnInit, Optional, Self } from '@angular/core';
+import {
+  Directive,
+  ElementRef,
+  HostListener,
+  Input,
+  OnInit,
+  Optional,
+  Self,
+} from '@angular/core';
 import { NgControl } from '@angular/forms';
 
 @Directive({
@@ -22,7 +30,9 @@ export class NumberInputDirective implements OnInit {
         this._regex = new RegExp(/^\d+$/);
         break;
       case 'phone':
-        this._regex = new RegExp(this.customRegex || /^(\+49)?[ ]?(\([0-9]{3}\)[ ]?)?[0-9]{3,14}$/);
+        this._regex = new RegExp(
+          this.customRegex || /^(\+49)?[ ]?(\([0-9]{3}\)[ ]?)?[0-9]{3,14}$/,
+        );
         this.maxLength = 16; // +49 (123) 4567890
         break;
       case 'zipcode':
@@ -35,7 +45,9 @@ export class NumberInputDirective implements OnInit {
   @HostListener('input', ['$event'])
   onInputChange(event: any) {
     const initialValue = this._el.nativeElement.value;
-    this._el.nativeElement.value = initialValue.replace(/[^0-9 +()]/g, '').slice(0, this.maxLength);
+    this._el.nativeElement.value = initialValue
+      .replace(/[^0-9 +()]/g, '')
+      .slice(0, this.maxLength);
 
     if (this.ngControl && this.ngControl.control) {
       if (!this._regex.test(this._el.nativeElement.value)) {

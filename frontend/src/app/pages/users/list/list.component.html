@@ -17,9 +17,14 @@
           @for (user of users; track user.id) {
             <tr (click)="userClicked()">
               <td>
-                <img [src]="user.picture.thumbnail" alt="{{ user.name.first }}'s avatar" />
+                <img
+                  [src]="user.picture.thumbnail"
+                  alt="{{ user.name.first }}'s avatar"
+                />
               </td>
-              <td>{{ user.name.title }} {{ user.name.first }} {{ user.name.last }}</td>
+              <td>
+                {{ user.name.title }} {{ user.name.first }} {{ user.name.last }}
+              </td>
               <td>{{ user.email }}</td>
               <td>{{ user.phone }}</td>
               <td>{{ user.location.city }}, {{ user.location.country }}</td>

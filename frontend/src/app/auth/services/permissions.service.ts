@@ -59,7 +59,10 @@ export class PermissionService {
     for (const role of roles) {
       // TODO: Implement the permissions as per your application requirements, provided above this file.
       const rolePermissions = appSetting.role[role as ROLE];
-      if (rolePermissions && this._checkPermission(rolePermissions, permission)) {
+      if (
+        rolePermissions &&
+        this._checkPermission(rolePermissions, permission)
+      ) {
         return true;
       }
     }
@@ -70,7 +73,10 @@ export class PermissionService {
   /* The `private _checkPermission` method is a helper function within the `PermissionService` class.
   Its purpose is to check if a user has a specific permission based on their roles and the
   application settings defined in the `appSetting` object. */
-  private _checkPermission(rolePermissions: any, permission: PERMISSIONS): boolean {
+  private _checkPermission(
+    rolePermissions: any,
+    permission: PERMISSIONS,
+  ): boolean {
     const keys = permission.split('.');
     let currentLevel = rolePermissions;
 

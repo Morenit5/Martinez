@@ -11,10 +11,18 @@
  * to the first invalid control using
  */
 
-import { AbstractControl, FormArray, FormControl, FormGroup } from '@angular/forms';
+import {
+  AbstractControl,
+  FormArray,
+  FormControl,
+  FormGroup,
+} from '@angular/forms';
 import { ElementRef } from '@angular/core';
 
-export function markInvalidFormControls<T extends AbstractControl>(control: T, elRef?: ElementRef): void {
+export function markInvalidFormControls<T extends AbstractControl>(
+  control: T,
+  elRef?: ElementRef,
+): void {
   if (control instanceof FormGroup) {
     const controls = control.controls;
     control.markAllAsTouched();
@@ -49,7 +57,8 @@ export function markInvalidFormControls<T extends AbstractControl>(control: T, e
 }
 
 function scrollToFirstInvalidControl(refElement: ElementRef) {
-  const firstInvalidControl: HTMLElement = refElement.nativeElement.querySelector('form .ng-invalid');
+  const firstInvalidControl: HTMLElement =
+    refElement.nativeElement.querySelector('form .ng-invalid');
   if (firstInvalidControl) {
     firstInvalidControl.scrollIntoView({ block: 'start', behavior: 'smooth' });
     (firstInvalidControl as HTMLElement).focus();

@@ -60,7 +60,9 @@ export class LetterWordCountDirective implements OnInit {
 
   ngOnInit() {
     if (this.targetElement) {
-      this._renderer.listen(this.targetElement, 'input', () => this._updateCount());
+      this._renderer.listen(this.targetElement, 'input', () =>
+        this._updateCount(),
+      );
     }
     this._updateCount();
   }
@@ -73,18 +75,26 @@ export class LetterWordCountDirective implements OnInit {
     if (!this.targetElement) return;
 
     let text = '';
-    if (this.targetElement instanceof HTMLInputElement || this.targetElement instanceof HTMLTextAreaElement) {
+    if (
+      this.targetElement instanceof HTMLInputElement ||
+      this.targetElement instanceof HTMLTextAreaElement
+    ) {
       text = this.targetElement.value;
     } else {
       text = this.targetElement.innerText;
     }
 
-    let count = this.countWords ? text.split(/\s+/).filter((word) => word.length > 0).length : text.length;
+    let count = this.countWords
+      ? text.split(/\s+/).filter((word) => word.length > 0).length
+      : text.length;
     if (this.reverse) {
       count = this.maxLimit - count;
       if (count < 0) {
         count = 0;
-        if (this.targetElement instanceof HTMLInputElement || this.targetElement instanceof HTMLTextAreaElement) {
+        if (
+          this.targetElement instanceof HTMLInputElement ||
+          this.targetElement instanceof HTMLTextAreaElement
+        ) {
           this.targetElement.value = text.substring(0, this.maxLimit); // Prevent further input
         }
       }

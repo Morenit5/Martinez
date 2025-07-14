@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
+import {
+  ActivatedRouteSnapshot,
+  Router,
+  RouterStateSnapshot,
+} from '@angular/router';
 
 import { Logger } from '@app/@core/services';
 import { UntilDestroy } from '@ngneat/until-destroy';
@@ -41,13 +45,19 @@ export class AuthenticationGuard {
     private readonly _credentialsService: CredentialsService,
   ) {}
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot,
+  ): boolean {
     if (this._credentialsService.isAuthenticated()) {
       return true;
     }
 
     log.debug('Not authenticated, redirecting and adding redirect url...');
-    this._router.navigate(['/login'], { queryParams: { redirect: state.url }, replaceUrl: true });
+    this._router.navigate(['/login'], {
+      queryParams: { redirect: state.url },
+      replaceUrl: true,
+    });
     return false;
   }
 }

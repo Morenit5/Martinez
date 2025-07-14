@@ -16,15 +16,24 @@ export enum LocalStorageKeys {
 // const secretKeyName = '@entry';
 // const secretKeyValue = 'xx1029384756';
 
-export const GetCredentials = () => getDataFromLocalStorage(LocalStorageKeys.CREDENTIALS) as Credentials;
+export const GetCredentials = () =>
+  getDataFromLocalStorage(LocalStorageKeys.CREDENTIALS) as Credentials;
 
-export const SetCredentials = (credentials: Credentials) => saveDataToLocalStorage(LocalStorageKeys.CREDENTIALS, credentials);
+export const SetCredentials = (credentials: Credentials) =>
+  saveDataToLocalStorage(LocalStorageKeys.CREDENTIALS, credentials);
 
-export const GetToken = () => getDataFromLocalStorage(LocalStorageKeys.CREDENTIALS)[LocalStorageKeys.TOKEN];
+export const GetToken = () =>
+  getDataFromLocalStorage(LocalStorageKeys.CREDENTIALS)[LocalStorageKeys.TOKEN];
 
-export const GetRefreshToken = () => getDataFromLocalStorage(LocalStorageKeys.CREDENTIALS)[LocalStorageKeys.REFRESH_TOKEN];
+export const GetRefreshToken = () =>
+  getDataFromLocalStorage(LocalStorageKeys.CREDENTIALS)[
+    LocalStorageKeys.REFRESH_TOKEN
+  ];
 
-export const GetUserId = () => getDataFromLocalStorage(LocalStorageKeys.CREDENTIALS)[LocalStorageKeys.USER_ID];
+export const GetUserId = () =>
+  getDataFromLocalStorage(LocalStorageKeys.CREDENTIALS)[
+    LocalStorageKeys.USER_ID
+  ];
 
 export const ClearStorage = () => clearStorage();
 

@@ -1,0 +1,42 @@
+/* nav-horizontal.component.css */
+.nav-tabs .nav-link.active {
+  border-bottom: 2px solid #9dfd0d3d;
+  font-weight: bold;
+}
+
+.tool-table-container {
+  margin: 20px;
+}
+
+.tool-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f4f4f4;
+  }
+
+  img {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+  }
+}
+
+.contenedor {
+  width: 70%; /* O un ancho fijo */
+  text-align: center; /* Centra el contenido horizontalmente */
+}
+
+.mi-div {
+  width: 65%; /* Ancho deseado */
+  margin: 0 auto; /* Centra horizontalmente */
+  background-color: rgba(235, 243, 238, 0.678); /* Opcional, para visualizar */
+}
