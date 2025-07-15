@@ -11,50 +11,47 @@ export const webSidebarMenuItems: NavMenuItem[] = [
     href: '/dashboard',
     title: 'Dashboard',
     active: true,
-    icon: 'fa-home',
+    icon: 'house',
   },
   {
     href: '/users',
     title: 'Usuarios', //Users
     active: false,
-    icon: 'fa-users',
+    icon: 'speedometer2',
     permissions: [PERMISSIONS.ACCESS_USER],
   },
   {
     href: '/sales',
     title: 'Clientes', //Sales
     active: false,
-    icon: 'fa-money-bill-alt',
+    icon: 'table',
     permissions: [PERMISSIONS.ACCESS_SALE],
   },
   {
     href: '/inventory',
     title: 'Invetario', //Products
     active: false,
-    icon: 'fa-box',
+    icon: 'clipboard-check',
     subItems: [
       {
         href: '/category',
-        title: 'Categoría', //Product Categories
+        title: 'Categoría', //Product Categories files-alt
+        icon: 'files-alt',
         active: false,
       },
       {
         href: '/tool',
         title: 'Herramienta', //Product Types
+        icon: 'hammer',
         active: false,
-      },
-      /*{
-        href: '/product-attributes',
-        title: 'Reportes', //Product Attributes
-        active: false,
-      },*/
+      }
     ],
   },
   {
     href: '/settings',
     title: 'Ajustes', //Settings
     active: false,
-    icon: 'fa-cog',
+    icon: 'gear',
     divider: true,
   },
 ];

@@ -2,46 +2,46 @@
   <a href="/" class="d-flex align-items-center pb-sm-3 mb-md-0 me-md-auto text-white text-decoration-none">
     <span class="fs-5">M<span class="d-none d-sm-inline">artinez Gardening</span></span>
   </a>
+  <div style="margin-top:20 px; margin-bottom: 20px;"></div>
   <ul
     class="nav nav-pills flex-sm-column flex-row flex-nowrap flex-shrink-1 flex-sm-grow-0 flex-grow-1 mb-sm-auto mb-0 justify-content-center align-items-center align-items-sm-start"
     id="menu">
-    <li class="nav-item">
-      <a href="#" class="nav-link px-sm-0 px-2 ">
-        <i style="color: #d9ef9f;" class="fs-5 bi-house"></i><span
-          class="ms-1 d-none d-sm-inline text-white">Home</span>
-      </a>
-    </li>
-    <li>
-      <a href="#submenu1" data-bs-toggle="collapse" class="nav-link px-sm-0 px-2">
-        <i style="color: #d9ef9f;" class="fs-5 bi-speedometer2"></i><span
-          class="ms-1 d-none d-sm-inline text-white">Dashboard</span> </a>
-    </li>
-    <li>
-      <a href="#" class="nav-link px-sm-0 px-2">
-        <i style="color: #d9ef9f;" class="fs-5 bi-table"></i><span
-          class="ms-1 d-none d-sm-inline text-white">Orders</span></a>
-    </li>
-    <div style="margin-top: 5px; margin-bottom: 5px;"class="nav-item" ngbDropdown>
-      <a style="color: #d9ef9f; text-decoration: none;" class="px-sm-0 px-2 " ngbDropdownToggle id="navbarDropdown1" role="button">
-        <i style="color: #d9ef9f;" class="fs-5 bi-bootstrap"></i>
-        <span class="ms-1 d-none d-sm-inline text-white">Bootstrap</span>
-      </a>
-      <div ngbDropdownMenu aria-labelledby="navbarDropdown1" class="dropdown-menu">
-        <a ngbDropdownItem href="#" (click)="$event.preventDefault()">New project...</a>
-        <a ngbDropdownItem href="#" (click)="$event.preventDefault()">Settings</a>
-        <a ngbDropdownItem href="#" (click)="$event.preventDefault()">Profile</a>
-      </div>
-    </div>
-    <li>
-      <a href="#" class="nav-link px-sm-0 px-2">
-        <i style="color: #d9ef9f;" class="fs-5 bi-grid"></i><span
-          class="ms-1 d-none d-sm-inline text-white">Products</span></a>
-    </li>
-    <li>
-      <a href="#" class="nav-link px-sm-0 px-2">
-        <i style="color: #d9ef9f;" class="fs-5 bi-people"></i><span
-          class="ms-1 d-none d-sm-inline text-white">Customers</span> </a>
-    </li>
+    <ng-container *ngFor="let item of sidebarItems; let i = index">
+      <ng-container *ngIf="shellService.allowedAccess(item)">
+        <div style="margin-top:15 px; margin-bottom: 15px;" class="nav-item" ngbDropdown>
+          <li>
+            <ng-container *ngIf="item.subItems && item.subItems.length; else elseBlock">
+              <a (click)="activateSidebarItem(i)" style="color: #d9ef9f; text-decoration: none;" class="px-sm-0 px-2 "
+                ngbDropdownToggle id="navbarDropdown{{ i }}" role="button">
+                <i style="color: #d9ef9f;" class="fs-5 bi-{{ item.icon }}"></i>
+                <span class="ms-1 d-none d-sm-inline text-white">{{ item.title }}</span>
+              </a>
+              <ng-container *ngIf="item.subItems && item.subItems.length">
+                <div ngbDropdownMenu attr.aria-labelledby="navbarDropdown{{ i }}" class="sub-menu-items">
+                  <ng-container *ngFor="let subItem of item.subItems">
+                    <ng-container *ngIf="shellService.allowedAccess(subItem)">
+                     
+                      <a ngbDropdownItem (click)="activateSidebarSubItem(i, subItem);" [routerLink]="subItem.href || undefined" routerLinkActive="active">
+                       
+                       <i class="fs-5 bi-{{ subItem.icon }}"></i> {{ subItem.title }}
+                      </a>
+                       
+                    </ng-container>
+                  </ng-container>
+                </div>
+              </ng-container>
+            </ng-container>
+            <ng-template #elseBlock>
+              <a (click)="activateSidebarItem(i)" style="color: #d9ef9f; text-decoration: none;" class="px-sm-0 px-2 "
+                id="navbarDropdown{{ i }}" role="button">
+                <i style="color: #d9ef9f;" class="fs-5 bi-{{ item.icon }}"></i>
+                <span class="ms-1 d-none d-sm-inline text-white">{{ item.title }}</span>
+              </a>
+            </ng-template>
+          </li>
+        </div>
+      </ng-container>
+    </ng-container>
   </ul>
   <div ngbDropdown class="dropdown py-sm-3 mt-sm-auto ms-auto ms-sm-0 flex-shrink-1">
     <a style="color: #d9ef9f;" class="px-sm-0 px-2 nav-link" ngbDropdownToggle id="dropdownUser1" role="button">
@@ -49,8 +49,8 @@
       <span class="d-none d-sm-inline mx-1">Joe</span>
     </a>
     <div ngbDropdownMenu aria-labelledby="dropdownUser1" class="dropdown-menu">
-        <a class="dropdown-item" href="#">Sign out</a>
+      <a class="dropdown-item" href="#">Sign out</a>
     </div>
-    
+
   </div>
 </div>
