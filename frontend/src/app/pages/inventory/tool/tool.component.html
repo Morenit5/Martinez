@@ -1,116 +1,14 @@
-<nav ngbNav #nav="ngbNav" [(activeId)]="active" class="nav-tabs">
-	<ng-container [ngbNavItem]="1">
-		<!--<button ngbNavLink>CONSULTA</button>[disabled]="false"-->
-		<a ngbNavLink>CONSULTA </a>
-		<ng-template ngbNavContent>
-			ESTA ES LA CONSULTA
-			<section class="main-container">
-				<h2>Listado de Herramientas</h2>
-				<div class="tool-table-container">
-					<table class="tool-table">
-						<thead>
-							<tr>
-								<th>ID</th>
-								<th>Nombre</th>
-								<th>Código</th>
-								<th>Imagen</th>
-								<th>Categoría</th>
-								<th>Estatus</th>
-								<th>Estado</th>
-								<th>Proveedor</th>
-								<th>Fecha de Adquisición</th>
-								<th>Activo</th>
-							</tr>
-						</thead>
-						<tbody>
+<div>
+<tabs
+[tabItems]="['Consulta', 'Registro']"
+[tabIcons]="['folder', 'plus-circle']"
+  (tabIndex)="getMessage($event)">
+</tabs>
+<div *ngIf="recivedTabIndex==0">
 
-						</tbody>
-					</table>
-				</div>
-			</section>
-
-			<!--<h5>Herramientas registradas:</h5>
-				<ul class="list-group">
-					<li class="list-group-item" *ngFor="let h of tools">
-						{{ h.name }} - {{ h.code }} - {{ h.status ? 'Disponible' : 'No disponible' }}
-					</li>
-				</ul>-->
-		</ng-template>
-	</ng-container>
-	<ng-container [ngbNavItem]="2" class="tool-reg">
-		<a ngbNavLink> REGISTRO</a>
-		<ng-template ngbNavContent>
-			<div class="mi-div" > 
-			ESTE ES EL REGISTRO
-			<form (ngSubmit)="onSubmit()" class="needs-validation" > <!--[formGroup]="toolForm" class="p-3"-->
-				<div class="mb-3">
-					<label>Nombre</label>
-					<input type="text" class="form-control" formControlName="name" />
-					<div *ngIf="toolForm.get('name')?.invalid && toolForm.get('name')?.touched" class="text-danger">
-						El Nombre de la Herramienta es un campo requerido
-					</div>
-				</div>
-
-				<div class="mb-3">
-					<label>Código</label>
-					<input type="text" class="form-control" formControlName="code" />
-					<div *ngIf="toolForm.get('code')?.invalid && toolForm.get('code')?.touched" class="text-danger">
-						El Código de la Herramienta es un campo requerido
-					</div>
-				</div>
-
-				<div class="mb-3">
-					<label for="formFile" class="form-label">Seleccione una imagen</label>
-					<input class="form-control" type="file" id="formFile">
-					<div *ngIf="toolForm.get('image')?.invalid && toolForm.get('image')?.touched" class="text-danger">
-						La Imagen de la Herramienta es requerida
-					</div>
-				</div>
-
-				<div class="mb-3">
-					<label>Estatus</label>
-					<select class="form-select" formControlName="image">
-						<option value="" disabled>Seleccione una imagen</option>
-						<option value="BUENO" >BUENO</option>
-						<option value="MALO" >MALO</option>
-						<!-- <option *ngFor="let image of categorias" [value]="image">{{ image }}</option>-->
-					</select>
-					
-				</div>
-
-				<div class="form-check form-switch">
-					<input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
-					<label class="form-check-label" for="flexSwitchCheckDefault">ACTIVO</label>
-				</div>
-
-				<div class="mb-3">
-					<label>Fecha de adquisición</label>
-					<div class="input-group">
-						<input class="form-control" placeholder="yyyy-mm-dd" name="dp" ngbDatepicker #d="ngbDatepicker"
-							formControlName="acquisitionDate" />
-						<button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">📅</button>
-					</div>
-					<div *ngIf="toolForm.get('acquisitionDate')?.invalid && toolForm.get('acquisitionDate')?.touched"
-						class="text-danger">
-						Fecha de Adquisición de la Herramienta es un campo requerido!
-					</div>
-				</div>
-
-				<div class="form-check mb-3">
-					<input class="form-check-input" type="checkbox" formControlName="disponible" />
-					<label class="form-check-label">Disponible</label>
-				</div>
-
-				<!--<button class="btn btn-primary" type="submit">Guardar herramienta</button>-->
-				<button class="btn btn-primary" type="submit">Save Tool</button>
-    			<button type="button" class="btn btn-primary ms-3" (click)="onClear()">Clear</button>
-			</form>
-			</div>
-
-		</ng-template>
-	</ng-container>
-</nav>
-
-<div [ngbNavOutlet]="nav" class="mt-2"></div>
-
-<pre>Active: {{ active }}</pre>
+CONSULTA
+</div>
+<div *ngIf="recivedTabIndex==1">
+  REGISTRO
+</div>
+</div>

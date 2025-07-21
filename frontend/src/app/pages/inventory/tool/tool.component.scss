@@ -31,12 +31,29 @@
 }
 
 .contenedor {
-  width: 70%; /* O un ancho fijo */
-  text-align: center; /* Centra el contenido horizontalmente */
+  width: 70%;
+  /* O un ancho fijo */
+  text-align: center;
+  /* Centra el contenido horizontalmente */
 }
 
 .mi-div {
-  width: 65%; /* Ancho deseado */
-  margin: 0 auto; /* Centra horizontalmente */
-  background-color: rgba(235, 243, 238, 0.678); /* Opcional, para visualizar */
+  width: 65%;
+  /* Ancho deseado */
+  margin: 0 auto;
+  /* Centra horizontalmente */
+  background-color: rgba(235, 243, 238, 0.678);
+  /* Opcional, para visualizar */
 }
+
+// NAVS
+.close {
+  font-size: 1.4rem;
+  opacity: 0.1;
+  transition: opacity 0.3s;
+}
+
+.nav-link:hover>.close {
+  opacity: 0.8;
+}
+//FIN NAVS
