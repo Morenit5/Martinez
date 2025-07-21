@@ -32,6 +32,7 @@ import { RouteReusableStrategy } from '@core/helpers';
 //import { provideHotToastConfig } from '@ngneat/hot-toast';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { IconsModule } from './icons/icons.module';
+import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 
 if (environment.production) {
   enableProdMode();
@@ -48,7 +49,8 @@ export const appConfig: ApplicationConfig = {
       TranslateModule.forRoot(),
       ShellModule,
       NgbModule,
-      IconsModule
+      IconsModule,
+      NgbNavModule
     ),
     
     // provideRouter is required for Angular's router with additional configuration

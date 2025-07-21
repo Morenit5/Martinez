@@ -29,7 +29,7 @@ export const webSidebarMenuItems: NavMenuItem[] = [
   },
   {
     href: '/inventory',
-    title: 'Invetario', //Products
+    title: 'Inventario', //Products
     active: false,
     icon: 'clipboard-check',
     subItems: [

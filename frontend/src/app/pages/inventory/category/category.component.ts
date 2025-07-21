@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-category',
@@ -6,4 +7,9 @@ import { Component } from '@angular/core';
   templateUrl: './category.component.html',
   styleUrl: './category.component.scss',
 })
-export class CategoryComponent {}
+
+export class CategoryComponent {
+getMessage($event: any) {
+throw new Error('Method not implemented.');
+}
+}
