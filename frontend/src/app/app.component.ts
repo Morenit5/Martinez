@@ -7,12 +7,13 @@ import { environment } from '@env/environment';
 import { filter, merge } from 'rxjs';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Logger } from '@core/services';
+import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 
 @UntilDestroy()
 @Component({
   selector: 'app-root',
-  imports: [TranslateModule, RouterOutlet, ReactiveFormsModule],
+  imports: [TranslateModule, RouterOutlet, FormsModule, ReactiveFormsModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

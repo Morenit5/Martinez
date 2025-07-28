@@ -4,6 +4,7 @@ import { Shell } from '@app/shell/services/shell.service';
 import { DashboardComponent } from '@pages/dashboard/dashboard.component';
 import { CategoryComponent } from './inventory/category/category.component';
 import { ToolComponent } from './inventory/tool/tool.component';
+import { ClientComponent } from './client/client.component';
 
 const routes: Routes = [
   Shell.childRoutes([
@@ -23,6 +24,10 @@ const routes: Routes = [
     {
       path: 'tool',
       component: ToolComponent,
+    },
+    {
+      path: 'client',
+      component: ClientComponent,
     },
 
     // Fallback when no prior route is matched
