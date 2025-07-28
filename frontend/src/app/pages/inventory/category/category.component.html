@@ -1,6 +1,36 @@
-<div style="background-color: blueviolet;">HOLA
+<div>
   <tabs [tabItems]="['Consulta', 'Registro']" (tabIndex)="getMessage($event)">>
   </tabs>
-  <div>
+<div *ngIf="recivedTabIndex==0" class="my-div">
+    <div class="container mt-4">
+      <h3 class="mb-4">Listado de Categorías</h3>
+      <div class="table-responsive">
+        <input type="text" class="form-control" placeholder="Buscar por Categoría"><!--[(ngModel)]="filterResults"-->
+        <table class="table table-bordered table-hover table-striped">
+          <thead class="table-bordered">
+            <tr>
+              <th>Tipo</th>
+              <th>Nombre</th>
+              <th>Activo</th>
+              <th>Editar</th>
+              <th>Eliminar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let category of categoryList |async">
+              <td>{{ category.categoryType }}</td>
+              <td>{{ category.name }}</td>
+              <td>{{ category.enabled }}</td>
+              <td><button class="btn btn-sm btn-primary me-2" (click)="editarHerramienta(category)"><i
+                    class="bi bi-pencil-fill"></i>
+                </button></td>
+              <td><button class="btn btn-sm btn-danger" (click)="abrirConfirmacion(category)"><i
+                    class="bi bi-trash-fill"></i>
+                </button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!--Fin container mt-4-->
   </div>
 </div>

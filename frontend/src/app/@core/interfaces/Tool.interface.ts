@@ -1,5 +1,6 @@
 export interface iTool {
 
+    toolId: number;
     categoryId: number;
     name : string;
     code : string;

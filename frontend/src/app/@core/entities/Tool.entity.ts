@@ -1,5 +1,6 @@
 export class ToolEntity {
 
+    toolId: number;
     categoryId: number;
     name : string;
     code : string;
