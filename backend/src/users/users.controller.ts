@@ -1,4 +1,4 @@
-/*import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { EntityUser } from 'src/entities/User.entity';
 //import { EntityUser } from '../entities/user.entity';
@@ -12,10 +12,10 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Get(':id')
+  /*@Get(':id')
   findOne(@Param('id') id: string): Promise<EntityUser|null> {
     return this.usersService.findOne(+id);
-  }
+  }*/
 
   @Post()
   create(@Body() user: EntityUser): Promise<EntityUser> {
@@ -26,4 +26,4 @@ export class UsersController {
   remove(@Param('id') id: string): Promise<void> {
     return this.usersService.remove(+id);
   }
-}*/
+}

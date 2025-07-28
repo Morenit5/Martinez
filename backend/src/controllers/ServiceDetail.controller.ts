@@ -3,7 +3,8 @@ import { ServiceDetailService } from 'src/services/ServiceDetail.service';
 import { EntityServiceDetail } from 'src/entities/ServiceDetails.entity';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 
-@Controller('servicedetail')
+//@Controller('servicedetail')
+@Controller({ version: '1', path: 'servicedetail' })
 export class ControllerServiceDetail {
 
   newServiceDetail: EntityServiceDetail;

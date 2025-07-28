@@ -3,7 +3,8 @@ import { ServiceClient } from 'src/services/Client.service';
 import { EntityClient } from 'src/entities/Client.entity';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 
-@Controller('client')
+//@Controller('client')
+@Controller({ version: '1', path: 'client' })
 export class  ControllerClient {
   newClient: EntityClient;
   constructor(private readonly serviceClient: ServiceClient, private readonly exceptions: TypeORMExceptions) {}

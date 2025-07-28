@@ -1,4 +1,4 @@
-/*import { Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
@@ -10,4 +10,4 @@ import { EntityUser } from 'src/entities/User.entity';
   exports: [UsersService],
   controllers: [UsersController],
 })
-export class UsersModule {}*/
+export class UsersModule {}

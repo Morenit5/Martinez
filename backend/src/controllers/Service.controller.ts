@@ -1,20 +1,22 @@
 import { Controller, Get, Post, Body, Param, Delete, HttpException, HttpStatus, InternalServerErrorException, NotFoundException, ParseIntPipe, Put } from '@nestjs/common';
-import { ServiceService} from 'src/services/Service.service';
-import { EntityService } from 'src/entities/Service.entity';
-import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
+import { ServiceService} from '../services/Service.service';
+import { EntityService } from '../entities/Service.entity';
+import { TypeORMExceptions } from '../exceptions/TypeORMExceptions';
+import { ServiceDto } from '../dto/Service.dto';
 
-@Controller('service')
+//@Controller('service')
+@Controller({ version: '1', path: 'service' })
 export class  ControllerService {
   newService: EntityService;
   constructor(private readonly serviceService: ServiceService, private readonly exceptions: TypeORMExceptions) {}
 
   @Get()
-  findAll(): Promise<EntityService[]> {
+  findAll(): Promise<ServiceDto[]> {
     return this.serviceService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<EntityService|null> {
+  findOne(@Param('id') id: string): Promise<ServiceDto|null> {
     return this.serviceService.findOne(+id);
   }
 
@@ -79,7 +81,7 @@ export class  ControllerService {
       });
     }
 
-    await this.serviceService.update(id, this.newService)
+    await this.serviceService.update(+id, this.newService)
       .then((result: any) => {
         console.log("Result:", result);
         return result;
