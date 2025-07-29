@@ -27,7 +27,7 @@ export class ServiceTool {
   async create(tool: CreateToolDto): Promise<ToolDto> {
     console.log(JSON.stringify(tool));
     if(tool.category == null){
-      var cat:CategoryDto = await this.categoryRepository.findOneBy({ name: 'general' }).then((result: any) => {
+      var cat:CategoryDto = await this.categoryRepository.findOne({ where:[ { name: 'General' },{ name: 'general' },{ name: 'GENERAL' }] }).then((result: any) => {
         return result;
       }).catch((error: any) => {
         throw new NotFoundException('La categoria general no existe y niguna categoria fue proveida en el request');

@@ -13,7 +13,7 @@ export class EntityTool {
     code: string;
 
     @Column({ type: 'varchar', length: 150, nullable: true  })
-    image: string;
+    image?: string;
 
     //@Column() //manyToOne
     //categoryId: number;
@@ -28,11 +28,11 @@ export class EntityTool {
     @Column({ type: 'varchar', length: 100 })
     toolState: string; //bueno, malo, mantenimiento
 
-    @Column({ type: 'varchar', length: 100 })
-    provider: string;
+    @Column({ nullable: true })
+    prize?: number;
 
-    @Column({ type: 'date'})
-    acquisitionDate: Date;
+    @Column({ type: 'date', nullable: true })
+    acquisitionDate?: Date;
 
     @Column({ type: 'boolean', default: true })
     enabled: boolean;
