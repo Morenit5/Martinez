@@ -35,11 +35,11 @@ export class ToolDto {
 
     @IsOptional()
     @IsString()
-    provider?: string;
+    prize?: number;
 
     @IsOptional()
     @IsString()
-    acquisitionDate: Date;
+    acquisitionDate?: Date;
 
   
 }
@@ -68,11 +68,11 @@ export class CreateToolDto {
 
     @IsOptional()
     @IsString()
-    provider?: string;
+    prize?: number;
 
-    @IsNotEmpty({ message: 'La fecha de adquisición es obligatoria.' })
+    @IsOptional()
     @IsDate()
-    acquisitionDate: Date;
+    acquisitionDate?: Date;
 
     @IsBoolean()
     enabled: true;
