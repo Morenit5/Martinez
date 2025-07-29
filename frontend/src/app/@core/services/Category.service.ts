@@ -40,6 +40,15 @@ export class CategoryService {
         return (await data.json()) ?? [];
     }
 
+    add(category: CategoryEntity): Observable<CategoryEntity> {
+    
+            console.log('TOOL ' + JSON.stringify(category));
+    
+            let regresa = this.http.post<CategoryEntity>(this.apiUrl, JSON.stringify(category));
+            //console.log('REGRESA '+regresa); 
+            return regresa;
+        }
+
     /*obtenerHerramientas(): Observable<CategoryEntity[]> {
         return this.http.get<ToolEntity[]>(this.apiUrl);
     }*
