@@ -1,9 +1,9 @@
 import { ColumnNumericTransformer } from 'src/utils/ColumnNumericTransformer';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { EntityInvoiceDetails } from './InvoiceDetails.entity';
 import { EntityPayment } from './Payment.entity';
 import { EntityService } from './Service.entity';
-import { IsBoolean, IsNotEmpty } from 'class-validator';
+
 
 @Entity()
 export class EntityInvoice {
@@ -14,7 +14,6 @@ export class EntityInvoice {
     invoiceDate: Date;
 
     @Column({type: 'varchar', length: 40 })
-    @IsNotEmpty({ message: 'El número de factura es obligatorio.' })
     invoiceNumber: string;
 
     @Column('numeric', {
@@ -24,16 +23,16 @@ export class EntityInvoice {
     })
     totalAmount: number;
 
-    @OneToMany(() => EntityPayment, payment => payment.paymentId)
+    @OneToMany(() => EntityPayment, payment => payment.invoice)
     payment: EntityPayment[];
 
-    @OneToMany(() => EntityInvoiceDetails, invoiceDetail => invoiceDetail.invoiceDetailId)
-    invoiceDetail: EntityInvoiceDetails[];
+    @OneToMany(() => EntityInvoiceDetails, (invoiceDetail) => invoiceDetail.invoice)
+    invoiceDetails: EntityInvoiceDetails[];
 
-    @OneToOne(() => EntityService, service => service.serviceId)
+    @OneToOne(() => EntityService, (service) => service.invoice)
+    @JoinColumn()
     service: EntityService;
 
     @Column({ type: 'boolean', default: true })
-    /*@IsBoolean({ message: 'El campo "activo" debe ser verdadero o falso' })*/
     enabled: boolean;
 }

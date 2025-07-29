@@ -1,29 +1,34 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, HttpException, HttpStatus, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, HttpException, HttpStatus, Patch, UseGuards } from '@nestjs/common';
 import { ServiceCategory } from 'src/services/Category.service';
 import { EntityCategory } from 'src/entities/Category.entity';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { CategoryDto, CreateCategoryDto, UpdateCategoryDto } from 'src/dto/Category.dto';
 
-@Controller('category')
+//@Controller('category')
+//@UseGuards(JwtAuthGuard)
+@Controller({ version: '1', path: 'category' })
 export class ControllerCategory {
-  newCategory: EntityCategory;
-  newPartialCategory: Partial<EntityCategory>;
+  createCat: CreateCategoryDto;
+  updateCat: UpdateCategoryDto;
+  
   constructor(private readonly serviceCategory: ServiceCategory, private readonly exceptions: TypeORMExceptions) { }
 
   @Get()
-  findAll(): Promise<EntityCategory[]> {
+  findAll(): Promise<CategoryDto[]> {
     return this.serviceCategory.findAll();
   }
 
   @Get(':categoryId')
-  findOne(@Param('categoryId') id: string): Promise<EntityCategory | null> {
+  findOne(@Param('categoryId') id: string): Promise<CategoryDto | null> {
     return this.serviceCategory.findOne(+id);
   }
 
   @Post()
-  async create(@Body() category: EntityCategory) {
+  async create(@Body() category: CreateCategoryDto) : Promise<CategoryDto | null> {
 
     try {
-      this.newCategory = category;
+      this.createCat = category;
     } catch (error) {
       throw new HttpException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -34,7 +39,7 @@ export class ControllerCategory {
       });
     }
 
-    await this.serviceCategory.create(this.newCategory)
+    return await this.serviceCategory.create(this.createCat)
       .then((result: any) => {
         console.log("Result:", result);
         return result;
@@ -42,16 +47,14 @@ export class ControllerCategory {
         this.exceptions.sendException(error);
       });
 
-    /*if (error.code === '23505') {
-        throw new BadRequestException('Categoría duplicada.');
-      }*/
+
   }
 
   @Put(':id')
-  async update(@Param('id') categoryId: string, @Body() category) {
+  async update(@Param('id') categoryId: string, @Body() category) : Promise<CategoryDto | null> {
 
     try {
-      this.newCategory = category;
+      this.updateCat = category;
     } catch (error) {
       throw new HttpException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -62,7 +65,7 @@ export class ControllerCategory {
       });
     }
 
-    await this.serviceCategory.update(categoryId, this.newCategory)
+    return await this.serviceCategory.update(Number(categoryId), this.updateCat)
       .then((result: any) => {
         console.log("Result:", result);
         return result;
@@ -73,10 +76,10 @@ export class ControllerCategory {
 
   /*Deshabilitar la categoria*/
   @Patch(':id')
-  async patchCategory(@Param('id') categoryId: string, @Body() partialCategory: Partial<EntityCategory>) {
+  async patchCategory(@Param('id') categoryId: string, @Body() partialCategory: UpdateCategoryDto) : Promise<CategoryDto | null> {
 
     try {
-      this.newPartialCategory = partialCategory;
+      this.updateCat = partialCategory;
     } catch (error) {
       throw new HttpException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -87,7 +90,7 @@ export class ControllerCategory {
       });
     }
 
-    await this.serviceCategory.patchCategory(categoryId, this.newPartialCategory)
+    return await this.serviceCategory.patchCategory(Number(categoryId), this.updateCat)
       .then((result: any) => {
         console.log("Result:", result);
         return result;

@@ -17,6 +17,8 @@ import { TypeORMExceptions } from './exceptions/TypeORMExceptions';
 import { UserModule } from './modules/User.module';
 //import { TypeOrmModule } from '@nestjs/typeorm';
 //import { provideHttpClient } from '@angular/common/http';
+import { AuthModule } from './auth/auth.module';
+import { PermissionModule } from './modules/Permission.module';
 
 let importModules =[
   ConfigModule.forRoot({
@@ -32,12 +34,14 @@ let importModules =[
   PaymentModule,
   ServiceModule,
   ToolModule,
-  UserModule
+  UserModule,
+  PermissionModule
 ];
 
 @Module({
   imports: [
-    ...importModules
+    ...importModules,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService, DbUtilService_Cls,ColumnNumericTransformer,TypeORMExceptions], /*Para que otras clases los puedan encontrar */

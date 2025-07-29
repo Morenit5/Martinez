@@ -1,25 +1,28 @@
-import { Controller, Get, Post, Body, Param, Delete, HttpException, HttpStatus } from '@nestjs/common';
-import { EntityUser } from 'src/entities/User.entity';
-import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
-import { ServiceUser } from 'src/services/User.service';
+import { Controller, Get, Post, Body, Param, Delete, HttpException, HttpStatus, Put } from '@nestjs/common';
+import { CreateUserDto, CreateUserLoginDto, UpdateUserDto, userDto } from '../dto/User.dto';
+import { TypeORMExceptions } from '../exceptions/TypeORMExceptions';
+import { ServiceUser } from '../services/User.service';
 
-@Controller('user')
+//@Controller('user')
+@Controller({ version: '1', path: 'user' })
 export class ControllerUser {
-  newUser: EntityUser;
+  newUser: CreateUserLoginDto;
+  updateUser: UpdateUserDto;
+
   constructor(private readonly serviceUser: ServiceUser, private readonly exceptions: TypeORMExceptions) { }
 
   @Get()
-  findAll(): Promise<EntityUser[]> {
+  findAll(): Promise<userDto[]> {
     return this.serviceUser.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<EntityUser | null> {
+  findOne(@Param('id') id: string): Promise<userDto | null> {
     return this.serviceUser.findOne(+id);
   }
 
   @Post()
-  async create(@Body() user: EntityUser): Promise<undefined> {
+  async create(@Body() user: CreateUserLoginDto): Promise<userDto> {
 
     try {
       this.newUser = user;
@@ -33,15 +36,37 @@ export class ControllerUser {
       });
     }
 
-    await this.serviceUser.create(this.newUser)
-      .then((result: any) => {
-        console.log("Result:", result);
+    return await this.serviceUser.createFullUser(this.newUser).then((result: any) => {
         return result;
-      }).catch((error: any) => {
+    }).catch((error: any) => {
         this.exceptions.sendException(error);
-      });
+    });
 
   }
+
+  @Put('/up/:id')
+  async update(@Param('id') toolId: string, @Body() user): Promise<userDto | null> {
+  
+      //buscar por id, nombre, categoria
+      try {
+        this.updateUser = user;
+      } catch (error) {
+        throw new HttpException({
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: "Internal error while updating"
+        },
+          HttpStatus.INTERNAL_SERVER_ERROR, {
+          cause: error
+        });
+      }
+  
+      return await this.serviceUser.update(Number(toolId), this.updateUser).then((result: any) => {
+          console.log("Result:", result);
+          return result;
+        }).catch((error: any) => {
+          this.exceptions.sendException(error);
+        });
+    }
 
   /*@Delete(':id')
   remove(@Param('id') id: string): Promise<void> {

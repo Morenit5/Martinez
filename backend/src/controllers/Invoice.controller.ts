@@ -3,7 +3,8 @@ import { ServiceInvoice } from 'src/services/Invoice.service';
 import { EntityInvoice } from 'src/entities/Invoice.entity';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 
-@Controller('invoice')
+//@Controller('invoice')
+@Controller({ version: '1', path: 'invoice' })
 export class  ControllerInvoice {
   newInvoice: EntityInvoice;
   constructor(private readonly serviceInvoice: ServiceInvoice, private readonly exceptions: TypeORMExceptions) {}
