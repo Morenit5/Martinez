@@ -44,7 +44,7 @@ export const webSidebarMenuItems: NavMenuItem[] = [
         title: 'Herramienta', //Product Types
         icon: 'hammer',
         active: false,
-      }
+      },
     ],
   },
   {

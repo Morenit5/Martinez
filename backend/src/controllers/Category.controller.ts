@@ -50,7 +50,7 @@ export class ControllerCategory {
 
   }
 
-  @Put(':id')
+  @Put('/up/:id')
   async update(@Param('id') categoryId: string, @Body() category) : Promise<CategoryDto | null> {
 
     try {

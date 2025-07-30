@@ -11,7 +11,15 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [CategoryComponent, ToolComponent, ClientComponent],
-  imports: [CommonModule, PagesRoutingModule, NgbModule, NgbNavModule, NavDynamicComponent,FormsModule,ReactiveFormsModule],
-  exports: [NavDynamicComponent]
+  imports: [
+    CommonModule,
+    PagesRoutingModule,
+    NgbModule,
+    NgbNavModule,
+    NavDynamicComponent,
+    FormsModule,
+    ReactiveFormsModule,
+  ],
+  exports: [NavDynamicComponent],
 })
 export class PagesModule {}

@@ -1,5 +1,5 @@
 <div>
-  <tabs [tabItems]="['Consulta', 'Registro']" (tabIndex)="getMessage($event)">>
+  <tabs [tabItems]="['Consulta', 'Registro']" [tabIcons]="['folder', 'plus-circle']" [requiredTabId]=reqTabId (tabIndex)="getMessage($event)">
   </tabs>
   <div *ngIf="recivedTabIndex==0" class="my-div">
     <div class="container mt-4">
@@ -18,13 +18,13 @@
           </thead>
           <tbody>
             <tr *ngFor="let category of categoryList |async">
-              <td>{{ category.categoryType }}</td>
-              <td>{{ category.name }}</td>
+              <td style="width: 42%;">{{ category.categoryType }}</td>
+              <td style="width: 42%;">{{ category.name }}</td>
               <!--<td>{{ category.enabled }}</td>-->
-              <td><button class="btn btn-sm btn-primary me-2" (click)="editarHerramienta(category)"><i
+              <td style="width: 8%; text-align: center; "><button *ngIf="category.name.toLowerCase() !== 'general' " class="btn btn-sm btn-primary me-2" (click)="updateCategory(category)"><i
                     class="bi bi-pencil-fill"></i>
                 </button></td>
-              <td><button class="btn btn-sm btn-danger" (click)="abrirConfirmacion(category)"><i
+              <td style="width: 8%; text-align: center;"><button *ngIf="category.name.toLowerCase() !== 'general' "  class="btn btn-sm btn-danger" (click)="deleteCategory(category)"><i
                     class="bi bi-trash-fill"></i>
                 </button></td>
             </tr>
@@ -35,8 +35,8 @@
   </div>
   <div *ngIf="recivedTabIndex==1" class="my-div">
     <div class="container mt-4">
-      <h4 class="mb-4">Registro de Categorías</h4>
-      <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+      <h4 class="mb-4">{{categoryLabel}}</h4>
+      <form [formGroup]="categoryForm" (ngSubmit)="onSubmit(categoryButton)">
         <div class="row">
           <!-- Columna 1 -->
           <div class="col-md-6">
@@ -49,7 +49,7 @@
             </div>
             <div class="mb-3">
               <label>Tipo</label>
-              <input type="text" class="form-control col-form-label" formControlName="categoryType" id="categoryType" />
+              <input type="text" class="form-control col-form-label" formControlName="categoryType" id="categoryType"/>
               <div *ngIf="categoryForm.get('categoryType')?.invalid && categoryForm.get('categoryType')?.touched"
                 class="text-danger">
                 El Tipo de la Categoría es un campo requerido
@@ -58,7 +58,7 @@
           </div>          
         </div>
         <div class="mt-3 text-end">
-          <button type="submit" class="btn btn-sm btn-primary">Registrar</button>
+          <button type="submit" class="btn btn-sm btn-primary">{{categoryButton}}</button>
           <button type="button" class="btn btn-sm btn-danger" (click)="onClear()">Cancelar</button>
         </div>
       </form>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, NgModule, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, NgModule, OnInit, Output, SimpleChanges } from '@angular/core';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule, NgFor } from '@angular/common';
 
@@ -13,6 +13,7 @@ export class NavDynamicComponent implements OnInit {
 
   @Output() tabIndex = new EventEmitter<number>();
 
+  @Input() requiredTabId: number; //el parent necesita cambiar al tab q proporcina en este input
   @Input() title: string = ''; // Ej. "Herramientas"
   @Input() tabItems: any[] = [];
   @Input() tabIcons: any[] = [];
@@ -28,8 +29,17 @@ export class NavDynamicComponent implements OnInit {
     }
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['requiredTabId']) {
+     this.activeTabId = this.requiredTabId;
+     
+    }
+  }
+
   sendMessageToParent() 
   {
     this.tabIndex.emit(this.activeTabId);
   }
+
+
 }

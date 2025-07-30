@@ -1,10 +1,10 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, inject } from '@angular/core';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { CategoryEntity } from '@app/@core/entities/Category.entity';
 import { iCategory } from '@app/@core/interfaces/Category.interface';
 import { CategoryService } from '@app/@core/services/Category.service';
+import { ToastUtility } from '@app/@core/utils/toast.utility';
 import { Observable } from 'rxjs';
+
 
 @Component({
   selector: 'app-category',
@@ -12,48 +12,82 @@ import { Observable } from 'rxjs';
   templateUrl: './category.component.html',
   styleUrl: './category.component.scss',
 })
-
 export class CategoryComponent {
-
+  
+  categoryLabel:string ='Registro de Cateogrías';
+  categoryButton:string = 'Registrar';
+  reqTabId:number;
   recivedTabIndex: number = 0;
   categoryForm: FormGroup;
   categoryList: Observable<iCategory[]> | undefined;
   categoryService: CategoryService = inject(CategoryService);
 
-  constructor(private fbCategory: FormBuilder, private http: HttpClient) {
+
+  constructor(private fbCategory: FormBuilder, private toast: ToastUtility) {
     this.categoryForm = this.fbCategory.group({
+      categoryId: [],
       name: ['', Validators.required],
-      categoryType: ['', Validators.required]
+      categoryType: ['', Validators.required],
     });
+
+    
   }
 
   ngOnInit() {
-    this.categoryList = this.categoryService.fetchData1();
+    this.categoryList = this.categoryService.getAllCategories();
   }
 
-  onSubmit() { //: void
+  onSubmit(accion: string) {
+
     this.categoryForm.updateValueAndValidity();
-    console.log(this.categoryForm.errors);
 
     if (this.categoryForm.valid) {
 
-      console.log(this.categoryForm.valid);
-      const newCategory: CategoryEntity = this.categoryForm.value;
-      this.categoryService.add(newCategory);
+      if (accion == 'Registrar') {
+        this.categoryService.addCategory(this.categoryForm.value).subscribe({
+          next: (response) => {
+            this.toast.showToast('Categoría registrada exitosamente!!', 7000, 'check2-circle', true);
+            console.log(response);
+          },
+          error: (err) => {
+            this.toast.showToast('Error al registar la categoria!!', 7000, 'x-circle', false);
+          },
+          complete: () => {
+            this.onClear();
+          }
+        });
+
+      } else if (accion == 'Actualizar') {
+        
+        this.categoryService.updateCategory(this.categoryForm.value).subscribe({
+          next: (response) => {
+            this.toast.showToast('Categoría actualizada exitosamente!!', 7000, 'check2-circle', true);
+          },
+          error: (err) => {
+            this.toast.showToast('Error al actualizar la categoria!!', 7000, 'x-circle', false);
+          },
+          complete: () => {
+            this.onClear();
+          }
+        });
+      }
 
     } else {
       console.log(this.categoryForm.valid);
       this.categoryForm.markAllAsTouched();
+      this.toast.showToast('Campos Invalidos, porfavor revise el formulario!!', 7000, 'x-circle', false);
     }
-
-    this.categoryService.add(this.categoryForm.value).subscribe(() => {
-      alert('Categoría registrada');
-      this.categoryForm.reset();
-    });
 
   }
 
   onClear() {
+    if (this.reqTabId && this.reqTabId != 0) {
+      this.recivedTabIndex = 0;
+      this.reqTabId = 0;
+      this.categoryLabel = 'Registro de Categorías';
+      this.categoryButton = 'Registrar'
+    }
+
     this.categoryForm.reset();
   }
 
@@ -61,11 +95,26 @@ export class CategoryComponent {
     this.recivedTabIndex = message;
   }
 
-  editarHerramienta(_t22: any) {
-    throw new Error('Method not implemented.');
-  }
-  abrirConfirmacion(_t22: any) {
-    throw new Error('Method not implemented.');
+  updateCategory(categoryInstance: iCategory) {
+    this.recivedTabIndex = 1;
+    this.reqTabId = 1;
+    this.categoryLabel = 'Actualizar Categoría';
+    this.categoryButton = 'Actualizar'
+
+    this.categoryForm.patchValue({
+      categoryId: categoryInstance.categoryId,
+      name: categoryInstance.name,
+      categoryType: categoryInstance.categoryType
+    });
+
+    console.log(categoryInstance);
   }
 
+
+  deleteCategory(_t22: any) {
+    
+
+  }
+
+  
 }
