@@ -1,6 +1,6 @@
 <div class="container-fluid">
 	<div class="overflow-x-auto">
-		<ul ngbNav #nav="ngbNav" class="nav-tabs" [(activeId)]="activeTabId">
+		<ul ngbNav #nav="ngbNav" class="nav-tabs" [(activeId)]="activeTabId" >
 			<li *ngFor="let tab of tabs; let i = index" [ngbNavItem]="i">
 				<button ngbNavLink (click)="sendMessageToParent()"> <i class="bi bi-{{tab.tabIcon}} tabBgcIcon"></i>  {{ tab.title}}<!---->
 				</button>

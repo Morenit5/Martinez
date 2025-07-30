@@ -1,55 +1,49 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
-import { CategoryEntity } from '../entities/Category.entity';
 import { iCategory } from '../interfaces/Category.interface';
 
 @Injectable({
-    providedIn: 'root',
+  providedIn: 'root',
 })
 export class CategoryService {
-    constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-    // we can now access environment.apiUrl
-    apiUrl = environment.apiUrl + '/category';
-    categories: CategoryEntity[] = [];// se crea un array vacio de la interfaz
-    /*fetchData(): Observable<ToolEntity[]> {
-        //console.log("Vamo a ver que nos trae el Fetch " + this.apiUrl)
-        var result = this.http.get<ToolEntity[]>(this.apiUrl).pipe(map((response: any) => {
-            this.tools = response;
-            return this.tools;
-        }))
-            .subscribe(result => {
-                console.log(result);
-                return result;
-            });
-        return result;
-    }*/
-    handleError(handleError: any) {
-        throw new Error('Method not implemented.');
-    }
+  // we can now access environment.apiUrl
+  apiUrl = environment.apiUrl + '/category';
 
-    fetchData1(): Observable<iCategory[]> {
+  handleError(handleError: any) {
+    throw new Error('Method not implemented.');
+  }
+
+  getAllCategories(): Observable<iCategory[]> {
     //console.log("Vamo a ver que nos trae el Fetch " + this.apiUrl)
     return this.http.get<iCategory[]>(this.apiUrl);
   }
 
-    async getAllTool(): Promise<iCategory[]> {
-        const data = await fetch(this.apiUrl);
-        return (await data.json()) ?? [];
-    }
 
-    add(category: CategoryEntity): Observable<CategoryEntity> {
-    
-            console.log('TOOL ' + JSON.stringify(category));
-    
-            let regresa = this.http.post<CategoryEntity>(this.apiUrl, JSON.stringify(category));
-            //console.log('REGRESA '+regresa); 
-            return regresa;
-        }
+  addCategory(category: iCategory): Observable<iCategory> {
+    console.log('TOOL ' + JSON.stringify(category));
 
-    /*obtenerHerramientas(): Observable<CategoryEntity[]> {
+    let regresa = this.http.post<iCategory>(
+      this.apiUrl,
+      JSON.stringify(category),
+    );
+    //console.log('REGRESA '+regresa);
+    return regresa;
+  }
+
+  updateCategory(category: iCategory): Observable<iCategory> {
+
+    let params = new HttpParams();
+        params = params.set('id', category.categoryId);
+     let instance = this.http.put<iCategory>(this.apiUrl + '/up/' + category.categoryId, category, { params: params });
+    
+    return instance;
+  }
+
+  /*obtenerHerramientas(): Observable<CategoryEntity[]> {
         return this.http.get<ToolEntity[]>(this.apiUrl);
     }*
 

@@ -11,10 +11,8 @@ import { Observable } from 'rxjs';
   templateUrl: './client.component.html',
   styleUrl: './client.component.scss',
 })
-
-export class ClientComponent implements OnInit  {
-
-  recivedTabIndex: number=0;
+export class ClientComponent implements OnInit {
+  recivedTabIndex: number = 0;
   clientForm: FormGroup;
   clientList: Observable<iClient[]> | undefined;
   clientService: ClientService = inject(ClientService);
@@ -28,7 +26,7 @@ export class ClientComponent implements OnInit  {
       toolState: ['', Validators.required],
       provider: ['', Validators.required],
       acquisitionDate: [null, Validators.required],
-      enabled: [false]
+      enabled: [false],
     });
   }
 
@@ -37,7 +35,6 @@ export class ClientComponent implements OnInit  {
     this.clientList = this.clientService.fetchData1();
   }
 
-  
   getMessage(message: number) {
     this.recivedTabIndex = message;
   }

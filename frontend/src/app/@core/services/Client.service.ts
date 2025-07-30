@@ -6,15 +6,15 @@ import { ClientEntity } from '../entities/Client.entity';
 import { iClient } from '../interfaces/Client.interface';
 
 @Injectable({
-    providedIn: 'root',
+  providedIn: 'root',
 })
 export class ClientService {
-    constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-    // we can now access environment.apiUrl
-    apiUrl = environment.apiUrl + '/client';
-    clients: ClientEntity[] = [];// se crea un array vacio de la interfaz
-    /*fetchData(): Observable<ToolEntity[]> {
+  // we can now access environment.apiUrl
+  apiUrl = environment.apiUrl + '/client';
+  clients: ClientEntity[] = []; // se crea un array vacio de la interfaz
+  /*fetchData(): Observable<ToolEntity[]> {
         //console.log("Vamo a ver que nos trae el Fetch " + this.apiUrl)
         var result = this.http.get<ToolEntity[]>(this.apiUrl).pipe(map((response: any) => {
             this.tools = response;
@@ -26,21 +26,21 @@ export class ClientService {
             });
         return result;
     }*/
-    handleError(handleError: any) {
-        throw new Error('Method not implemented.');
-    }
+  handleError(handleError: any) {
+    throw new Error('Method not implemented.');
+  }
 
-    fetchData1(): Observable<iClient[]> {
+  fetchData1(): Observable<iClient[]> {
     //console.log("Vamo a ver que nos trae el Fetch " + this.apiUrl)
     return this.http.get<iClient[]>(this.apiUrl);
   }
 
-    async getAllTool(): Promise<iClient[]> {
-        const data = await fetch(this.apiUrl);
-        return (await data.json()) ?? [];
-    }
+  async getAllTool(): Promise<iClient[]> {
+    const data = await fetch(this.apiUrl);
+    return (await data.json()) ?? [];
+  }
 
-    /*obtenerHerramientas(): Observable<CategoryEntity[]> {
+  /*obtenerHerramientas(): Observable<CategoryEntity[]> {
         return this.http.get<ToolEntity[]>(this.apiUrl);
     }*
 

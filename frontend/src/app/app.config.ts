@@ -1,35 +1,13 @@
-import {
-  ApplicationConfig,
-  enableProdMode,
-  importProvidersFrom,
-  provideZoneChangeDetection,
-} from '@angular/core';
-import {
-  PreloadAllModules,
-  provideRouter,
-  RouteReuseStrategy,
-  withEnabledBlockingInitialNavigation,
-  withInMemoryScrolling,
-  withPreloading,
-  withRouterConfig,
-} from '@angular/router';
-
+import { ApplicationConfig, enableProdMode, importProvidersFrom,provideZoneChangeDetection, } from '@angular/core';
+import { PreloadAllModules, provideRouter, RouteReuseStrategy, withEnabledBlockingInitialNavigation, withInMemoryScrolling, withPreloading, withRouterConfig,} from '@angular/router';
 import { routes } from './app.routes';
 import { TranslateModule } from '@ngx-translate/core';
 import { environment } from '@env/environment';
 import { ShellModule } from './shell/shell.module';
-import {
-  HTTP_INTERCEPTORS,
-  provideHttpClient,
-  withInterceptorsFromDi,
-} from '@angular/common/http';
-import {
-  ApiPrefixInterceptor,
-  ErrorHandlerInterceptor,
-} from '@core/interceptors';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi, } from '@angular/common/http';
+import { ApiPrefixInterceptor, ErrorHandlerInterceptor, } from '@core/interceptors';
 import { RouteReusableStrategy } from '@core/helpers';
-
-//import { provideHotToastConfig } from '@ngneat/hot-toast';
+import { provideHotToastConfig } from '@ngxpert/hot-toast';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { IconsModule } from './icons/icons.module';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
@@ -50,9 +28,9 @@ export const appConfig: ApplicationConfig = {
       ShellModule,
       NgbModule,
       IconsModule,
-      NgbNavModule
+      NgbNavModule,
     ),
-    
+
     // provideRouter is required for Angular's router with additional configuration
     provideRouter(
       routes,
@@ -67,18 +45,17 @@ export const appConfig: ApplicationConfig = {
       }),
       withPreloading(PreloadAllModules),
     ),
-/*
+
     // provideHotToastConfig is required for HotToastModule by ngneat
     provideHotToastConfig({
       reverseOrder: true,
       dismissible: true,
       autoClose: true,
-      position: 'top-right',
-      theme: 'snackbar',
-    }),*/
+    }),
 
     // provideHttpClient is required for Angular's HttpClient with additional configuration, which includes interceptors from DI (dependency injection) , means to use class based interceptors
     provideHttpClient(withInterceptorsFromDi()),
+
     {
       provide: HTTP_INTERCEPTORS,
       useClass: ApiPrefixInterceptor,
