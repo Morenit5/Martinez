@@ -16,11 +16,7 @@ export class EntityInvoice {
     @Column({type: 'varchar', length: 40 })
     invoiceNumber: string;
 
-    @Column('numeric', {
-        precision: 7,
-        scale: 2,
-        transformer: new ColumnNumericTransformer(),
-    })
+    @Column('numeric', { precision: 7, scale: 2, transformer: new ColumnNumericTransformer() })
     totalAmount: number;
 
     @OneToMany(() => EntityPayment, payment => payment.invoice)
@@ -30,8 +26,7 @@ export class EntityInvoice {
     invoiceDetails: EntityInvoiceDetails[];
 
     @OneToOne(() => EntityService, (service) => service.invoice)
-    @JoinColumn()
-    service: EntityService;
+    service?: EntityService;
 
     @Column({ type: 'boolean', default: true })
     enabled: boolean;

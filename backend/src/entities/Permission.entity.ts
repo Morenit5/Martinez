@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, ManyToMany } from 'typeorm';
 import { EntityRol } from './Rol.entity';
 
 
@@ -10,9 +10,8 @@ export class EntityPermission {
     @Column({ type: 'varchar', length: 100 })
     name: string;
 
-    @ManyToOne(() => EntityRol, (rol) => rol.permission, { onUpdate: "CASCADE" })
-    @JoinColumn({ name: "rolId" }) // Nombre de la columna en la tabla donde se une
-    rol: EntityRol;
+    @ManyToMany(() => EntityRol, (rol) => rol.permission, { onUpdate: "CASCADE" })
+    rol: EntityRol[];
 
     @Column({ type: 'boolean', default: true })
     enabled: boolean;

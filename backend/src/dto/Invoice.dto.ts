@@ -32,7 +32,7 @@ export class InvoiceDto {
 
     @IsOptional()
     @IsObject()
-    service: ServiceDto; //@OneToOne(() => EntityService, service => service.serviceId)
+    service?: ServiceDto; //@OneToOne(() => EntityService, service => service.serviceId)
 
    
 }
@@ -60,9 +60,9 @@ export class CreateInvoiceDto {
     invoiceDetails: CreateInvoiceDetailsDto[];  // @OneToMany(() => EntityInvoiceDetails, invoiceDetail => invoiceDetail.invoiceDetailId)
 
 
-    @IsNotEmpty({ message: 'El campo Servicios es obligatorio.' })
+    @IsOptional()
     @IsObject()
-    service: CreateServiceDto; //@OneToOne(() => EntityService, service => service.serviceId)
+    service?: CreateServiceDto; //@OneToOne(() => EntityService, service => service.serviceId)
 
     
     @IsBoolean({ message: 'El campo "activo" debe ser verdadero o falso' })

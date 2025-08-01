@@ -1,22 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, UpdateResult } from 'typeorm';
+import { Repository } from 'typeorm';
 import { EntityInvoiceDetails } from '../entities/InvoiceDetails.entity';
+import { CreateInvoiceDetailsDto, InvoiceDetailsDto, UpdateInvoiceDetailsDto } from 'src/dto/InvoiceDetails.dto';
 
 @Injectable()
 export class ServiceInvoiceDetail {
   constructor(@InjectRepository(EntityInvoiceDetails) private invoiceDetailRepository: Repository<EntityInvoiceDetails>) {
   }
 
-  findAll(): Promise<EntityInvoiceDetails[]> {
+  findAll(): Promise<InvoiceDetailsDto[]> {
     return this.invoiceDetailRepository.find();
   }
 
-  findOne(invoiceDetailId: number): Promise<EntityInvoiceDetails|null> {
+  findOne(invoiceDetailId: number): Promise<InvoiceDetailsDto|null> {
     return this.invoiceDetailRepository.findOneBy({ invoiceDetailId });
   }
 
-  create(invoiceDetail: EntityInvoiceDetails): Promise<EntityInvoiceDetails> {
+  create(invoiceDetail: CreateInvoiceDetailsDto): Promise<InvoiceDetailsDto> {
     return this.invoiceDetailRepository.save(invoiceDetail);
   }
 
@@ -24,7 +25,8 @@ export class ServiceInvoiceDetail {
     await this.invoiceDetailRepository.delete(id);
   }
 
-  async update(id: string, entity: EntityInvoiceDetails): Promise<UpdateResult> {
-    return await this.invoiceDetailRepository.update(id, entity);
+  async update(invoiceDetailId: number, entity: UpdateInvoiceDetailsDto): Promise<InvoiceDetailsDto | null> {
+    await this.invoiceDetailRepository.update(invoiceDetailId, entity);
+    return this.invoiceDetailRepository.findOneBy({ invoiceDetailId });
   }
 }

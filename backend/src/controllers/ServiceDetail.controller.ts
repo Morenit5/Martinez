@@ -1,27 +1,28 @@
-import { Controller, Get, Post, Body, Param, Delete, HttpException, HttpStatus, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, Put } from '@nestjs/common';
 import { ServiceDetailService } from 'src/services/ServiceDetail.service';
-import { EntityServiceDetail } from 'src/entities/ServiceDetails.entity';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
+import { CreateServiceDetailDto, ServiceDetailDto, UpdateServiceDetailDto } from 'src/dto/ServiceDetail.dto';
 
 //@Controller('servicedetail')
 @Controller({ version: '1', path: 'servicedetail' })
 export class ControllerServiceDetail {
 
-  newServiceDetail: EntityServiceDetail;
+  newServiceDetail: CreateServiceDetailDto;
+  updateServiceDetail: UpdateServiceDetailDto;
   constructor(private readonly serviceDetailService: ServiceDetailService, private readonly exceptions: TypeORMExceptions) { }
 
   @Get()
-  findAll(): Promise<EntityServiceDetail[]> {
+  findAll(): Promise<ServiceDetailDto[]> {
     return this.serviceDetailService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<EntityServiceDetail | null> {
+  findOne(@Param('id') id: string): Promise<ServiceDetailDto | null> {
     return this.serviceDetailService.findOne(+id);
   }
 
   @Post()
-  async create(@Body() serviceDetail: EntityServiceDetail): Promise<undefined> {
+  async create(@Body() serviceDetail: CreateServiceDetailDto): Promise<undefined> {
     
     try {
       this.newServiceDetail = serviceDetail;
@@ -50,8 +51,8 @@ export class ControllerServiceDetail {
     return this.serviceDetailService.delete(+id);
   }*/
 
-  @Put(':id')
-    async update(@Param('id') serviceDetailId: string, @Body() serviceDetail) {
+  @Put('/up/:id')
+    async update(@Param('id') serviceDetailId: number, @Body() serviceDetail) {
   
       try {
         this.newServiceDetail = serviceDetail;
@@ -65,7 +66,7 @@ export class ControllerServiceDetail {
         });
       }
   
-      await this.serviceDetailService.update(serviceDetailId, this.newServiceDetail)
+      await this.serviceDetailService.update(serviceDetailId, this.updateServiceDetail)
         .then((result: any) => {
           console.log("Result:", result);
           return result;

@@ -1,26 +1,27 @@
 import { Controller, Get, Post, Body, Param, Delete, HttpException, HttpStatus, NotFoundException, InternalServerErrorException, Put, ParseIntPipe } from '@nestjs/common';
 import { ServiceInvoiceDetail } from 'src/services/InvoiceDetails.service';
-import { EntityInvoiceDetails } from 'src/entities/InvoiceDetails.entity';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
+import { CreateInvoiceDetailsDto, InvoiceDetailsDto, UpdateInvoiceDetailsDto } from 'src/dto/InvoiceDetails.dto';
 
 //@Controller('invoicedetail')
-@Controller({ version: '1', path: 'invoicedetail' })
+@Controller({ version: '1', path: 'invdetail' })
 export class ControllerInvoiceDetail {
-  newInvoiceDetail: EntityInvoiceDetails;
+  newInvoiceDetail: CreateInvoiceDetailsDto;
+  updateInvoiceDetail: UpdateInvoiceDetailsDto;
   constructor(private readonly serviceDetailService: ServiceInvoiceDetail, private readonly exceptions: TypeORMExceptions) {}
 
   @Get()
-  findAll(): Promise<EntityInvoiceDetails[]> {
+  findAll(): Promise<InvoiceDetailsDto[]> {
     return this.serviceDetailService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<EntityInvoiceDetails|null> {
-    return this.serviceDetailService.findOne(+id);
+  findOne(@Param('id') id: number): Promise<InvoiceDetailsDto|null> {
+    return this.serviceDetailService.findOne(id);
   }
 
   @Post()
-  async create(@Body() invoiceDetails: EntityInvoiceDetails) {
+  async create(@Body() invoiceDetails: CreateInvoiceDetailsDto) {
     //return this.serviceClient.create(client);
 
     try {
@@ -69,11 +70,11 @@ export class ControllerInvoiceDetail {
     }
   }*/
 
-  @Put(':id')
-  async update(@Param('id') id: string, @Body() invoiceDetail) {
+  @Put('/up/:id')
+  async update(@Param('id') id: number, @Body() invoiceDetail) {
 
     try {
-      this.newInvoiceDetail = invoiceDetail;
+      this.updateInvoiceDetail = invoiceDetail;
     } catch (error) {
       throw new HttpException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -84,7 +85,7 @@ export class ControllerInvoiceDetail {
       });
     }
 
-    await this.serviceDetailService.update(id, this.newInvoiceDetail)
+    await this.serviceDetailService.update(id, this.updateInvoiceDetail)
       .then((result: any) => {
         console.log("Result:", result);
         return result;

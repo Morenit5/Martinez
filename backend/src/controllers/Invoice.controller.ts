@@ -1,26 +1,27 @@
-import { Controller, Get, Post, Body, Param, Delete, ParseIntPipe, NotFoundException, InternalServerErrorException, Put, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, HttpException, HttpStatus } from '@nestjs/common';
 import { ServiceInvoice } from 'src/services/Invoice.service';
-import { EntityInvoice } from 'src/entities/Invoice.entity';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
+import { CreateInvoiceDto, InvoiceDto, UpdateInvoiceDto } from 'src/dto/Invoice.dto';
 
 //@Controller('invoice')
-@Controller({ version: '1', path: 'invoice' })
+@Controller({ version: '1', path: 'inv' })
 export class  ControllerInvoice {
-  newInvoice: EntityInvoice;
+  newInvoice: CreateInvoiceDto;
+  updateInvoice: UpdateInvoiceDto;
   constructor(private readonly serviceInvoice: ServiceInvoice, private readonly exceptions: TypeORMExceptions) {}
 
   @Get()
-  findAll(): Promise<EntityInvoice[]> {
+  findAll(): Promise<InvoiceDto[]> {
     return this.serviceInvoice.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<EntityInvoice|null> {
+  findOne(@Param('id') id: string): Promise<InvoiceDto|null> {
     return this.serviceInvoice.findOne(+id);
   }
 
   @Post()
-  async create(@Body() invoice: EntityInvoice) {
+  async create(@Body() invoice: CreateInvoiceDto) {
       //return this.serviceClient.create(client);
   
       try {
@@ -68,11 +69,11 @@ export class  ControllerInvoice {
      }
    }*/
 
-   @Put(':id')
-     async update(@Param('id') id: string, @Body() invoice) {
+   @Put('/up/:id')
+     async update(@Param('id') id: number, @Body() invoice) {
    
        try {
-         this.newInvoice = invoice;
+         this.updateInvoice = invoice;
        } catch (error) {
          throw new HttpException({
            status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -83,7 +84,7 @@ export class  ControllerInvoice {
          });
        }
    
-       await this.serviceInvoice.update(id, this.newInvoice)
+       await this.serviceInvoice.update(id, this.updateInvoice)
          .then((result: any) => {
            console.log("Result:", result);
            return result;

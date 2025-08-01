@@ -20,9 +20,9 @@ export class ServiceDto {
 
     @IsOptional()
     @IsObject()
-    invoice: InvoiceDto; // @OneToOne(() => EntityInvoice, invoice => invoice.invoiceId)
+    invoice?: InvoiceDto; // @OneToOne(() => EntityInvoice, invoice => invoice.invoiceId)
 
-    @IsOptional()   
+    @IsOptional()
     @IsString()
     status: string;
 
@@ -50,9 +50,9 @@ export class CreateServiceDto {
     @IsDate()
     serviceDate: Date;
 
-    @IsNotEmpty({ message: 'El Invoice es obligatorio.' })
+    @IsOptional()
     @IsObject()
-    invoice: CreateInvoiceDto; // @OneToOne(() => EntityInvoice, invoice => invoice.invoiceId)
+    invoice?: CreateInvoiceDto; // @OneToOne(() => EntityInvoice, invoice => invoice.invoiceId)
 
     @IsString()
     status: string;
@@ -74,7 +74,7 @@ export class CreateServiceDto {
   
 }
 
-export class UpdageServiceDto  extends PartialType(CreateServiceDto) {
+export class UpdateServiceDto  extends PartialType(CreateServiceDto) {
  
     serviceId: number;
   

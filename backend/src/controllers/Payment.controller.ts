@@ -1,26 +1,27 @@
 import { Controller, Get, Post, Body, Param, Delete, HttpStatus, HttpException, ParseIntPipe, NotFoundException, InternalServerErrorException, Put } from '@nestjs/common';
 import { ServicePayment} from 'src/services/Payment.service';
-import { EntityPayment } from 'src/entities/Payment.entity';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
+import { CreatePaymentDto, PaymentDto, UpdatePaymentDto } from 'src/dto/Payment.dto';
 
 //@Controller('payment')
 @Controller({ version: '1', path: 'payment' })
 export class  ControllerPayment {
-  newPayment: EntityPayment;
+  newPayment: CreatePaymentDto;
+  updatePayment: UpdatePaymentDto;
   constructor(private readonly servicePayment: ServicePayment, private readonly exceptions: TypeORMExceptions) {}
 
   @Get()
-  findAll(): Promise<EntityPayment[]> {
+  findAll(): Promise<PaymentDto[]> {
     return this.servicePayment.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<EntityPayment|null> {
-    return this.servicePayment.findOne(+id);
+  findOne(@Param('id') id: number): Promise<PaymentDto|null> {
+    return this.servicePayment.findOne(id);
   }
 
   @Post()
-    async create(@Body() payment: EntityPayment) {
+    async create(@Body() payment: CreatePaymentDto) {
       //return this.serviceClient.create(client);
   
       try {
@@ -66,11 +67,11 @@ export class  ControllerPayment {
       }
     }*/
   
-    @Put(':id')
-    async update(@Param('id') id: string, @Body() payment) {
+    @Put('/up/:id')
+    async update(@Param('id') id: number, @Body() payment) {
   
       try {
-        this.newPayment = payment;
+        this.updatePayment = payment;
       } catch (error) {
         throw new HttpException({
           status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -81,7 +82,7 @@ export class  ControllerPayment {
         });
       }
   
-      await this.servicePayment.update(id, this.newPayment)
+      await this.servicePayment.update(id, this.updatePayment)
         .then((result: any) => {
           console.log("Result:", result);
           return result;
