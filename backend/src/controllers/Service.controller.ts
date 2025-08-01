@@ -1,13 +1,13 @@
-import { Controller, Get, Post, Body, Param, Delete, HttpException, HttpStatus, InternalServerErrorException, NotFoundException, ParseIntPipe, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param,  HttpException, HttpStatus,  Put } from '@nestjs/common';
 import { ServiceService} from '../services/Service.service';
-import { EntityService } from '../entities/Service.entity';
 import { TypeORMExceptions } from '../exceptions/TypeORMExceptions';
-import { ServiceDto } from '../dto/Service.dto';
+import { CreateServiceDto, ServiceDto, UpdateServiceDto } from '../dto/Service.dto';
 
 //@Controller('service')
 @Controller({ version: '1', path: 'service' })
 export class  ControllerService {
-  newService: EntityService;
+  newService: CreateServiceDto;
+  updateService: UpdateServiceDto;
   constructor(private readonly serviceService: ServiceService, private readonly exceptions: TypeORMExceptions) {}
 
   @Get()
@@ -21,8 +21,7 @@ export class  ControllerService {
   }
 
   @Post()
-  async create(@Body() service: EntityService) {
-    //return this.serviceClient.create(client);
+  async create(@Body() service: CreateServiceDto) {
 
     try {
       this.newService = service;
@@ -66,11 +65,11 @@ export class  ControllerService {
     }
   }*/
 
-  @Put(':id')
+  @Put('/up/:id')
   async update(@Param('id') id: string, @Body() service) {
 
     try {
-      this.newService = service;
+      this.updateService = service;
     } catch (error) {
       throw new HttpException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -81,7 +80,7 @@ export class  ControllerService {
       });
     }
 
-    await this.serviceService.update(+id, this.newService)
+    await this.serviceService.update(+id, this.updateService)
       .then((result: any) => {
         console.log("Result:", result);
         return result;

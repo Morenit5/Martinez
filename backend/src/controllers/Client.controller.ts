@@ -1,26 +1,37 @@
-import { Controller, Get, Post, Body, Param, Delete, HttpException, HttpStatus, Put, ParseIntPipe, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, Put} from '@nestjs/common';
 import { ServiceClient } from 'src/services/Client.service';
-import { EntityClient } from 'src/entities/Client.entity';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
+import { ClientDto, CreateClientDto, UpdateClientDto } from 'src/dto/Client.dto';
 
 //@Controller('client')
 @Controller({ version: '1', path: 'client' })
 export class  ControllerClient {
-  newClient: EntityClient;
+  newClient: CreateClientDto;
+  updateClient: UpdateClientDto;
   constructor(private readonly serviceClient: ServiceClient, private readonly exceptions: TypeORMExceptions) {}
 
   @Get()
-  findAll(): Promise<EntityClient[]> {
+  findAll(): Promise<ClientDto[]> {
     return this.serviceClient.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<EntityClient|null> {
-    return this.serviceClient.findOne(+id);
+  findOne(@Param('id') id: number): Promise<ClientDto|null> {
+    return this.serviceClient.findOne(id);
+  }
+
+  @Get('/serv/a')
+  findWithServices(): Promise<ClientDto[]> {
+    return  this.serviceClient.findAllWithServices();
+  }
+
+  @Get('/serv/:id')
+  findOneWithServices(@Param('id') id: number): Promise<ClientDto|null> {
+    return this.serviceClient.findOneWithServices(id);
   }
 
   @Post()
-  async create(@Body() client: EntityClient) {
+  async create(@Body() client: CreateClientDto) {
     //return this.serviceClient.create(client);
 
     try {
@@ -70,11 +81,11 @@ export class  ControllerClient {
     }
   }*/
 
-  @Put(':id')
-  async update(@Param('id') id: string, @Body() client) {
+  @Put('/up/:id')
+  async update(@Param('id') id: number, @Body() client) {
 
     try {
-      this.newClient = client;
+      this.updateClient = client;
     } catch (error) {
       throw new HttpException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -85,7 +96,7 @@ export class  ControllerClient {
       });
     }
 
-    await this.serviceClient.update(id, this.newClient)
+    await this.serviceClient.update(id, this.updateClient)
       .then((result: any) => {
         console.log("Result:", result);
         return result;

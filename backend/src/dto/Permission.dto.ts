@@ -14,7 +14,7 @@ export class PermissionDto {
 
     @IsOptional()
     @IsObject()
-    rol?: RolDto; //@ManyToOne EntityRol, rol => rol.permission, 
+    rol?: RolDto[]; //@ManyToOne EntityRol, rol => rol.permission, 
 
 }
 
@@ -27,7 +27,7 @@ export class CreatePermissionDto {
 
     @IsOptional()
     @IsObject()
-    rol?: CreateRolDto; //@ManyToOne EntityRol, rol => rol.permission, 
+    rol?: CreateRolDto[]; //@ManyToOne EntityRol, rol => rol.permission, 
     
     @IsNotEmpty()
     @IsBoolean()

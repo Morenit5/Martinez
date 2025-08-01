@@ -20,7 +20,7 @@ export class ServicePermission {
         return permissions;
     }
 
-    async findOne(rolId: number): Promise<PermissionDto | null> {
+    async findAllByRol(rolId: number): Promise<PermissionDto | null> {
 
         var permissions: PermissionDto = await this.permissionRepository.find({
             where: { rol : { rolId : rolId } },
@@ -32,7 +32,20 @@ export class ServicePermission {
             this.exceptions.sendException(error);
         });
         return permissions;
-        
+    }
+
+    async findByPermission(permissionId: number): Promise<PermissionDto | null> {
+
+        var permissions: PermissionDto = await this.permissionRepository.find({
+            where: { permissionId : permissionId  },
+            relations: { rol: true }
+
+        }).then((result: any) => {
+            return result;
+        }).catch((error: any) => {
+            this.exceptions.sendException(error);
+        });
+        return permissions;
     }
 
     

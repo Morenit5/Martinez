@@ -1,18 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto, CreateUserLoginDto, UpdateUserDto, userDto } from '../dto/User.dto';
-import { EntityRol } from '../entities/Rol.entity';
 import { EntityUser } from '../entities/User.entity';
-import { Repository, UpdateResult } from 'typeorm';
-import { EntityPermission } from '../entities/Permission.entity';
+import { Repository } from 'typeorm';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 
 @Injectable()
 export class ServiceUser {
-    constructor(@InjectRepository(EntityUser) private userRepository: Repository<EntityUser>,
-                @InjectRepository(EntityRol) private rolRepository: Repository<EntityRol>,
-                @InjectRepository(EntityPermission) private permissionRepository: Repository<EntityPermission>,
-                private readonly exceptions:TypeORMExceptions ) {
+    constructor(@InjectRepository(EntityUser) private userRepository: Repository<EntityUser>,private readonly exceptions:TypeORMExceptions ) {
     }
 
     async findAll(): Promise<userDto[]> {

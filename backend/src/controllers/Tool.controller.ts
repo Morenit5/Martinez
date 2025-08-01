@@ -1,6 +1,5 @@
 import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, Put } from '@nestjs/common';
 import { ServiceTool } from 'src/services/Tool.service';
-import { EntityTool } from 'src/entities/Tool.entity';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 import { CreateToolDto, ToolDto, UpdateToolDto } from 'src/dto/Tool.dto';
 

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, HttpException, HttpStatus, Put } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { TypeORMExceptions } from '../exceptions/TypeORMExceptions';
 import { PermissionDto } from 'src/dto/Permission.dto';
 import { ServicePermission } from 'src/services/Permission.service';
@@ -15,9 +15,9 @@ export class ControllerPermission {
     return this.servicePermission.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string): Promise<PermissionDto | null> {
-    return this.servicePermission.findOne(+id);
+  @Get('/r/:id')
+  findAllByRol(@Param('id') id: number): Promise<PermissionDto | null> {
+    return this.servicePermission.findAllByRol(id);
   }
 
   

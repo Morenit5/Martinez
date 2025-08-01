@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, UpdateResult } from 'typeorm';
+import { Repository } from 'typeorm';
 import { EntityServiceDetail } from '../entities/ServiceDetails.entity';
+import { CreateServiceDetailDto, ServiceDetailDto, UpdateServiceDetailDto } from 'src/dto/ServiceDetail.dto';
 
 @Injectable()
 export class ServiceDetailService {
@@ -9,15 +10,15 @@ export class ServiceDetailService {
 
   }
 
-  findAll(): Promise<EntityServiceDetail[]> {
+  findAll(): Promise<ServiceDetailDto[]> {
     return this.serviceDetailRepository.find();
   }
 
-  findOne(serviceDetailsId: number): Promise<EntityServiceDetail | null> {
+  findOne(serviceDetailsId: number): Promise<ServiceDetailDto | null> {
     return this.serviceDetailRepository.findOneBy({ serviceDetailsId });
   }
 
-  create(serviceDetail: EntityServiceDetail): Promise<EntityServiceDetail> {
+  create(serviceDetail: CreateServiceDetailDto): Promise<ServiceDetailDto> {
     return this.serviceDetailRepository.save(serviceDetail);
   }
 
@@ -25,9 +26,10 @@ export class ServiceDetailService {
     await this.serviceDetailRepository.delete(id);
   }
 
-  async update(serviceDetailId: string, category: EntityServiceDetail): Promise<UpdateResult> {
+  async update(serviceDetailsId: number, category: UpdateServiceDetailDto): Promise<ServiceDetailDto | null> {
 
-    return await this.serviceDetailRepository.update(serviceDetailId, category);
+    await this.serviceDetailRepository.update(serviceDetailsId, category);
+    return this.serviceDetailRepository.findOneBy({ serviceDetailsId });
 
   }
 }
