@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Query } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { ToolEntity } from '@app/@core/entities/Tool.entity';
 import { Observable } from 'rxjs';
@@ -10,7 +10,7 @@ import { CategoryEntity } from '../entities/Category.entity';
   providedIn: 'root',
 })
 export class ToolService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // we can now access environment.apiUrl
   apiUrl = environment.apiUrl + '/tool';
@@ -38,7 +38,39 @@ export class ToolService {
   }
 
   fetchData1(): Observable<iTool[]> {
-    return this.http.get<iTool[]>(this.apiUrl);
+
+    console.log((`${this.apiUrl+'/'}?enabled=${true}`));
+    return this.http.get<iTool[]>((`${this.apiUrl+ '/'}?enabled=${true}`));
+
+    //return this.http.get<iTool[]>(`${this.apiUrl}?enabled=${true}`);
+
+    /*const data = await fetch(`${this.apiUrl}?id=${id}`);
+    const toolJson = await data.json();
+    return toolJson[0] ?? {};*/
+    //return this.http.get<iTool[]>(this.getAllTool() + '/' + 'enabled', { params: params }).subscribe();
+
+
+    /*//params = params.set('id', id).set('enabled', tool.enabled);
+    this.http.put(this.updateDelete + '/' + id, tool, { params: params })
+      .subscribe();
+
+    this.http.get<iTool[]>(this.apiUrl+ { where: [{ 'enabled': 'true' }] });
+    //console.log('TOOL SERVICE FETCH ' +this.http.get<iTool[]>(this.apiUrl+ { where: [{ 'enabled': 'true' }] }));
+    //return this.http.get<iTool[]>(this.apiUrl,{ where: { enabled: true } } );
+    return this.http.get<iTool[]>(this.apiUrl, params 
+      
+      fetchData1({ where: { enabled: true } });*/
+
+    /*async findActiveUsers(): Promise<User[]> {
+      return this.userRepository.find({ where: { isActive: true } });
+    }*/
+
+    /*const tools: EntityTool[] = await this.toolRepository.find({ where: [{ categoryId: Number(categoryId) }] }).then((result: any) => {
+      // console.log(JSON.stringify(result));
+      return result;
+    }).catch((error: any) => {
+      this.exceptions.sendException(error);
+    });*/
   }
 
   /*create(tool: ToolEntity): Observable<ToolEntity> {

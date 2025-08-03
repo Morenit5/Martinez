@@ -3,6 +3,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { iClient } from '@app/@core/interfaces/Client.interface';
 import { ClientService } from '@app/@core/services/Client.service';
+import { ToastUtility } from '@app/@core/utils/toast.utility';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -17,15 +18,15 @@ export class ClientComponent implements OnInit {
   clientList: Observable<iClient[]> | undefined;
   clientService: ClientService = inject(ClientService);
 
-  constructor(private fbCategory: FormBuilder, private http: HttpClient) {
-    this.clientForm = this.fbCategory.group({
+  constructor(private fbClient: FormBuilder, private toast: ToastUtility) {
+    this.clientForm = this.fbClient.group({
       name: ['', Validators.required],
-      code: ['', Validators.required],
-      image: ['', Validators.required],
-      status: ['', Validators.required],
-      toolState: ['', Validators.required],
-      provider: ['', Validators.required],
-      acquisitionDate: [null, Validators.required],
+      lastname: ['', Validators.required],
+      address: ['', Validators.required],
+      phone: ['', Validators.required],
+      email: ['', Validators.required],
+      clienType: ['', Validators.required],
+      registryDate: [null, Validators.required],
       enabled: [false],
     });
   }

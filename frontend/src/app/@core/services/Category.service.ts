@@ -8,7 +8,7 @@ import { iCategory } from '../interfaces/Category.interface';
   providedIn: 'root',
 })
 export class CategoryService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // we can now access environment.apiUrl
   apiUrl = environment.apiUrl + '/category';
@@ -37,9 +37,11 @@ export class CategoryService {
   updateCategory(category: iCategory): Observable<iCategory> {
 
     let params = new HttpParams();
-        params = params.set('id', category.categoryId);
-     let instance = this.http.put<iCategory>(this.apiUrl + '/up/' + category.categoryId, category, { params: params });
-    
+    params = params.set('id', category.categoryId);
+    console.log('LLEGA A SERVICE -PARAMS '+ params);
+
+    let instance = this.http.put<iCategory>(this.apiUrl + '/up/' + category.categoryId, category, { params: params });
+
     return instance;
   }
 

@@ -1,7 +1,9 @@
 <div class="d-flex flex-sm-column flex-row h-100 flex-grow-1 align-items-center align-items-sm-start px-3 pt-2 ">
-  <a href="/" class="d-flex align-items-center pb-sm-3 mb-md-0 me-md-auto text-white text-decoration-none">
-    <span class="fs-5">M<span class="d-none d-sm-inline">artinez Gardening</span></span>
-  </a>
+  <div style="align-items: center; justify-content: center;">
+    <a href="/" class="d-flex align-items-center pb-sm-3 mb-md-0 me-md-auto text-white text-decoration-none">
+      <img src="images/mg.png" alt="hugenerd" width="70" height="70" class="align-items-center" />
+    </a>
+  </div>
   <div style="margin-top:20 px; margin-bottom: 20px;"></div>
   <ul
     class="nav nav-pills flex-sm-column flex-row flex-nowrap flex-shrink-1 flex-sm-grow-0 flex-grow-1 mb-sm-auto mb-0 justify-content-center align-items-center align-items-sm-start"
@@ -20,12 +22,13 @@
                 <div ngbDropdownMenu attr.aria-labelledby="navbarDropdown{{ i }}" class="sub-menu-items">
                   <ng-container *ngFor="let subItem of item.subItems">
                     <ng-container *ngIf="shellService.allowedAccess(subItem)">
-                     
-                      <a ngbDropdownItem (click)="activateSidebarSubItem(i, subItem);" [routerLink]="subItem.href || undefined" routerLinkActive="active">
-                       
-                       <i class="fs-5 bi-{{ subItem.icon }}"></i> {{ subItem.title }}
+
+                      <a ngbDropdownItem (click)="activateSidebarSubItem(i, subItem);"
+                        [routerLink]="subItem.href || undefined" routerLinkActive="active">
+
+                        <i class="fs-5 bi-{{ subItem.icon }}"></i> {{ subItem.title }}
                       </a>
-                       
+
                     </ng-container>
                   </ng-container>
                 </div>
