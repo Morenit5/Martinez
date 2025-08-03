@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { CategoryEntity } from '@app/@core/entities/Category.entity';
 import { ToolEntity } from '@app/@core/entities/Tool.entity';
@@ -14,7 +14,7 @@ import { Observable } from 'rxjs';
   styleUrl: './tool.component.scss',
 })
 
-export class ToolComponent implements OnInit, OnChanges {
+export class ToolComponent implements OnInit {
 
   toolLabel: string = 'Registro de Herramientas';
   toolButton: string = 'Registrar';
@@ -39,7 +39,7 @@ export class ToolComponent implements OnInit, OnChanges {
       status: new FormControl('', [Validators.required]),
       toolState: new FormControl('', [Validators.required]),
       categoryId: new FormControl('', [Validators.required]),
-      acquisitionDate: new FormControl('', [Validators.required])/**/
+      acquisitionDate: new FormControl('', [Validators.required])
     })
   }
 
@@ -48,26 +48,17 @@ export class ToolComponent implements OnInit, OnChanges {
   onSelectChange($event: any) { throw new Error('Method not implemented.'); }
   enviarFormulario() { throw new Error('Method not implemented.'); }
 
-  ngOnChanges(changes: SimpleChanges) {
-    // changes.prop contains the old and the new value...
-    console.log('Cada vez que se llama metodo OnChanges');
-  }
-
   getMessage(message: number) {
     this.recivedTabIndex = message;
   }
 
   ngOnInit() {
-    /*this.toolList =this.toolService.fetchData();*/
-    //console.log('Cada vez que se llama metodo OnInit');
-    //this.toolList = this.toolService.fetchData1();
-
     this.toolService.getCategories().subscribe(data => {
       this.categories = data;
     });
   }
 
-  onSubmit(accion: string) { //: void
+  onSubmit(accion: string) { 
     this.toolForm.updateValueAndValidity();
 
     if (this.toolForm.valid) {
@@ -78,7 +69,7 @@ export class ToolComponent implements OnInit, OnChanges {
         this.toolForm.value['acquisitionDate'] = fechaConvertida;
         //const newTool: ToolEntity = this.toolForm.value;
 
-        this.toolService.add(this.toolForm.value).subscribe({
+        this.toolService.addTool(this.toolForm.value).subscribe({
           next: (response) => {
             this.toast.showToast('Herramienta registrada exitosamente!!', 7000, 'check2-circle', true);
             console.log(response);
@@ -139,16 +130,15 @@ export class ToolComponent implements OnInit, OnChanges {
 
   async deleteTool(tool: iTool) {
     const toolObject = new ToolEntity();
-
     toolObject.enabled = false; // deshabilitamos el objeto
     toolObject.toolId = tool.toolId;
-    //console.log("ToolComponent "+ JSON.stringify(toolObject));
 
     this.toolService.update(tool.toolId, toolObject).then(data => {
       console.log('Datos con promise:', data);
-      
+      //enviar el toast
     }).catch(error => {
       console.error('Error al eliminar', error);
+      //enviar el toast
     });
     this.toolList = this.toolService.fetchData1();
   }
