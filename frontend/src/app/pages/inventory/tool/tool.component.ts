@@ -1,10 +1,10 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, inject, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { CategoryEntity } from '@app/@core/entities/Category.entity';
 import { ToolEntity } from '@app/@core/entities/Tool.entity';
 import { iTool } from '@app/@core/interfaces/Tool.interface';
 import { ToolService } from '@app/@core/services/Tool.service';
+import { ToastUtility } from '@app/@core/utils/toast.utility';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -14,19 +14,12 @@ import { Observable } from 'rxjs';
   styleUrl: './tool.component.scss',
 })
 
-export class ToolComponent implements OnInit, OnChanges {
+export class ToolComponent implements OnInit {
 
+  toolLabel: string = 'Registro de Herramientas';
+  toolButton: string = 'Registrar';
   categories: CategoryEntity[] = [];
   categoryId: number | null = null;
-
-  onSelectChange($event: any) {
-    throw new Error('Method not implemented.');
-  }
-
-  enviarFormulario() {
-    throw new Error('Method not implemented.');
-  }
-
   recivedTabIndex: number = 0;
   checkoutForm;
   exceptions: any;
@@ -35,8 +28,9 @@ export class ToolComponent implements OnInit, OnChanges {
   toolList: Observable<iTool[]> | undefined;
   toolService: ToolService = inject(ToolService);
   filteredToolList: ToolEntity[] = [];
+  reqTabId: number;
 
-  constructor(private fbTool: FormBuilder, private http: HttpClient) {
+  constructor(private fbTool: FormBuilder, private toast: ToastUtility) {
     this.toolList = this.toolService.fetchData1();
 
     this.toolForm = new FormGroup({
@@ -45,57 +39,59 @@ export class ToolComponent implements OnInit, OnChanges {
       status: new FormControl('', [Validators.required]),
       toolState: new FormControl('', [Validators.required]),
       categoryId: new FormControl('', [Validators.required]),
-      acquisitionDate: new FormControl('', [Validators.required])/**/
+      acquisitionDate: new FormControl('', [Validators.required])
     })
   }
 
   @Output() guardado = new EventEmitter<void>();
 
-  ngOnChanges(changes: SimpleChanges) {
-    // changes.prop contains the old and the new value...
-    console.log('Cada vez que se llama metodo OnChanges');
-  }
+  onSelectChange($event: any) { throw new Error('Method not implemented.'); }
+  enviarFormulario() { throw new Error('Method not implemented.'); }
 
   getMessage(message: number) {
     this.recivedTabIndex = message;
   }
 
   ngOnInit() {
-    /*this.toolList =this.toolService.fetchData();*/
-    //console.log('Cada vez que se llama metodo OnInit');
-    //this.toolList = this.toolService.fetchData1();
-
     this.toolService.getCategories().subscribe(data => {
       this.categories = data;
     });
   }
 
-  onSubmit() { //: void
+  onSubmit(accion: string) { 
     this.toolForm.updateValueAndValidity();
-    console.log(this.toolForm.errors);
-    console.log('1 Llega al onSubmit ' + this.toolForm.valid);
 
     if (this.toolForm.valid) {
-      let convertDate = JSON.parse(JSON.stringify(this.toolForm.controls['acquisitionDate'].value));
-      let fechaConvertida = convertDate.year + '-' + convertDate.month + '-' + convertDate.day;
-      console.log(this.toolForm.valid);
-      this.toolForm.value['acquisitionDate'] = fechaConvertida;
-      const newTool: ToolEntity = this.toolForm.value;
-      this.toolService.add(newTool);
+      if (accion == 'Registrar') {
+        let convertDate = JSON.parse(JSON.stringify(this.toolForm.controls['acquisitionDate'].value));
+        let fechaConvertida = convertDate.year + '-' + convertDate.month + '-' + convertDate.day;
+        console.log(this.toolForm.valid);
+        this.toolForm.value['acquisitionDate'] = fechaConvertida;
+        //const newTool: ToolEntity = this.toolForm.value;
 
-    } else {
-      console.log(this.toolForm.valid);
-      this.toolForm.markAllAsTouched();
+        this.toolService.addTool(this.toolForm.value).subscribe({
+          next: (response) => {
+            this.toast.showToast('Herramienta registrada exitosamente!!', 7000, 'check2-circle', true);
+            console.log(response);
+          },
+          error: (err) => {
+            this.toast.showToast('Error al registar la herramienta!!', 7000, 'x-circle', false);
+          },
+          complete: () => {
+            this.onClear();
+          }
+        });
+      }
     }
-
-    this.toolService.add(this.toolForm.value).subscribe(() => {
-      alert('Herramienta registrada');
-      this.toolForm.reset();
-    });
-
   }
 
   onClear() {
+    if (this.reqTabId && this.reqTabId != 0) {
+      this.recivedTabIndex = 0;
+      this.reqTabId = 0;
+      this.toolLabel = 'Registro de Herramientas';
+      this.toolButton = 'Registrar'
+    }
     this.toolForm.reset();
   }
 
@@ -112,22 +108,39 @@ export class ToolComponent implements OnInit, OnChanges {
     console.log("entra aqui" + this.filteredToolList);
   }
 
-  editarHerramienta(arg0: any) {
-    throw new Error('Method not implemented.');
+  updateTool(toolInstance: iTool) {
+    this.recivedTabIndex = 1;
+    this.reqTabId = 1;
+    this.toolLabel = 'Actualizar Herramienta';
+    this.toolButton = 'Actualizar'
+
+    this.toolForm.patchValue({
+      toolId: toolInstance.toolId,
+      name: toolInstance.name,
+      code: toolInstance.code,
+      image: toolInstance.image,
+      status: toolInstance.status,
+      toolState: toolInstance.toolState,
+      acquisitionDate: toolInstance.acquisitionDate /*,
+        prize: toolInstance.prize*/
+    });
+
+    console.log(toolInstance);
   }
 
   async deleteTool(tool: iTool) {
     const toolObject = new ToolEntity();
-
     toolObject.enabled = false; // deshabilitamos el objeto
     toolObject.toolId = tool.toolId;
-    //console.log("ToolComponent "+ JSON.stringify(toolObject));
 
     this.toolService.update(tool.toolId, toolObject).then(data => {
       console.log('Datos con promise:', data);
-      this.toolList = this.toolService.fetchData1();
+      //enviar el toast
     }).catch(error => {
       console.error('Error al eliminar', error);
+      //enviar el toast
     });
+    this.toolList = this.toolService.fetchData1();
   }
 }
+

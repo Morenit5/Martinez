@@ -8,9 +8,10 @@ import { NavDynamicComponent } from '@app/shared/components';
 import { ClientComponent } from './client/client.component';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
+import { PaymentComponent } from './payment/payment.component';
 
 @NgModule({
-  declarations: [CategoryComponent, ToolComponent, ClientComponent],
+  declarations: [CategoryComponent, ToolComponent, ClientComponent, PaymentComponent],
   imports: [
     CommonModule,
     PagesRoutingModule,

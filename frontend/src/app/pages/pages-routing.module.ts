@@ -5,6 +5,7 @@ import { DashboardComponent } from '@pages/dashboard/dashboard.component';
 import { CategoryComponent } from './inventory/category/category.component';
 import { ToolComponent } from './inventory/tool/tool.component';
 import { ClientComponent } from './client/client.component';
+import { PaymentComponent } from './payment/payment.component';
 
 const routes: Routes = [
   Shell.childRoutes([
@@ -29,6 +30,10 @@ const routes: Routes = [
       path: 'client',
       component: ClientComponent,
     },
+    {
+      path: 'payment',
+      component: PaymentComponent,
+    },   
 
     // Fallback when no prior route is matched
     { path: '**', redirectTo: '', pathMatch: 'full' },

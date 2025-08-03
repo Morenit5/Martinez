@@ -17,21 +17,21 @@ export const webSidebarMenuItems: NavMenuItem[] = [
     href: '/users',
     title: 'Usuarios', //Users
     active: false,
-    icon: 'speedometer2',
+    icon: 'person-fill-gear',
     permissions: [PERMISSIONS.ACCESS_USER],
   },
   {
-    href: '/sales',
+    href: '/client',
     title: 'Clientes', //Sales
     active: false,
-    icon: 'table',
+    icon: 'person-vcard-fill',
     permissions: [PERMISSIONS.ACCESS_SALE],
   },
   {
     href: '/inventory',
     title: 'Inventario', //Products
     active: false,
-    icon: 'clipboard-check',
+    icon: 'clipboard-check-fill',
     subItems: [
       {
         href: '/category',
@@ -46,6 +46,13 @@ export const webSidebarMenuItems: NavMenuItem[] = [
         active: false,
       },
     ],
+  },
+  {
+    href: '/payment',
+    title: 'Pagos', //Settings
+    active: false,
+    icon: 'cash-coin',
+    divider: true,
   },
   {
     href: '/settings',
