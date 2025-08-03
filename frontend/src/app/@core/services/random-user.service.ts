@@ -12,7 +12,7 @@ export class RandomUserService {
     return this._http
       .get('https://randomuser.me/api/', {
         headers: {
-          noauth: 'false', // Ad noauth header to bypass custom api prefix interceptor
+          noauth: 'true', // Ad noauth header to bypass custom api prefix interceptor
         },
       })
       .pipe(map((response: any) => response.results));

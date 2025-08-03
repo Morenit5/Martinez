@@ -13,7 +13,11 @@ export class ServiceTool {
     }
 
   findAll(): Promise<ToolDto[]> {
-    return this.toolRepository.find();
+    return this.toolRepository.find({
+      where: [
+        { enabled: true },
+      ],
+    })
   }
 
   async findOne(toolId: number): Promise<ToolDto|null> {

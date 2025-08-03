@@ -16,7 +16,15 @@ export class ServiceCategory {
   }
 
   findOne(categoryId: number): Promise<CategoryDto | null> {
-    return this.categoryRepository.findOneBy({ categoryId });
+    return this.categoryRepository.findOne({
+            where: { categoryId: categoryId },
+            relations: { tool : true }
+
+        }).then((result: any) => {
+            return result;
+        }).catch((error: any) => {
+            this.exceptions.sendException(error);
+        });
   }
 
   create(category: CreateCategoryDto): Promise<CategoryDto> {

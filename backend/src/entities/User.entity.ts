@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from 'typeorm';
 import { EntityRol } from './Rol.entity';
 
 @Entity()
@@ -12,11 +12,11 @@ export class EntityUser {
   @Column({ type: 'varchar', length: 50 })
   password: string;
 
-  @Column({ type: 'varchar', length: 100 })
-  name: string;
+  @Column({ type: 'varchar', nullable:true, length: 100 })
+  name?: string;
 
-  @Column({ type: 'varchar', length: 100 })
-  lastname: string;
+  @Column({ type: 'varchar', nullable:true, length: 100 })
+  lastname?: string;
 
   @ManyToOne(() => EntityRol, (rol) => rol.user, { onUpdate: "CASCADE" })
   @JoinColumn({name:'rolId' })
@@ -24,6 +24,9 @@ export class EntityUser {
 
   @Column({ unique: true }) //para que el correo no se repita en la bd
   email: string;
+
+  @Column({ unique: true, nullable:true }) //para que el correo no se repita en la bd
+  phone?: string;
 
   @Column({ type: 'boolean', default: true })
   enabled: boolean;

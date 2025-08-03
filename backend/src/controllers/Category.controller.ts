@@ -4,9 +4,11 @@ import { EntityCategory } from 'src/entities/Category.entity';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CategoryDto, CreateCategoryDto, UpdateCategoryDto } from 'src/dto/Category.dto';
+import { Serializer } from 'src/interceptors/UserTransform.interceptor';
 
 //@Controller('category')
 //@UseGuards(JwtAuthGuard)
+@Serializer(CategoryDto)
 @Controller({ version: '1', path: 'category' })
 export class ControllerCategory {
   createCat: CreateCategoryDto;

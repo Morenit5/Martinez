@@ -22,12 +22,14 @@ export class ApiPrefixInterceptor implements HttpInterceptor {
     private readonly _translateService: TranslateService,
   ) {}
 
-  intercept(
-    request: HttpRequest<any>,
-    next: HttpHandler,
-  ): Observable<HttpEvent<any>> {
+  intercept(request: HttpRequest<any>,next: HttpHandler,): Observable<HttpEvent<any>> {
+
+    console.log('estamos aqui en el intercept....')
+
     // If the request has the 'noauth' header, don't add the Authorization header
     if (request.headers.get('noauth')) {
+      console.log('con el header adecuado....')
+
       return next.handle(request);
     }
 

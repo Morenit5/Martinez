@@ -17,7 +17,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let category of categoryList |async">
+            <tr *ngFor="let category of categoryList | async ">
               <td style="width: 42%;">{{ category.categoryType }}</td>
               <td style="width: 42%;">{{ category.name }}</td>
               <!--<td>{{ category.enabled }}</td>-->
