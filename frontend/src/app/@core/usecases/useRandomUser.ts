@@ -10,13 +10,10 @@ import { inject } from '@angular/core';
  * This is an Exmaple of a usecase.
  */
 export class UseRandomUser {
-  private readonly _randomUserService: RandomUserService =
-    inject(RandomUserService);
+  private readonly _randomUserService: RandomUserService = inject(RandomUserService);
 
   getAllUsers() {
-    return this._randomUserService
-      .find()
-      .pipe(
+    return this._randomUserService.find().pipe(
         map((response) =>
           response.map((user: any) => plainToInstance(RandomUserEntity, user)),
         ),

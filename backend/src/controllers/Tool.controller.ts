@@ -2,8 +2,10 @@ import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, Put } fr
 import { ServiceTool } from 'src/services/Tool.service';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 import { CreateToolDto, ToolDto, UpdateToolDto } from 'src/dto/Tool.dto';
+import { Serializer } from 'src/interceptors/UserTransform.interceptor';
 
 //@Controller('tool')
+@Serializer(ToolDto)
 @Controller({ version: '1', path: 'tool' })
 export class ControllerTool {
   createTool: CreateToolDto;

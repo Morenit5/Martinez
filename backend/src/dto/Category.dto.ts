@@ -1,23 +1,27 @@
 import { IsBoolean, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { CreateToolDto, ToolDto } from './Tool.dto';
 import { PartialType } from '@nestjs/mapped-types';
-import { Type } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 
 
 export class CategoryDto {
 
+    @Expose()
     @IsOptional()
     @IsNumber()
     categoryId: number;
     
+    @Expose()
     @IsOptional()
     @IsString()
     categoryType: string;
 
+    @Expose()
     @IsOptional()
     @IsString()
     name: string;
 
+    @Expose()
     @IsOptional()
     @IsObject()
     @ValidateNested()

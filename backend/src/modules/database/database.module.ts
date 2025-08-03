@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { typeOrmConfig } from "src/db/typeorm.config";
+import { typeOrmConfig } from "../../db/typeorm.config";
 
 @Module({
     imports: [TypeOrmModule.forRootAsync(typeOrmConfig)]

@@ -2,41 +2,51 @@
 import { IsBoolean, IsNotEmpty, IsNumber, IsString,IsDate, IsOptional } from 'class-validator';
 import { CategoryDto, CreateCategoryDto, UpdateCategoryDto } from './Category.dto';
 import { PartialType } from '@nestjs/mapped-types';
+import { Exclude, Expose } from 'class-transformer';
 
 
 export class ToolDto {
 
+    @Exclude()
     @IsOptional()
     @IsNumber()
     toolId?: number;
 
-     @IsOptional()
+    @Expose()
+    @IsOptional()
     name: string;
 
+    @Expose()
     @IsOptional()
     @IsString()
     code: string;
 
+    @Expose()
     @IsOptional()
     @IsString()
     image?: string;
 
+    @Expose()
     @IsOptional()
     @IsString()
     category?: CategoryDto; //@ManyToOne => category.categoryId
  
+    @Expose()
     @IsOptional()
     @IsString()
     status: string;
 
+    @Expose()
     @IsOptional()
     @IsString()
     toolState: string;
 
+    @Expose()
     @IsOptional()
     @IsString()
     prize?: number;
 
+    @Expose()
     @IsOptional()
     @IsString()
     acquisitionDate?: Date;
