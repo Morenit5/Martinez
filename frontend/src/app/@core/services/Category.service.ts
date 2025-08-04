@@ -16,7 +16,7 @@ export class CategoryService {
   handleError(handleError: any) { throw new Error('Method not implemented.'); }
 
   getAllCategories(): Observable<iCategory[]> {
-    return this.http.get<iCategory[]>(this.apiUrl);
+   return this.http.get<iCategory[]>(this.apiUrl);
   }
 
   addCategory(category: iCategory): Observable<iCategory> {

@@ -1,0 +1,22 @@
+{
+  "clientes": [
+    {
+      "id": "1",
+      "clientType": "Fijo"
+    },
+    {
+      "title": "2",
+      "clientType": "Eventual"
+    }
+  ],
+ "categoria": [
+    {
+      "id": "1",
+      "clientType": "Fijo"
+    },
+    {
+      "title": "2",
+      "clientType": "Eventual"
+    }
+  ]
+}

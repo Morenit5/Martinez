@@ -1,9 +1,9 @@
 <div>
-  <tabs [tabItems]="['Consulta', 'Registro']" (tabIndex)="getMessage($event)">>
+  <tabs [tabItems]="['Consulta', 'Registro']" [tabIcons]="['folder', 'plus-circle']" (tabIndex)="getMessage($event)">>
   </tabs>
-<div *ngIf="recivedTabIndex==0" class="my-div">
+  <div *ngIf="recivedTabIndex==0" class="my-div">
     <div class="container mt-4">
-      <h3 class="mb-4">Listado de Clientes</h3>
+      <h3 class="mb-4">Clientes</h3>
       <div class="table-responsive">
         <input type="text" class="form-control" placeholder="Buscar por Cliente"><!--[(ngModel)]="filterResults"-->
         <table class="table table-bordered table-hover table-striped">
@@ -29,11 +29,11 @@
               <td>{{ client.phone }}</td>
               <td>{{ client.email }}</td>
               <td>{{ client.registryDate }}</td>
-              <td><button class="btn btn-sm btn-primary me-2" (click)="editarHerramienta(client)"><i
-                    class="bi bi-pencil-fill"></i>
+              <td style="width: 8%; text-align: center; "><button class="btn btn-sm btn-primary me-2"
+                  (click)="updateClient(client)"><i class="bi bi-pencil-fill"></i>
                 </button></td>
-              <td><button class="btn btn-sm btn-danger" (click)="abrirConfirmacion(client)"><i
-                    class="bi bi-trash-fill"></i>
+              <td style="width: 8%; text-align: center;"><button class="btn btn-sm btn-danger"
+                  (click)="deleteClient(client)"><i class="bi bi-trash-fill"></i>
                 </button></td>
             </tr>
           </tbody>
@@ -41,4 +41,58 @@
       </div>
     </div><!--Fin container mt-4-->
   </div>
-</div>
+  <div *ngIf="recivedTabIndex==1" class="my-div">
+    <div class="container mt-4">
+      <h4 class="mb-4">{{clientLabel}}</h4>
+      <form [formGroup]="clientForm" (ngSubmit)="onSubmit(clientButton)">
+        <div class="container">
+          <!-- Fila 1 -->
+          <div class="row mb-3">
+            <div id="Client-Left-Column" class="col-md-6">
+              <label for="name" class="form-label">Nombre</label>
+              <input type="text" id="name" class="form-control" formControlName="name">
+              <div *ngIf="clientForm.get('name')?.invalid && clientForm.get('name')?.touched" class="text-danger">
+                El Nombre del cliente es un campo requerido
+              </div>
+              <label for="lastName" class="form-label">Apellido</label>
+              <input type="text" id="lastName" class="form-control" formControlName="lastName">
+              <label for="address" class="form-label">Dirección</label>
+              <input type="text" id="address" class="form-control" formControlName="address">
+              <label for="email" class="form-label">Correo electrónico</label>
+              <input type="email" id="email" class="form-control" formControlName="email">
+            </div><!--Fin columna Left-->
+            <div id="Client-Right-Column" class="col-md-6">
+              <label for="phone" class="form-label">Teléfono</label>
+              <input type="tel" id="phone" class="form-control" formControlName="phone">
+              <label>*Fecha de Registro</label>
+              <div class="input-group">
+                <input class="form-control" placeholder="yyyy-mm-dd" name="registryDate" ngbDatepicker
+                  #d="ngbDatepicker" formControlName="registryDate" />
+                <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">📅</button>
+              </div>
+              <div *ngIf="clientForm.get('registryDate')?.invalid && clientForm.get('registryDate')?.touched"
+                class="text-danger">
+                La Fecha de Registro del Cliente es un campo requerido!
+              </div>
+              <label for="opcion" class="form-label">Tipo de Cliente:</label>
+              <select id="opcion" class="form-select" formControlName="clientType">
+                <option value="">-- Selecciona --</option>
+                <option *ngFor="let item of opciones" [value]="item.clientType"> <!--[value]="item.id"-->
+                  {{ item.clientType }}
+                </option>
+              </select>
+            </div><!--Fin column Right-->
+            <!-- Botón -->
+            <div class="row">
+              <div class="col text-end">
+                <div class="mt-3 text-end">
+                  <button type="submit" class="btn btn-sm btn-primary">{{clientButton}}</button>
+                  <button type="button" class="btn btn-sm btn-danger" (click)="onClear()">Cancelar</button>
+                </div>
+              </div>
+            </div><!--Fin class=row-->
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>

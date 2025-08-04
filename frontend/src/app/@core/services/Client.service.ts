@@ -1,60 +1,42 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
 import { ClientEntity } from '../entities/Client.entity';
-import { iClient } from '../interfaces/Client.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ClientService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+   }
 
   // we can now access environment.apiUrl
   apiUrl = environment.apiUrl + '/client';
+  updateDelete = this.apiUrl + '/up';
   clients: ClientEntity[] = []; // se crea un array vacio de la interfaz
-  /*fetchData(): Observable<ToolEntity[]> {
-        //console.log("Vamo a ver que nos trae el Fetch " + this.apiUrl)
-        var result = this.http.get<ToolEntity[]>(this.apiUrl).pipe(map((response: any) => {
-            this.tools = response;
-            return this.tools;
-        }))
-            .subscribe(result => {
-                console.log(result);
-                return result;
-            });
-        return result;
-    }*/
-  handleError(handleError: any) {
-    throw new Error('Method not implemented.');
+
+  handleError(handleError: any) { throw new Error('Method not implemented.'); }
+
+  fetchData1(): Observable<ClientEntity[]> {
+    return this.http.get<ClientEntity[]>(this.apiUrl);
   }
 
-  fetchData1(): Observable<iClient[]> {
-    //console.log("Vamo a ver que nos trae el Fetch " + this.apiUrl)
-    return this.http.get<iClient[]>(this.apiUrl);
+  getAllClients(): Observable<ClientEntity[]> {
+    return this.http.get<ClientEntity[]>(this.apiUrl);
   }
 
-  async getAllTool(): Promise<iClient[]> {
-    const data = await fetch(this.apiUrl);
-    return (await data.json()) ?? [];
+  addClient(client: ClientEntity): Observable<ClientEntity> {
+    console.log('CLIENTE ' + JSON.stringify(client));
+
+    let regresa = this.http.post<ClientEntity>(this.apiUrl, JSON.stringify(client));
+    return regresa;
   }
 
-  /*obtenerHerramientas(): Observable<CategoryEntity[]> {
-        return this.http.get<ToolEntity[]>(this.apiUrl);
-    }*
-
-    async getToolById(id: number): Promise<CategoryEntity | undefined> {
-        const data = await fetch(`${this.apiUrl}?id=${id}`);
-        const categoryJson = await data.json();
-        return categoryJson[0] ?? {};
-    }
-
-    submitApplication(name: string, code: string, status: string) {
-        console.log(`Categoria: nombre: ${name}, código: ${code}, estatus: ${status}.`,);
-    }
-
-    /*crearHerramienta(herramienta: ToolEntity): Observable<ToolEntity> {
-        return this.http.post<ToolEntity>(this.apiUrl, herramienta);
-    }*/
+  updateClient(client: ClientEntity): Observable<ClientEntity> {
+    let params = new HttpParams();
+    params = params.set('id', client.clientId);
+    let instance = this.http.put<ClientEntity>(this.apiUrl + '/up/' + client.clientId, client, { params: params });
+    return instance;
+  }
 }

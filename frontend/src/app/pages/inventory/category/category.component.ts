@@ -24,6 +24,9 @@ export class CategoryComponent {
   categoryService: CategoryService = inject(CategoryService);
 
   constructor(private fbCategory: FormBuilder, private toast: ToastUtility) {
+    this.categoryList = this.categoryService.getAllCategories();
+
+    console.log('CATEGORY LIST'+ JSON.stringify(this.categoryList));
     this.categoryForm = this.fbCategory.group({
       categoryId: [],
       name: ['', Validators.required],
@@ -32,7 +35,7 @@ export class CategoryComponent {
   }
 
   ngOnInit() {
-    this.categoryList = this.categoryService.getAllCategories();
+    
   }
 
   onSubmit(accion: string) {
