@@ -6,6 +6,8 @@ import { CategoryComponent } from './inventory/category/category.component';
 import { ToolComponent } from './inventory/tool/tool.component';
 import { ClientComponent } from './client/client.component';
 import { PaymentComponent } from './payment/payment.component';
+import { ServiceComponent } from './services/service/service.component';
+import { InvoceComponent } from './services/invoce/invoce.component';
 
 const routes: Routes = [
   Shell.childRoutes([
@@ -17,6 +19,14 @@ const routes: Routes = [
       path: 'users',
       loadChildren: () =>
         import('./users/users.module').then((m) => m.UsersModule),
+    },
+    {
+      path: 'service',
+      component: ServiceComponent,
+    },
+    {
+      path: 'invoice',
+      component: InvoceComponent,
     },
     {
       path: 'category',

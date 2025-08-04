@@ -1,46 +1,75 @@
 <div>
-  <tabs [tabItems]="['Consulta', 'Registro']" [tabIcons]="['folder', 'plus-circle']" (tabIndex)="getMessage($event)">
+  <tabs [tabItems]="['Consulta', 'Crear Servicio', 'Pagos']" [tabIcons]="['journal-check', 'plus-circle', 'cash-coin']" (tabIndex)="getMessage($event)">
   </tabs>
   <div *ngIf="recivedTabIndex==0" class="my-div">
     <div class="container mt-4">
-      <h3 class="mb-4">Herramientas</h3>
+      <h3 class="mb-4">Servicios</h3>
       <div class="table-responsive">
-        <input type="text" class="form-control" placeholder="Buscar por nombre"><!--[(ngModel)]="filterResults"-->
-        <table class="table table-bordered table-hover table-striped">
-          <thead class="table-bordered">
+        <input type="text" class="form-control" placeholder="Buscar por nombre">
+        <div class="table-responsive">
+           
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Cliente</th>
+        <th>Servicio</th>
+        <th>Fecha Servicio</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+     </tr>
+    </thead>
+    <tbody>
+        @if (!isLoading) {
+    <ng-container *ngFor="let parentItem of serviceList">
+      <tr>
+        <td>{{parentItem.client.name}} {{parentItem.client.lastName}}</td>
+        <td>
+          <a  role="button"  (click)="toggleDetails(parentItem)">
+            {{ parentItem.serviceName }}
+          </a>
+        </td>
+        <td>{{ parentItem.serviceDate }}</td>
+        <td [ngClass]="{'table-success': parentItem.status === 'terminado', 'table-danger': parentItem.status === 'en progreso'}">{{ parentItem.status }}</td>
+        <td>
+            <button class="btn btn-sm btn-primary me-2" (click)="generateInvoice()"><i class="bi bi-receipt-cutoff"></i></button>
+        </td>
+      </tr>
+      <tr *ngIf="parentItem.showDetails">
+        <td colspan="5">
+            
+          <table class="table caption-top table-striped-columns">
+            <caption>Detalles del Servicio</caption>
+            <thead>
+              <tr>  
+                <th>Tipo</th>
+                <th>Descripcion</th>
+                <th>Unidades</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let childItem of parentItem.serviceDetail" >
+                <td>{{ childItem.serviceType }}</td>
+                <td>{{ childItem.description }}</td>
+                <td>{{ childItem.unitMeasurement }}</td>
+                <td>{{ childItem.quantity }}</td>
+                <td>${{ childItem.price }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </ng-container>
+        } @else {
             <tr>
-              <th>Código</th>
-              <th>Nombre</th>
-              <!--<th>Imagen</th>-->
-              <th>Estatus</th>
-              <th>Estado de Herramienta</th>
-              <!--<th>Proveedor</th>-->
-              <th>Fecha Adquisición</th>
-              <!--<th>Activo</th>-->
-              <th>Editar</th>
-              <th>Eliminar</th>
+              <td colspan="5" style="text-align: center">Cargando....</td>
             </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let tool of toolList |async">
-              <!--<td>{{ tool.toolId }}</td>-->
-              <td>{{ tool.code }}</td>
-              <td>{{ tool.name }}</td>
-              <!--<td>{{ tool.image }}</td>-->
-              <td>{{ tool.status }}</td>
-              <td>{{ tool.toolState }}</td>
-              <!--<td>{{ tool.provider }}</td>-->
-              <td>{{ tool.acquisitionDate | date: 'shortDate' }}</td>
-              <!--<td>{{ tool.enabled }}</td>-->
-               <td style="width: 8%; text-align: center; "><button *ngIf="tool.name.toLowerCase() !== 'general' " class="btn btn-sm btn-primary me-2" (click)="updateTool(tool)"><i
-                    class="bi bi-pencil-fill"></i>
-                </button></td>
-              <td style="width: 8%; text-align: center;"><button *ngIf="tool.name.toLowerCase() !== 'general' "  class="btn btn-sm btn-danger" (click)="deleteTool(tool)"><i
-                    class="bi bi-trash-fill"></i>
-                </button></td>
-            </tr>
-          </tbody>
-        </table>
+        }
+  </tbody>
+  </table>
+
+</div>
       </div>
     </div><!--Fin container mt-4-->
   </div>

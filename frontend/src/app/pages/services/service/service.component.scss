@@ -1,0 +1,16 @@
+.table-success{
+    background-color: green;
+}
+
+.table-danger{
+    background-color:gold ;
+}
+
+a[role="button"] {
+  color: blue; /* Or a specific hex code like #0000FF */
+}
+
+a[role="button"]:hover {
+  color: blue; /* Or a specific hex code like #0000FF */
+  text-decoration:underline; 
+}
