@@ -15,8 +15,8 @@ export class EntityClient {
     @Column({ type: 'varchar', length: 100 })
     address: string;
 
-    @Column()
-    phone: number;
+    @Column({ unique: true, nullable:true }) //para que el correo no se repita en la bd
+    phone:string;
 
     @Column({ unique: true }) //para que el correo no se repita en la bd
     email: string;

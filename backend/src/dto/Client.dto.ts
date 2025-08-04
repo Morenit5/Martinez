@@ -22,8 +22,8 @@ export class ClientDto {
     address: string;
 
     @IsOptional()
-    @IsNumber()
-    phone: number;
+    @IsString()
+    phone: string;
 
     @IsOptional()
     @IsString()
@@ -61,9 +61,9 @@ export class CreateClientDto {
     address: string;
 
     @IsOptional()
-    @IsNumber()
+    @IsString()
     @IsNotEmpty({ message: 'Favor de escribir el Número Telefónico es un campo obligatorio.' })
-    phone: number;
+    phone: string;
 
     @IsOptional()
     @IsString()
