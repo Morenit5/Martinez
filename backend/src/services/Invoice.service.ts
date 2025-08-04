@@ -12,7 +12,8 @@ export class ServiceInvoice {
   }
 
   findAll(): Promise<InvoiceDto[]> {
-    var invoices = this.invoiceRepository.find({ 
+    var invoices = this.invoiceRepository.find({
+      where: [{ enabled: true } ],
       relations: {
         service:{
           serviceDetail:true,

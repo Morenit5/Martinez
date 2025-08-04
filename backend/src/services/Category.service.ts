@@ -12,7 +12,11 @@ export class ServiceCategory {
   constructor(@InjectRepository(EntityCategory) private categoryRepository: Repository<EntityCategory>, @InjectRepository(EntityTool) private toolRepository: Repository<EntityTool>) { }
 
   findAll(): Promise<CategoryDto[]> {
-    return this.categoryRepository.find();
+    return this.categoryRepository.find({
+      where: [
+        { enabled: true },
+      ],
+    })
   }
 
   findOne(categoryId: number): Promise<CategoryDto | null> {

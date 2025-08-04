@@ -12,7 +12,11 @@ export class ServicePayment {
   }
 
   findAll(): Promise<PaymentDto[]> {
-    return this.paymentRepository.find();
+    return this.paymentRepository.find({
+      where: [
+        { enabled: true },
+      ],
+    })
   }
 
   findOne(paymentId: number): Promise<PaymentDto | null> {

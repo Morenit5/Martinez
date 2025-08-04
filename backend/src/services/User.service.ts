@@ -11,7 +11,9 @@ export class ServiceUser {
     }
 
     async findAll(): Promise<userDto[]> {
-        var users: userDto[] = await this.userRepository.find({ relations: { rol: true } }).then((result: any) => {
+        var users: userDto[] = await this.userRepository.find({ 
+            where: [{ enabled: true } ],
+            relations: { rol: true } }).then((result: any) => {
             return result;
         }).catch((error: any) => {
             this.exceptions.sendException(error);

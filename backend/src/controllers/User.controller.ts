@@ -2,8 +2,10 @@ import { Controller, Get, Post, Body, Param, Delete, HttpException, HttpStatus, 
 import { CreateUserDto, CreateUserLoginDto, UpdateUserDto, userDto } from '../dto/User.dto';
 import { TypeORMExceptions } from '../exceptions/TypeORMExceptions';
 import { ServiceUser } from '../services/User.service';
+import { Serializer } from 'src/interceptors/UserTransform.interceptor';
 
 //@Controller('user')
+@Serializer(userDto)
 @Controller({ version: '1', path: 'user' })
 export class ControllerUser {
   newUser: CreateUserLoginDto;

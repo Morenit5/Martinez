@@ -10,7 +10,11 @@ export class ServiceInvoiceDetail {
   }
 
   findAll(): Promise<InvoiceDetailsDto[]> {
-    return this.invoiceDetailRepository.find();
+    return this.invoiceDetailRepository.find({
+      where: [
+        { enabled: true },
+      ],
+    })
   }
 
   findOne(invoiceDetailId: number): Promise<InvoiceDetailsDto|null> {

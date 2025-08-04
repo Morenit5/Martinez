@@ -41,6 +41,10 @@ export class PaymentComponent implements OnInit, OnChanges {
 
   constructor(private fbTool: FormBuilder, private toast: ToastUtility) {
     this.paymentList = this.paymentService.fetchData1();
+    /*.subscribe(result => {
+                console.log(result);
+                return result;
+            });*/
 
     this.paymentForm = new FormGroup({
       paymentDate: new FormControl('', [Validators.required]),
@@ -139,7 +143,7 @@ export class PaymentComponent implements OnInit, OnChanges {
       paymentMethod: paymentInstance.paymentMethod,
       taxAmount: paymentInstance.taxAmount,
       paymentStatus: paymentInstance.paymentStatus,
-      invoiceId: paymentInstance.invoiceId 
+      //invoiceId: paymentInstance.invoiceId 
     });
 
     console.log(paymentInstance);

@@ -50,7 +50,7 @@
       <form [formGroup]="toolForm" (ngSubmit)="onSubmit(toolButton)"><!--[formGroup]="toolForm" (ngSubmit)="enviarFormulario()"-->
         <div class="row">
           <!-- Columna 1 -->
-          <div class="col-md-6">
+          <div id="Tools-Left-Column" class="col-md-6">
             <div class="mb-3">
               <label for="name" class="form-label">Nombre</label>
               <input type="text" id="name" class="form-control col-form-label" formControlName="name" />
@@ -81,7 +81,7 @@
           </div><!---->
 
           <!-- Columna 2 -->
-          <div class="col-md-6">
+          <div id="Tools-Right-Column" class="col-md-6">
             <div class="mb-3">
               <label>Estatus</label>
               <select class="form-select" formControlName="status">
