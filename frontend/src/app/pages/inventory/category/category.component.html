@@ -3,7 +3,7 @@
   </tabs>
   <div *ngIf="recivedTabIndex==0" class="my-div">
     <div class="container mt-4">
-      <h3 class="mb-4">Listado de Categorías</h3>
+      <h3 class="mb-4">Categorías</h3>
       <div class="table-responsive">
         <input type="text" class="form-control" placeholder="Buscar por Categoría"><!--[(ngModel)]="filterResults"-->
         <table class="table table-bordered table-hover table-striped">
@@ -39,7 +39,7 @@
       <form [formGroup]="categoryForm" (ngSubmit)="onSubmit(categoryButton)">
         <div class="row">
           <!-- Columna 1 -->
-          <div class="col-md-6">
+          <div id="Category-Left-Column" class="col-md-6">
             <div class="mb-3">
               <label for="name" class="form-label">Nombre</label>
               <input type="text" id="name" class="form-control col-form-label" formControlName="name" />
@@ -55,11 +55,19 @@
                 El Tipo de la Categoría es un campo requerido
               </div>
             </div>
-          </div>          
-        </div>
-        <div class="mt-3 text-end">
-          <button type="submit" class="btn btn-sm btn-primary">{{categoryButton}}</button>
-          <button type="button" class="btn btn-sm btn-danger" (click)="onClear()">Cancelar</button>
+          </div>
+
+          <div id="Tools-Right-Column" class="col-md-6 ">
+            <div class="d-flex justify-content-end" style="height: 90%;">
+          
+              <div class="align-self-end text-end">
+                <button type="submit" class="btn btn-sm btn-primary">{{categoryButton}}</button>
+                <button type="button" class="btn btn-sm btn-danger" (click)="onClear()">Cancelar</button>
+              </div>
+            </div>
+          
+          </div>
+        
         </div>
       </form>
     </div>

@@ -28,10 +28,30 @@ export const webSidebarMenuItems: NavMenuItem[] = [
     permissions: [PERMISSIONS.ACCESS_SALE],
   },
   {
+    href: '/services',
+    title: 'Servicios', //Servicios ofrecidos
+    active: false,
+    icon: 'clipboard-check-fill',
+    subItems: [
+      {
+        href: '/service',
+        title: 'Servicio', 
+        icon: 'list-check',
+        active: false,
+      },
+      {
+        href: '/invoice',
+        title: 'Factura', //factura
+        icon: 'receipt-cutoff',
+        active: false,
+      },
+    ],
+  },  
+  {
     href: '/inventory',
     title: 'Inventario', //Products
     active: false,
-    icon: 'clipboard-check-fill',
+    icon: 'tools',
     subItems: [
       {
         href: '/category',
@@ -47,13 +67,7 @@ export const webSidebarMenuItems: NavMenuItem[] = [
       },
     ],
   },
-  {
-    href: '/payment',
-    title: 'Pagos', //Settings
-    active: false,
-    icon: 'cash-coin',
-    divider: true,
-  },
+
   {
     href: '/settings',
     title: 'Ajustes', //Settings
