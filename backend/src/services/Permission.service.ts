@@ -12,7 +12,9 @@ export class ServicePermission {
     }
 
     async findAll(): Promise<PermissionDto[]> {
-        var permissions: PermissionDto[] = await this.permissionRepository.find({ relations: { rol: true } }).then((result: any) => {
+        var permissions: PermissionDto[] = await this.permissionRepository.find({
+            where: [{ enabled: true } ],
+            relations: { rol: true } }).then((result: any) => {
             return result;
         }).catch((error: any) => {
             this.exceptions.sendException(error);

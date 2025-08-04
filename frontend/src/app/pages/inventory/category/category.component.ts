@@ -14,10 +14,10 @@ import { Observable } from 'rxjs';
 })
 
 export class CategoryComponent {
-  
-  categoryLabel:string ='Registro de Categorías';
-  categoryButton:string = 'Registrar';
-  reqTabId:number;
+
+  categoryLabel: string = 'Registro de Categorías';
+  categoryButton: string = 'Registrar';
+  reqTabId: number;
   recivedTabIndex: number = 0;
   categoryForm: FormGroup;
   categoryList: Observable<iCategory[]> | undefined;
@@ -56,7 +56,7 @@ export class CategoryComponent {
         });
 
       } else if (accion == 'Actualizar') {
-        
+
         this.categoryService.updateCategory(this.categoryForm.value).subscribe({
           next: (response) => {
             this.toast.showToast('Categoría actualizada exitosamente!!', 7000, 'check2-circle', true);
@@ -110,22 +110,21 @@ export class CategoryComponent {
 
 
   async deleteCategory(category: iCategory) {
-      const categoryObject = new CategoryEntity();
-  
-      categoryObject.enabled = false; // deshabilitamos el objeto
-      categoryObject.categoryId = category.categoryId;
-      //console.log("ToolComponent "+ JSON.stringify(toolObject));
-  
-      this.categoryService.updateCategory(/*category.categoryId,*/categoryObject).subscribe({
-          next: (response) => {
-            this.toast.showToast('Categoría eliminada exitosamente!!', 7000, 'check2-circle', true);
-          },
-          error: (err) => {
-            this.toast.showToast('Error al eliminar la categoría!!', 7000, 'x-circle', false);
-          },
-          complete: () => {
-            this.onClear();
-          }
-        });
-    }
+    const categoryObject = new CategoryEntity();
+
+    categoryObject.enabled = false; // deshabilitamos el objeto
+    categoryObject.categoryId = category.categoryId;
+
+    this.categoryService.updateCategory(categoryObject).subscribe({
+      next: (response) => {
+        this.toast.showToast('Categoría eliminada exitosamente!!', 7000, 'check2-circle', true);
+      },
+      error: (err) => {
+        this.toast.showToast('Error al eliminar la categoría!!', 7000, 'x-circle', false);
+      },
+      complete: () => {
+        this.categoryList = this.categoryService.getAllCategories();
+      }
+    });
+  }
 }

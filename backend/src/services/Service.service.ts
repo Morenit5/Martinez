@@ -13,6 +13,7 @@ export class ServiceService {
 
   async findAll(): Promise<ServiceDto[]> {
     var services: ServiceDto[] = await this.serviceRepository.find({ 
+      where: [{ enabled: true } ],
       relations: {
         client: true,
         serviceDetail:true,

@@ -5,6 +5,6 @@ export interface iPayment {
   paymentMethod: string;
   taxAmount: number;
   paymentStatus: string;
-  invoiceId: number;
+  //invoiceId: number;
   enabled: boolean;
 }

@@ -11,7 +11,11 @@ export class ServiceDetailService {
   }
 
   findAll(): Promise<ServiceDetailDto[]> {
-    return this.serviceDetailRepository.find();
+    return this.serviceDetailRepository.find({
+      where: [
+        { enabled: true },
+      ],
+    })
   }
 
   findOne(serviceDetailsId: number): Promise<ServiceDetailDto | null> {

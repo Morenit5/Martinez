@@ -17,22 +17,19 @@
               <!--<th>Proveedor</th>-->
               <th>Fecha Adquisición</th>
               <!--<th>Activo</th>-->
-              <th>Editar</th>
-              <th>Eliminar</th>
+              <th>Cancelar</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let payment of paymentList |async">
+              
               <!--<td>{{ payment.paymentId }}</td>-->
               <td>{{ payment.code }}</td>
               <td>{{ payment.name }}</td>
               <td>{{ payment.status }}</td>
               <td>{{ payment.toolState }}</td>
               <td>{{ payment.acquisitionDate | date: 'shortDate' }}</td>
-               <td style="width: 8%; text-align: center; "><button *ngIf="payment.name.toLowerCase() !== 'general' " class="btn btn-sm btn-primary me-2" (click)="updatePayment(payment)"><i
-                    class="bi bi-pencil-fill"></i>
-                </button></td>
-              <td style="width: 8%; text-align: center;"><button *ngIf="payment.name.toLowerCase() !== 'general' "  class="btn btn-sm btn-danger" (click)="deletePayment(payment)"><i
+              <td style="width: 8%; text-align: center;"><button  class="btn btn-sm btn-danger" (click)="deletePayment(payment)"><i
                     class="bi bi-trash-fill"></i>
                 </button></td>
             </tr>

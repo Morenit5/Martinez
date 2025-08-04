@@ -11,7 +11,11 @@ export class ServiceClient {
   }
 
   findAll(): Promise<ClientDto[]> {
-    return this.clientRepository.find();
+    return this.clientRepository.find({
+      where: [
+        { enabled: true },
+      ],
+    })
   }
 
 
