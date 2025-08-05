@@ -7,7 +7,7 @@ import { Exclude, Expose } from 'class-transformer';
 
 export class ToolDto {
 
-    @Exclude()
+    @Expose()
     @IsOptional()
     @IsNumber()
     toolId?: number;

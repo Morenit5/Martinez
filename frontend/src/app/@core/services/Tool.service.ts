@@ -39,6 +39,13 @@ export class ToolService {
     this.http.put(this.updateDelete + '/' + id, tool, { params: params }).subscribe();
   }
 
+  updateTool(tool: ToolEntity): Observable<ToolEntity> {
+      let params = new HttpParams();
+      params = params.set('id', tool.toolId);
+      let instance = this.http.put<ToolEntity>(this.apiUrl + '/up/' + tool.toolId, tool, { params: params });
+      return instance;
+    }
+
   getCategories(): Observable<CategoryEntity[]> {
     return this.http.get<CategoryEntity[]>(this.apiUrlCat);
   }
@@ -60,7 +67,7 @@ export class ToolService {
     return toolJson[0] ?? {};
   }
 
-  submitApplication(name: string, code: string, status: string) {
+  /*submitApplication(name: string, code: string, status: string) {
     console.log(`Herramienta: nombre: ${name}, código: ${code}, estatus: ${status}.`,);
-  }
+  }*/
 }

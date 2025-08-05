@@ -4,9 +4,9 @@
   <div *ngIf="recivedTabIndex==0" class="my-div">
     <div class="container mt-4">
       <h3 class="mb-4">Clientes</h3>
-      <div class="table-responsive">
         <input type="text" class="form-control" placeholder="Buscar por Cliente"><!--[(ngModel)]="filterResults"-->
-        <table class="table table-bordered table-hover table-striped">
+        <div class="table-responsive">
+        <table class="table table-bordered  table-hover table-striped">
           <thead class="table-bordered">
             <tr>
               <th>Nombre</th>
@@ -38,7 +38,8 @@
             </tr>
           </tbody>
         </table>
-      </div>
+        </div>
+      
     </div><!--Fin container mt-4-->
   </div>
   <div *ngIf="recivedTabIndex==1" class="my-div">

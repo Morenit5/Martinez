@@ -34,6 +34,7 @@ export class ClientService {
   }
 
   updateClient(client: ClientEntity): Observable<ClientEntity> {
+    
     let params = new HttpParams();
     params = params.set('id', client.clientId);
     let instance = this.http.put<ClientEntity>(this.apiUrl + '/up/' + client.clientId, client, { params: params });
