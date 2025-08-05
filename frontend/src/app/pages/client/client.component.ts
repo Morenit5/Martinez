@@ -1,5 +1,5 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, inject, OnInit } from '@angular/core';
+
+import { Component, inject} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ClientEntity } from '@app/@core/entities/Client.entity';
 import { ClientService } from '@app/@core/services/Client.service';
@@ -13,7 +13,7 @@ import * as jsonData from '@core/enums/data.json';
   templateUrl: './client.component.html',
   styleUrl: './client.component.scss',
 })
-export class ClientComponent implements OnInit {
+export class ClientComponent  {
   onSelectChange($event: any) { throw new Error('Method not implemented.'); }
 
   clientLabel: string = 'Registro de Clientes';
@@ -35,6 +35,7 @@ export class ClientComponent implements OnInit {
     this.opciones = jsonData.clientes;
 
     this.clientForm = this.fbClient.group({
+      clientId: [],
       name: ['', Validators.required],
       lastName: ['', Validators.required],
       address: ['', Validators.required],
@@ -47,29 +48,37 @@ export class ClientComponent implements OnInit {
       
   }
 
-  ngOnInit() {
-    /*this.toolList =this.toolService.fetchData();*/
-    //this.clientList = this.clientService.fetchData1();
-  }
 
   onSubmit(accion: string) {
     this.clientForm.updateValueAndValidity();
 
     if (this.clientForm.valid) {
-      if (accion == 'Registrar') {
-        let convertDate = JSON.parse(JSON.stringify(this.clientForm.controls['registryDate'].value));
-        let fechaConvertida = convertDate.year + '-' + convertDate.month + '-' + convertDate.day;
-        console.log(this.clientForm.valid);
-        this.clientForm.value['registryDate'] = fechaConvertida;
-        //const newTool: ToolEntity = this.toolForm.value;
 
+      let convertDate = JSON.parse(JSON.stringify(this.clientForm.controls['registryDate'].value));
+        let fechaConvertida = convertDate.year + '-' + convertDate.month + '-' + convertDate.day;
+        this.clientForm.value['registryDate'] = fechaConvertida;
+      if (accion == 'Registrar') {
+        
         this.clientService.addClient(this.clientForm.value).subscribe({
           next: (response) => {
             this.toast.showToast('Cliente registrado exitosamente!!', 7000, 'check2-circle', true);
             console.log(response);
           },
           error: (err) => {
-            this.toast.showToast('Error al registar la herramienta!!', 7000, 'x-circle', false);
+            this.toast.showToast('Error al registar al cliente!!', 7000, 'x-circle', false);
+          },
+          complete: () => {
+            this.onClear();
+          }
+        });
+      }else if (accion == 'Actualizar') {
+
+        this.clientService.updateClient(this.clientForm.value).subscribe({
+          next: (response) => {
+            this.toast.showToast('Cliente actualizado exitosamente!!', 7000, 'check2-circle', true);
+          },
+          error: (err) => {
+            this.toast.showToast('Error al actualizar al cliente!!', 7000, 'x-circle', false);
           },
           complete: () => {
             this.onClear();
@@ -127,6 +136,4 @@ export class ClientComponent implements OnInit {
   }
 
   getMessage(message: number) { this.recivedTabIndex = message; }
-
-  
 }

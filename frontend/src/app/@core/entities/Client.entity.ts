@@ -7,7 +7,7 @@ export class ClientEntity {
   email?: string;
   clienType?: string;
   registryDate?: Date;
-  //enabled?: boolean;
+  enabled?: boolean;
 
   get fullName(): string {
     return `${this.name} ${this.lastName}`;

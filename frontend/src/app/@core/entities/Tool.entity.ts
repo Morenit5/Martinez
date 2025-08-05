@@ -1,6 +1,8 @@
+import { CategoryEntity } from "./Category.entity";
+
 export class ToolEntity {
   toolId: number;
-  categoryId: number;
+  category: CategoryEntity;
   name: string;
   code: string;
   image: string;
@@ -10,3 +12,4 @@ export class ToolEntity {
   acquisitionDate: Date;
   enabled: boolean;
 }
+

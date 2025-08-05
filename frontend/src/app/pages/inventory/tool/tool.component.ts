@@ -29,23 +29,28 @@ export class ToolComponent implements OnInit {
   toolService: ToolService = inject(ToolService);
   filteredToolList: ToolEntity[] = [];
   reqTabId: number;
+  category: CategoryEntity;
 
   constructor(private fbTool: FormBuilder, private toast: ToastUtility) {
     this.toolList = this.toolService.fetchData1();
 
-    this.toolForm = new FormGroup({
-      name: new FormControl('', [Validators.required, Validators.minLength(5)]),
-      code: new FormControl('', [Validators.required, Validators.minLength(5)]),
-      status: new FormControl('', [Validators.required]),
-      toolState: new FormControl('', [Validators.required]),
-      categoryId: new FormControl('', [Validators.required]),
-      acquisitionDate: new FormControl('', [Validators.required])
+    this.toolForm = this.fbTool.group({
+      toolId: [],
+      name: ['', Validators.required],
+      code: ['', Validators.required],
+      status: ['', Validators.required],
+      toolState: ['', Validators.required],
+      category: ['', Validators.required],
+      acquisitionDate: ['', Validators.required]
     })
   }
 
   @Output() guardado = new EventEmitter<void>();
 
-  onSelectChange($event: any) { throw new Error('Method not implemented.'); }
+  onSelectChange($categoryId: any) { 
+    this.category = new CategoryEntity();
+    this.category.categoryId = $categoryId;    
+  }
   enviarFormulario() { throw new Error('Method not implemented.'); }
 
   getMessage(message: number) {
@@ -62,12 +67,12 @@ export class ToolComponent implements OnInit {
     this.toolForm.updateValueAndValidity();
 
     if (this.toolForm.valid) {
-      if (accion == 'Registrar') {
-        let convertDate = JSON.parse(JSON.stringify(this.toolForm.controls['acquisitionDate'].value));
+
+      let convertDate = JSON.parse(JSON.stringify(this.toolForm.controls['acquisitionDate'].value));
         let fechaConvertida = convertDate.year + '-' + convertDate.month + '-' + convertDate.day;
         console.log(this.toolForm.valid);
         this.toolForm.value['acquisitionDate'] = fechaConvertida;
-        //const newTool: ToolEntity = this.toolForm.value;
+      if (accion == 'Registrar') {
 
         this.toolService.addTool(this.toolForm.value).subscribe({
           next: (response) => {
@@ -76,6 +81,19 @@ export class ToolComponent implements OnInit {
           },
           error: (err) => {
             this.toast.showToast('Error al registar la herramienta!!', 7000, 'x-circle', false);
+          },
+          complete: () => {
+            this.onClear();
+          }
+        });
+      }else if (accion == 'Actualizar') {
+
+        this.toolService.updateTool(this.toolForm.value).subscribe({
+          next: (response) => {
+            this.toast.showToast('Herramienta actualizada exitosamente!!', 7000, 'check2-circle', true);
+          },
+          error: (err) => {
+            this.toast.showToast('Error al actualizar la Herramienta!!', 7000, 'x-circle', false);
           },
           complete: () => {
             this.onClear();
@@ -108,7 +126,7 @@ export class ToolComponent implements OnInit {
     console.log("entra aqui" + this.filteredToolList);
   }
 
-  updateTool(toolInstance: iTool) {
+  updateTool(toolInstance: ToolEntity) {
     this.recivedTabIndex = 1;
     this.reqTabId = 1;
     this.toolLabel = 'Actualizar Herramienta';
@@ -121,6 +139,7 @@ export class ToolComponent implements OnInit {
       image: toolInstance.image,
       status: toolInstance.status,
       toolState: toolInstance.toolState,
+      category: this.category,
       acquisitionDate: toolInstance.acquisitionDate /*,
         prize: toolInstance.prize*/
     });
@@ -128,7 +147,7 @@ export class ToolComponent implements OnInit {
     console.log(toolInstance);
   }
 
-  async deleteTool(tool: iTool) {
+  async deleteTool(tool: ToolEntity) {
     const toolObject = new ToolEntity();
     toolObject.enabled = false; // deshabilitamos el objeto
     toolObject.toolId = tool.toolId;
@@ -136,9 +155,12 @@ export class ToolComponent implements OnInit {
     this.toolService.update(tool.toolId, toolObject).then(data => {
       console.log('Datos con promise:', data);
       //enviar el toast
+       this.toast.showToast('Herramienta eliminada exitosamente!!', 7000, 'check2-circle', true);
+
     }).catch(error => {
       console.error('Error al eliminar', error);
       //enviar el toast
+      this.toast.showToast('Error al registar la herramienta!!', 7000, 'x-circle', false);
     });
     this.toolList = this.toolService.fetchData1();
   }
