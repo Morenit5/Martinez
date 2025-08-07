@@ -19,6 +19,7 @@ import { UserModule } from './modules/User.module';
 //import { provideHttpClient } from '@angular/common/http';
 import { AuthModule } from './auth/auth.module';
 import { PermissionModule } from './modules/Permission.module';
+import { RolModule } from './modules/Rol.module';
 
 let importModules =[
   ConfigModule.forRoot({
@@ -35,7 +36,8 @@ let importModules =[
   ServiceModule,
   ToolModule,
   UserModule,
-  PermissionModule
+  PermissionModule,
+  RolModule
 ];
 
 @Module({

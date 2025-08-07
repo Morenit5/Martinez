@@ -1,12 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { UseRandomUser } from '@core/usecases';
 import { RandomUserEntity } from '@core/entities';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastUtility } from '@app/@core/utils/toast.utility';
+import { RolEntity, UserEntity } from '@app/@core/entities/User.entity';
+import { RolesInstances, UsersInstances } from '@app/@core/services/Users.service';
 
-import { UserEntity } from '@app/@core/entities/User.entity';
-import { UsersInstances } from '@app/@core/services/Users.service';
-//import { HotToastService } from '@ngneat/hot-toast';
 
 @Component({
   selector: 'app-list',
@@ -18,30 +17,31 @@ export class ListComponent implements OnInit {
 
   users: RandomUserEntity[] = [];
   users1: UserEntity[] = [];
-  usersForm: any;
-  usersLabel: any;
-  usersButton: any;
+  roles: RolEntity[] = []; 
+  usersForm: FormGroup;
+  usersLabel: string = 'Registro de Usuarios';
+  usersButton: string = 'Registrar';
   
-  reqTabId: any;
+  reqTabId: number;
   recivedTabIndex: number = 0;
   isLoading = true;
-
+  
   private readonly _useRandomUser = new UseRandomUser();
+ 
   
 
-  constructor(private fmBldUsers: FormBuilder, private toast: ToastUtility, private readonly userList:UsersInstances) {
+  constructor(private fmBldUsers: FormBuilder, private toast: ToastUtility, private readonly userList:UsersInstances,private readonly rolesList: RolesInstances) {
       this.usersForm = this.fmBldUsers.group({
         userId: [],
-        username: ['', Validators.required],
-        password: ['', Validators.required],
-        name: [],
-        lastname: [],
-        email: ['', Validators.required],
+        userName: ['', Validators.required],
+        firstName: [''],
+        lastName: [''],
+        inputEmail: ['',Validators.required],
+        inputPassword: ['', Validators.required],
+        rol: [],
         phone: []
       });
-  
-      
-    }
+  }
 
   ngOnInit() {
     this._useRandomUser.getAllUsers().subscribe({
@@ -58,7 +58,18 @@ export class ListComponent implements OnInit {
       next: (usersL) => {
         this.users1 = usersL;
         this.isLoading = false;
-        console.log(JSON.stringify(this.users1) )
+        //console.log(JSON.stringify(this.users1) )
+      },
+      error: (error) => {
+        console.error(error);
+      },
+    });
+
+    this.rolesList.getAllRoles().subscribe({
+      next: (rolesL) => {
+        this.roles = rolesL;
+        this.isLoading = false;
+        //console.log(JSON.stringify(this.users1) )
       },
       error: (error) => {
         console.error(error);
@@ -72,15 +83,20 @@ export class ListComponent implements OnInit {
     );*/
   }
 
-  onClear() {
-    throw new Error('Method not implemented.');
+  onCancel() {
+    if (this.reqTabId && this.reqTabId != 0) {
+      this.recivedTabIndex = 0;
+      this.reqTabId = 0;
+      this.usersLabel = 'Registro de Usuarios';
+      this.usersButton = 'Registrar'
+    }
   }
 
   onSubmit(arg0: any) {
-    throw new Error('Method not implemented.');
+    console.log(arg0)
   }
 
-  getMessage($event: any) {
-    throw new Error('Method not implemented.');
+  getMessage(message: number) {
+    this.recivedTabIndex = message;
   }
 }
