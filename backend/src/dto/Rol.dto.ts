@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import { IsBoolean, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { CreatePermissionDto, PermissionDto } from './Permission.dto';
 import { userDto } from './User.dto';
@@ -6,18 +6,22 @@ import { PartialType } from '@nestjs/mapped-types';
 
 export class RolDto {
 
+    @Expose()
     @IsOptional()
     @IsNumber()
     rolId: number;
      
+    @Expose()
     @IsOptional()
     @IsString()
     name: string;
 
+    @Expose()
     @IsOptional()
     @IsObject()
     user?: userDto;  //@OneToOne(() => EntityUser, user => user.userId)
 
+    @Expose()
     @IsOptional()
     @IsObject()
     @ValidateNested()

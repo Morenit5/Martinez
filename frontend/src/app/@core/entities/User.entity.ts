@@ -15,7 +15,7 @@ export class UserEntity {
   
   name: string;
 
-  rol: Rol;
+  rol: RolEntity;
   
   get fullName(): string {
     return `${this.name} ${this.lastname}`;
@@ -33,9 +33,10 @@ class Login {
   sha256: string;
 }
 
-class Rol {
+export class RolEntity {
   rolId: string;
   name: string;
+  enabled: boolean;
 }
 
 class Picture {
