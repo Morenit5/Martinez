@@ -1,32 +1,40 @@
 <div>
   <tabs [tabItems]="['Consulta', 'Registro']" [tabIcons]="['folder', 'plus-circle']" [requiredTabId]=reqTabId (tabIndex)="getMessage($event)"></tabs>
   <div *ngIf="recivedTabIndex==0" class="user-table-container">
-    <div class="container mt-4">
+    <div class="container mt-2">
       <h3 class="mb-4">Usuarios</h3>
       <div class="table-responsive">
         <input type="text" class="form-control" placeholder="Buscar por Categor&iacute;a"><!--[(ngModel)]="filterResults"-->
         <table class="user-table table table-bordered table-hover table-striped">
           <thead>
             <tr>
-              <th>Avatar</th>
+              <th style="width: 8%;" >Avatar</th>
               <th>Nombre</th>
               <th>Correo Electr&oacute;nico</th>
               <th>Tel&eacute;fono</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
             @if (!isLoading) {
-            @for (user of users1; track user.userId) {
-            <tr (click)="userClicked()">
-              <td style="text-align: center;">
-                <img src="images/{{user.name }}_{{user.lastname}}.png" alt="{{ user.fullName }}'s avatar" />
+            @for (user of users1; track user.email) {
+            <tr >
+              <td style="text-align:center;">
+                <input type="file" (change)="onFileSelected($event,user)" #fileInput accept="image/png" name="thumbnail" >
+                <button class="btn btn-sm " (click)="fileInput.click()">
+                  <img [src]="avatarImg" (error)="onImgError($event)" />
+                </button>
               </td>
               <td>
                  {{ user.fullName }}
               </td>
               <td>{{ user.email }}</td>
               <td>{{ user.phone }}</td>
-             
+              <td style="width: 8%; text-align: center; ">
+                <button class="btn btn-sm btn-outline-info" (click)="updateUser(user)"><i class="bi bi-pencil-fill"></i>
+                </button>
+                <button  class="btn btn-sm btn-outline-danger" (click)="deleteUser(user)"><i class="bi bi-trash-fill"></i>
+                </button></td>
             </tr>
             }
             } @else {
@@ -49,18 +57,18 @@
           <div id="Tools-Left-Column" class="col-md-6">
             <div class="mb-3">
               <label for="userName" class="form-label">&#160;Usuario</label>
-              <input type="text" id="userName" class="form-control col-form-label" formControlName="userName" />
-              <div *ngIf="usersForm.get('userName')?.invalid && usersForm.get('userName')?.touched" class="text-danger">
+              <input type="text" id="username" class="form-control col-form-label" formControlName="username" />
+              <div *ngIf="usersForm.get('username')?.invalid && usersForm.get('username')?.touched" class="text-danger">
                 *Requerido
               </div>
             </div>
             <div class="mb-3">
-              <label for="firstName" class="form-label">&#160;Nombre</label>
-              <input type="text" class="form-control col-form-label" formControlName="firstName" id="firstName" />
+              <label for="firstname" class="form-label">&#160;Nombre</label>
+              <input type="text" class="form-control col-form-label" formControlName="firstname" id="firstname" />
             </div>
             <div class="mb-3">
-              <label for="inputEmail" class="form-label">&#160;Correo Electronico</label>
-              <input type="email" class="form-control col-form-label" id="inputEmail" formControlName="inputEmail" aria-describedby="emailHelp" >
+              <label for="email" class="form-label">&#160;Correo Electronico</label>
+              <input type="email" class="form-control col-form-label" id="email" formControlName="email" aria-describedby="emailHelp" >
               <div *ngIf="usersForm.get('inputEmail')?.invalid && usersForm.get('inputEmail')?.touched" class="text-danger">
                 *Requerido
               </div>
@@ -69,7 +77,7 @@
               <label for="rol" class="form-label">&#160;Rol</label>
               <select class="form-select" formControlName="rol">
                 <option [ngValue]="null">-- Select --</option>
-                <option *ngFor="let rol of roles" [ngValue]="rol.rolId">
+                <option *ngFor="let rol of roles" [ngValue]="rol">
                   {{ rol.name }}
                 </option>
               </select>
@@ -79,15 +87,15 @@
           <!-- Columna Derecha -->
           <div id="Tools-Right-Column" class="col-md-6">
             <div class="mb-3">
-              <label for="inputPassword" class="form-label">&#160;Clave</label>
-              <input type="password" class="form-control" id="inputPassword"  formControlName="inputPassword" placeholder="Password">
+              <label for="password" class="form-label">&#160;Clave</label>
+              <input type="password" class="form-control" id="password"  formControlName="password" placeholder="Password">
               <div *ngIf="usersForm.get('inputPassword')?.invalid && usersForm.get('inputPassword')?.touched" class="text-danger">
                 *Requerido
               </div>
             </div>
             <div class="mb-3">
-              <label for="lastName" class="form-label">&#160;Apellidos</label>
-              <input type="text" class="form-control col-form-label" formControlName="lastName" id="lastName" />
+              <label for="lastname" class="form-label">&#160;Apellidos</label>
+              <input type="text" class="form-control col-form-label" formControlName="lastname" id="lastname" />
             </div>
             <div class="mb-3">
               <label for="phone" class="form-label">&#160;Telefono</label>

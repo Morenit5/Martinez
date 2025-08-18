@@ -13,12 +13,20 @@ export class UserEntity {
 
   lastname: string;
   
-  name: string;
+  firstname: string;
 
   rol: RolEntity;
+
+  username: string;
+
+  password: string;
+
+  avatar: string;
+  
+  enabled: boolean;
   
   get fullName(): string {
-    return `${this.name} ${this.lastname}`;
+    return `${this.firstname} ${this.lastname}`;
   }
 }
 
@@ -34,7 +42,7 @@ class Login {
 }
 
 export class RolEntity {
-  rolId: string;
+  rolId: number;
   name: string;
   enabled: boolean;
 }

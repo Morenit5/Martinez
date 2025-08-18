@@ -5,3 +5,12 @@ nav {
   display: flex;
   justify-content: space-between;
 }
+
+
+
+    /* Hide the content on screens up to a certain width (e.g., 768px for common mobile breakpoints) */
+    @media only screen and (max-width: 768px) {
+        .desktop-only-content {
+            display: none;
+        }
+    }

@@ -21,7 +21,7 @@ export class NavDynamicComponent implements OnInit {
   tabs = [];
 
   ngOnInit(): void {
-    console.log(this.tabItems);
+    //console.log(this.tabItems);
     for(let i =0; i<this.tabItems.length; i++)
     {
       let varTab= { title: this.tabItems[i] , key: this.tabItems[i], tabIcon: this.tabIcons[i] };

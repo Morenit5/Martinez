@@ -26,7 +26,6 @@ export class CategoryComponent {
   constructor(private fbCategory: FormBuilder, private toast: ToastUtility) {
     this.categoryList = this.categoryService.getAllCategories();
 
-    console.log('CATEGORY LIST'+ JSON.stringify(this.categoryList));
     this.categoryForm = this.fbCategory.group({
       categoryId: [],
       name: ['', Validators.required],

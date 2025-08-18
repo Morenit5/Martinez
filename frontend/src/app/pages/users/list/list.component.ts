@@ -1,10 +1,12 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, SecurityContext, ViewChild } from '@angular/core';
 import { UseRandomUser } from '@core/usecases';
 import { RandomUserEntity } from '@core/entities';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastUtility } from '@app/@core/utils/toast.utility';
 import { RolEntity, UserEntity } from '@app/@core/entities/User.entity';
 import { RolesInstances, UsersInstances } from '@app/@core/services/Users.service';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { firstValueFrom, from, timer } from 'rxjs';
 
 
 @Component({
@@ -17,30 +19,35 @@ export class ListComponent implements OnInit {
 
   users: RandomUserEntity[] = [];
   users1: UserEntity[] = [];
-  roles: RolEntity[] = []; 
+  roles: RolEntity[] = [];
+  rolEntity: RolEntity;
   usersForm: FormGroup;
   usersLabel: string = 'Registro de Usuarios';
   usersButton: string = 'Registrar';
+  avatarFileName = '';
+  imageUrl: SafeUrl;
   
   reqTabId: number;
   recivedTabIndex: number = 0;
   isLoading = true;
   
   private readonly _useRandomUser = new UseRandomUser();
+  fileNotFound: boolean = false; //assume we do find the correct avatar image
  
-  
 
-  constructor(private fmBldUsers: FormBuilder, private toast: ToastUtility, private readonly userList:UsersInstances,private readonly rolesList: RolesInstances) {
+  constructor(private fmBldUsers: FormBuilder, private toast: ToastUtility, private readonly userInstances:UsersInstances,private readonly rolesList: RolesInstances,private sanitizer: DomSanitizer) {
       this.usersForm = this.fmBldUsers.group({
         userId: [],
-        userName: ['', Validators.required],
-        firstName: [''],
-        lastName: [''],
-        inputEmail: ['',Validators.required],
-        inputPassword: ['', Validators.required],
+        username: ['', Validators.required],
+        firstname: [''],
+        lastname: [''],
+        email: ['',Validators.required],
+        password: ['', Validators.required],
         rol: [],
         phone: []
       });
+
+      this.getAllUserInstances();
   }
 
   ngOnInit() {
@@ -54,22 +61,27 @@ export class ListComponent implements OnInit {
       },
     });
 
-    this.userList.getAllUsers().subscribe({
-      next: (usersL) => {
-        this.users1 = usersL;
+    //this.getAllUserInstances();
+
+    this.rolesList.getAllRoles().subscribe({
+      next: (rolesL) => {
+        this.roles = rolesL;
         this.isLoading = false;
-        //console.log(JSON.stringify(this.users1) )
       },
       error: (error) => {
         console.error(error);
       },
     });
 
-    this.rolesList.getAllRoles().subscribe({
-      next: (rolesL) => {
-        this.roles = rolesL;
-        this.isLoading = false;
-        //console.log(JSON.stringify(this.users1) )
+    this.usersForm.get('rol').valueChanges.subscribe({
+      next: (rol) => {
+        if(rol != null){
+          this.rolEntity = rol;
+        } else{
+          this.rolEntity = new RolEntity();
+          this.rolEntity.rolId = 1;
+          this.rolEntity.name = 'admin';
+        }
       },
       error: (error) => {
         console.error(error);
@@ -77,10 +89,52 @@ export class ListComponent implements OnInit {
     });
   }
 
-  userClicked() {
-    /*this._toast.show(
-      'Se hizo click en el usuario, aqui se debe mostar mas info tal vez centrar el toast',
-    );*/
+ 
+
+  onImgError(event){
+    event.target.src = 'images/placeholder.png'
+    this.fileNotFound = true;
+  }
+
+  updateUser(userInstance: UserEntity) {
+    this.recivedTabIndex = 1;
+    this.reqTabId = 1;
+    this.usersLabel = 'Actualizar Categoría';
+    this.usersButton = 'Actualizar'
+
+    this.usersForm.patchValue({
+      userId: userInstance.userId,
+      userName: userInstance.username,
+      firstName: userInstance.firstname,
+      lastName: userInstance.lastname,
+      inputEmail: userInstance.email,
+      inputPassword: userInstance.password,
+      rol: this.rolEntity,
+      phone: userInstance.password
+    });
+
+    
+  }
+
+
+  async deleteUser(userInstance: UserEntity) {
+    const usrInstance = new UserEntity();
+
+    usrInstance.enabled = false; // deshabilitamos el objeto
+    usrInstance.userId = userInstance.userId;
+
+    this.userInstances.updateUser(usrInstance).subscribe({
+      next: (response) => {
+        //el response contiene el usuario actualizado 
+        this.toast.showToast('Usuario eliminado exitosamente!!', 7000, 'check2-circle', true);
+      },
+      error: (err) => {
+        this.toast.showToast('Error al eliminar el usuario!!', 7000, 'x-circle', false);
+      },
+      complete: () => {
+        this.getAllUserInstances();
+      }
+    });
   }
 
   onCancel() {
@@ -90,13 +144,134 @@ export class ListComponent implements OnInit {
       this.usersLabel = 'Registro de Usuarios';
       this.usersButton = 'Registrar'
     }
+    this.usersForm.reset();
   }
 
-  onSubmit(arg0: any) {
-    console.log(arg0)
+  onSubmit(action: string) {
+    this.usersForm.updateValueAndValidity();
+
+    if (this.usersForm.valid) {
+
+      if (action == 'Registrar') {
+        this.userInstances.addUser(this.usersForm.value).subscribe({
+          next: (response) => {
+            this.toast.showToast('Usuario registrado exitosamente!!', 7000, 'check2-circle', true);
+          },
+          error: (err) => {
+            console.log(err);
+            this.toast.showToast('Error al registar al Usuario!!', 7000, 'x-circle', false);
+          },
+          complete: () => {
+            this.onCancel();
+            this.getAllUserInstances();
+          }
+        });
+
+      } else if (action == 'Actualizar') {
+
+        this.userInstances.updateUser(this.usersForm.value).subscribe({
+          next: (response) => {
+            this.toast.showToast('Usuario actualizado exitosamente!!', 7000, 'check2-circle', true);
+          },
+          error: (err) => {
+            this.toast.showToast('Error al actualizar al Usuario!!', 7000, 'x-circle', false);
+          },
+          complete: () => {
+            this.onCancel();
+            this.getAllUserInstances();
+          }
+        });
+      }
+
+    } else {
+      console.log(this.usersForm.valid);
+      this.usersForm.markAllAsTouched();
+      this.toast.showToast('Campos Invalidos, porfavor revise el formulario!!', 7000, 'x-circle', false);
+    }
   }
 
   getMessage(message: number) {
     this.recivedTabIndex = message;
   }
+
+  sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+  private getAllUserInstances() { //helper method
+
+    this.userInstances.getAllUsers().subscribe({
+      next: async (usersL) => {
+        this.users1 = usersL;
+        this.isLoading = false;
+        let imgName;
+        let objectURL;
+        for (const usr of this.users1) {
+          this.avatarImg = null;
+
+          if (usr.avatar == null || usr.avatar == undefined) {
+            imgName = 'placeholder.png';
+          } else {
+            imgName = usr.avatar 
+          }
+
+          this.getUserAvatarImage(imgName).subscribe({
+            next: (imageBlob) => {
+              objectURL = URL.createObjectURL(imageBlob);
+            },
+            complete: () => {
+              // This code runs when the Observable completes
+              this.avatarImg = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+            }
+          });
+
+          await this.sleep(2000); 
+
+        }
+        
+      },
+      error: (error) => {
+        console.error(error);
+      },
+    });
+  }
+
+
+  onFileSelected(event, userInstance: any) {
+
+    const file: File = event.target.files[0];
+    let avatarName;
+    if (file) {
+      this.avatarFileName = file.name;
+      const formData = new FormData();
+      console.log('desde el front' + userInstance.userId);
+      formData.append('thumbnail', file,userInstance.userId);
+      
+      this.userInstances.uploadUserAvatar(formData).subscribe({
+      next: (response) => {
+        avatarName = response.avatar;
+      },
+      error: (error) => {
+
+        console.error(error);
+      }
+      });
+
+      this.getAllUserInstances();
+
+    }
+  }
+    
+  avatarImg; 
+  getUserAvatarImage(avatarName:string) {
+    let result;
+    try {
+     result = this.userInstances.getUserAvatar(avatarName);
+   
+  } catch (error) {
+    console.log(error);
+  }
+    return result;
+  }
+
+  userClicked(){}
+
 }

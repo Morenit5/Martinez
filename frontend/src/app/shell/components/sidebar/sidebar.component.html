@@ -1,13 +1,8 @@
-<div class="d-flex flex-sm-column flex-row h-100 flex-grow-1 align-items-center align-items-sm-start px-3 pt-2 ">
-  <div style="align-items: center; justify-content: center;">
-    <a href="/" class="d-flex align-items-center pb-sm-3 mb-md-0 me-md-auto text-white text-decoration-none">
-      <img src="images/logo.png" width="150" height="70" class="align-items-center" />
-    </a>
-  </div>
- 
-  <ul
-    class="nav nav-pills flex-sm-column flex-row flex-nowrap flex-shrink-1 flex-sm-grow-0 flex-grow-1 mb-sm-auto mb-0 justify-content-center align-items-center align-items-sm-start"
-    id="menu">
+<div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+  <a href="/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+    <span class="fs-5 d-none d-sm-inline">Menu</span>
+  </a>
+  <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
     <ng-container *ngFor="let item of sidebarItems; let i = index">
       <ng-container *ngIf="shellService.allowedAccess(item)">
         <div style="margin-top:15 px; margin-bottom: 15px;" class="nav-item" ngbDropdown>
@@ -46,14 +41,4 @@
       </ng-container>
     </ng-container>
   </ul>
-  <div ngbDropdown class="dropdown py-sm-3 mt-sm-auto ms-auto ms-sm-0 flex-shrink-1">
-    <a style="color: #d9ef9f;" class="px-sm-0 px-2 nav-link" ngbDropdownToggle id="dropdownUser1" role="button">
-      <img src="https://github.com/mdo.png" alt="hugenerd" width="35" height="35" class="rounded-circle">
-      <span class="d-none d-sm-inline mx-1">Omar</span>
-    </a>
-    <div ngbDropdownMenu aria-labelledby="dropdownUser1" class="dropdown-menu">
-      <a class="dropdown-item" href="#">Sign out</a>
-    </div>
-
-  </div>
 </div>
