@@ -37,7 +37,7 @@ export class CategoryComponent {
     this.getAllDataCategories();
     //this.categoryList = this.categoryService.getAllCategories();
 
-    //console.log('CATEGORY LIST' + JSON.stringify(this.categoryList));
+
     this.categoryForm = this.fbCategory.group({
       categoryId: [],
       name: ['', Validators.required],

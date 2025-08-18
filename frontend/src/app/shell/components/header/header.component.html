@@ -3,9 +3,36 @@
   <app-language-selector></app-language-selector>
 </nav-->
 
+
 <div style="background-color: #E6F0DC;" class="row pt-3">
-  <h2 style="background-color: #E6F0DC; text-align: center;" class="pacifico">Martinez Gardening</h2><!--class="fst-italic"-->
-</div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col desktop-only-content" style="align-items: center; justify-content: center;" id="logo">
+        <a href="/" class=" d-flex align-items-center pb-sm-3 mb-md-0 me-md-auto text-white text-decoration-none">
+          <img src="images/logo.png" width="100" height="50" class="align-items-center" />
+        </a>
+        
+      </div>
+      <div class="col header_toggle"> <i class='bi bi-list' id="header-toggle"></i> </div>
+      <div class="col" id="title">
+        <h2 style="background-color: #E6F0DC; text-align: center;" class="pacifico">Martinez Gardening</h2>
+      </div>
+      <div class="col d-flex justify-content-end" id="inoutsign">
+        <div ngbDropdown  class="tex dropdown mt-sm-auto ms-auto ms-sm-0 flex-shrink-1 ">
+          <a class="px-sm-0 px-2 nav-link" ngbDropdownToggle id="dropdownUser1" role="button">
+            <img src="https://github.com/mdo.png" alt="hugenerd" width="35" height="35" class="rounded-circle">
+            <span class="d-none d-sm-inline mx-1">Omar</span>
+          </a>
+          <div ngbDropdownMenu aria-labelledby="dropdownUser1" class="dropdown-menu ">
+            <a class="dropdown-item" href="#">Sign out</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 
 
 <!-- Popover menu -->

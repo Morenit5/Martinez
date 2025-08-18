@@ -58,9 +58,9 @@ export class ApiPrefixInterceptor implements HttpInterceptor {
     const requestKey = this._getRequestKey(request);
 
     const ongoingRequest = this._ongoingRequests.get(requestKey);
-    if (ongoingRequest) {
-      return ongoingRequest.asObservable();
-    } else {
+    //if (ongoingRequest) {
+      //return ongoingRequest.asObservable();
+    //} else {
       const cancelSubject = new Subject<any>();
       this._ongoingRequests.set(requestKey, cancelSubject);
 
@@ -78,7 +78,7 @@ export class ApiPrefixInterceptor implements HttpInterceptor {
           cancelSubject.complete();
         }),
       );
-    }
+    //}
   }
 
   private _getRequestKey(req: HttpRequest<any>): string {

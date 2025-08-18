@@ -13,7 +13,7 @@ export class EntityUser {
   password: string;
 
   @Column({ type: 'varchar', nullable:true, length: 100 })
-  name?: string;
+  firstname?: string;
 
   @Column({ type: 'varchar', nullable:true, length: 100 })
   lastname?: string;
@@ -27,6 +27,9 @@ export class EntityUser {
 
   @Column({ unique: true, nullable:true }) //para que el correo no se repita en la bd
   phone?: string;
+
+  @Column({ type: 'varchar', nullable:true}) //para que el correo no se repita en la bd
+  avatar: string;
 
   @Column({ type: 'boolean', default: true })
   enabled: boolean;

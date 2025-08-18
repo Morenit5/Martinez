@@ -20,6 +20,7 @@ import { UserModule } from './modules/User.module';
 import { AuthModule } from './auth/auth.module';
 import { PermissionModule } from './modules/Permission.module';
 import { RolModule } from './modules/Rol.module';
+import { MulterModule } from '@nestjs/platform-express';
 
 let importModules =[
   ConfigModule.forRoot({
@@ -37,13 +38,16 @@ let importModules =[
   ToolModule,
   UserModule,
   PermissionModule,
-  RolModule
+  RolModule,
+  AuthModule
 ];
 
 @Module({
   imports: [
     ...importModules,
-    AuthModule
+    MulterModule.register({
+          dest: './uploads', 
+        }),
   ],
   controllers: [AppController],
   providers: [AppService, DbUtilService_Cls,ColumnNumericTransformer,TypeORMExceptions], /*Para que otras clases los puedan encontrar */

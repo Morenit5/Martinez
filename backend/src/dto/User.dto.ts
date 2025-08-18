@@ -7,6 +7,11 @@ export class userDto {
 
   @Expose()
   @IsOptional()
+  @IsNumber()
+  userId?: number;
+
+  @Expose()
+  @IsOptional()
   @IsString()
   username?: string;
 
@@ -18,7 +23,7 @@ export class userDto {
   @Expose()
   @IsOptional()
   @IsString()
-  name?: string;
+  firstname?: string;
 
   @Expose()
   @IsOptional()
@@ -40,12 +45,17 @@ export class userDto {
   @IsPhoneNumber('US', { message: 'Invalid US phone number' })
   phone?: string;
 
+  @Expose()
+  @IsOptional()
+  @IsString()  
+  avatar?:string;
+
 }
 
 export class CreateUserDto  {
   
   @IsOptional()
-  name: string;
+  firstname: string;
 
   @IsOptional()
   lastname: string;
@@ -56,6 +66,11 @@ export class CreateUserDto  {
   @IsOptional()
   @IsPhoneNumber('US', { message: 'Invalid US phone number' })
   phone?: string;
+
+  @Expose()
+  @IsOptional()
+  @IsString()  
+  avatar?:string;
 
   @IsBoolean()
   enabled: boolean;
@@ -83,3 +98,5 @@ export class UpdateUserDto extends PartialType(CreateUserLoginDto) {
   userId: number;
 
 }
+
+
