@@ -2,10 +2,8 @@ import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { CategoryEntity } from '@app/@core/entities/Category.entity';
 import { ToolEntity } from '@app/@core/entities/Tool.entity';
-import { iTool } from '@app/@core/interfaces/Tool.interface';
 import { ToolService } from '@app/@core/services/Tool.service';
 import { ToastUtility } from '@app/@core/utils/toast.utility';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-tool',
@@ -24,15 +22,26 @@ export class ToolComponent implements OnInit {
   checkoutForm;
   exceptions: any;
   toolForm: FormGroup;
-  tools: ToolEntity[] = [];// se crea un array vacio de la interfaz
-  toolList: Observable<iTool[]> | undefined;
+  //toolList: Observable<ToolEntity[]> | undefined;
   toolService: ToolService = inject(ToolService);
   filteredToolList: ToolEntity[] = [];
   reqTabId: number;
   category: CategoryEntity;
+  
+  /*Paginacion*/
+  tools: ToolEntity[] = [];// se crea un array vacio de la interfaz
+  paginatedTools: ToolEntity[] = [];
+  page = 1; // Página actual
+  pageSize = 7; // Elementos por página
+  collectionSize = 0; // Total de registros
+  totalPages = 0;
+  currentPage = 1;
+  /*Paginacion*/
+
+  isLoading = true;
 
   constructor(private fbTool: FormBuilder, private toast: ToastUtility) {
-    this.toolList = this.toolService.fetchData1();
+   this.getAllDataTools();
 
     this.toolForm = this.fbTool.group({
       toolId: [],
@@ -43,35 +52,68 @@ export class ToolComponent implements OnInit {
       category: ['', Validators.required],
       acquisitionDate: ['', Validators.required]
     })
+    this.updatePaginatedData();
+  }
+
+  getAllDataTools()
+  {
+     this.toolService.fetchData1().subscribe({
+      next: (toolsList) => {
+        this.tools = toolsList;
+        console.log(toolsList);
+        this.collectionSize = this.tools.length;
+        this.paginatedTools = this.tools.slice(0, this.pageSize);
+      },
+      error: (error) => {
+        console.error(error);
+      },
+    });
   }
 
   @Output() guardado = new EventEmitter<void>();
 
-  onSelectChange($categoryId: any) { 
+  onSelectChange($categoryId: any) {
     this.category = new CategoryEntity();
-    this.category.categoryId = $categoryId;    
-  }
-  enviarFormulario() { throw new Error('Method not implemented.'); }
-
-  getMessage(message: number) {
-    this.recivedTabIndex = message;
+    this.category.categoryId = $categoryId;
   }
 
-  ngOnInit() {
+  getMessage(message: number) { this.recivedTabIndex = message; }
+
+  ngOnInit(): void {
+    //carga de categorias
     this.toolService.getCategories().subscribe(data => {
       this.categories = data;
     });
   }
 
-  onSubmit(accion: string) { 
+  toggleDetails(Item: any) {
+    Item.showDetails = !Item.showDetails;
+  }
+
+  /*METODOS PAGINACION*/
+  private updatePaginatedData(): void {
+    const startIndex = (this.page - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.paginatedTools = this.tools.slice(startIndex, endIndex);
+  }
+
+  onPageChange(newPage: number): void {
+    console.log('AQUI ENTRA');
+    this.page = newPage;
+    console.log(this.page);
+    this.updatePaginatedData();
+  }
+  /*FIN METODOS DE PAGINACION*/
+
+  onSubmit(accion: string) {
     this.toolForm.updateValueAndValidity();
 
-    if (this.toolForm.valid) {
-
+    if (this.toolForm.valid)
+    {
       let convertDate = JSON.parse(JSON.stringify(this.toolForm.controls['acquisitionDate'].value));
-        let fechaConvertida = convertDate.year + '-' + convertDate.month + '-' + convertDate.day;
-        console.log(this.toolForm.valid);
-        this.toolForm.value['acquisitionDate'] = fechaConvertida;
+      let fechaConvertida = convertDate.year + '-' + convertDate.month + '-' + convertDate.day;
+      console.log(this.toolForm.valid);
+      this.toolForm.value['acquisitionDate'] = fechaConvertida;
       if (accion == 'Registrar') {
 
         this.toolService.addTool(this.toolForm.value).subscribe({
@@ -86,7 +128,7 @@ export class ToolComponent implements OnInit {
             this.onClear();
           }
         });
-      }else if (accion == 'Actualizar') {
+      } else if (accion == 'Actualizar') {
 
         this.toolService.updateTool(this.toolForm.value).subscribe({
           next: (response) => {
@@ -114,9 +156,10 @@ export class ToolComponent implements OnInit {
   }
 
   filterResults(text: string) {
-    console.log('Entra a FilterResults');
+    //console.log('TEXTO ' + text);
 
     if (!text) {
+      console.log(' entra a !text ' + text)
       this.filteredToolList = this.tools;
       return;
     }
@@ -143,7 +186,6 @@ export class ToolComponent implements OnInit {
       acquisitionDate: toolInstance.acquisitionDate /*,
         prize: toolInstance.prize*/
     });
-
     console.log(toolInstance);
   }
 
@@ -155,14 +197,13 @@ export class ToolComponent implements OnInit {
     this.toolService.update(tool.toolId, toolObject).then(data => {
       console.log('Datos con promise:', data);
       //enviar el toast
-       this.toast.showToast('Herramienta eliminada exitosamente!!', 7000, 'check2-circle', true);
+      this.toast.showToast('Herramienta eliminada exitosamente!!', 7000, 'check2-circle', true);
 
     }).catch(error => {
       console.error('Error al eliminar', error);
       //enviar el toast
       this.toast.showToast('Error al registar la herramienta!!', 7000, 'x-circle', false);
     });
-    this.toolList = this.toolService.fetchData1();
+    this.getAllDataTools();
   }
 }
-

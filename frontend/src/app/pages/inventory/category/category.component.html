@@ -1,7 +1,7 @@
 <div>
   <tabs [tabItems]="['Consulta', 'Registro']" [tabIcons]="['folder', 'plus-circle']" [requiredTabId]=reqTabId (tabIndex)="getMessage($event)">
   </tabs>
-  <div *ngIf="recivedTabIndex==0" class="my-div">
+  <div *ngIf="recivedTabIndex==0" class="containerCategory">
     <div class="container mt-4">
       <h3 class="mb-4">Categorías</h3>
       <div class="table-responsive">
@@ -12,28 +12,35 @@
               <th>Tipo</th>
               <th>Nombre</th>
               <!--<th>Activo</th>-->
-              <th>Editar</th>
-              <th>Eliminar</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let category of categoryList | async ">
+            @for (category of paginatedCategories; track category.categoryId) {
+            <tr> <!--*ngFor="let category of categoryList | async "-->
               <td style="width: 42%;">{{ category.categoryType }}</td>
               <td style="width: 42%;">{{ category.name }}</td>
               <!--<td>{{ category.enabled }}</td>-->
-              <td style="width: 8%; text-align: center; "><button *ngIf="category.name.toLowerCase() !== 'general' " class="btn btn-sm btn-primary me-2" (click)="updateCategory(category)"><i
+              <td><button *ngIf="category.name.toLowerCase() !== 'general' " class="btn btn-sm btn-primary me-2" (click)="updateCategory(category)"><i
                     class="bi bi-pencil-fill"></i>
-                </button></td>
-              <td style="width: 8%; text-align: center;"><button *ngIf="category.name.toLowerCase() !== 'general' "  class="btn btn-sm btn-danger" (click)="deleteCategory(category)"><i
+                </button>
+                <button *ngIf="category.name.toLowerCase() !== 'general' "  class="btn btn-sm btn-danger" (click)="deleteCategory(category)"><i
                     class="bi bi-trash-fill"></i>
                 </button></td>
             </tr>
+          }
           </tbody>
         </table>
+        <!-- Paginación -->
+        <ngb-pagination class="d-flex justify-content-center" [(page)]="page" [pageSize]="pageSize"
+          [collectionSize]="categories.length" (pageChange)="onPageChange($event)" [boundaryLinks]="true" [maxSize]="5"
+          *ngIf="categories.length"> pageSize">
+        </ngb-pagination>
+        <!--Fin Paginacion-->
       </div>
     </div><!--Fin container mt-4-->
   </div>
-  <div *ngIf="recivedTabIndex==1" class="my-div">
+  <div *ngIf="recivedTabIndex==1" class="containerCategory">
     <div class="container mt-4">
       <h4 class="mb-4">{{categoryLabel}}</h4>
       <form [formGroup]="categoryForm" (ngSubmit)="onSubmit(categoryButton)">

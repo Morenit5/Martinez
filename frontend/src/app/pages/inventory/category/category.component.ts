@@ -23,19 +23,59 @@ export class CategoryComponent {
   categoryList: Observable<iCategory[]> | undefined;
   categoryService: CategoryService = inject(CategoryService);
 
-  constructor(private fbCategory: FormBuilder, private toast: ToastUtility) {
-    this.categoryList = this.categoryService.getAllCategories();
+  /*Paginacion*/
+  categories: CategoryEntity[] = [];// se crea un array vacio de la interfaz
+  paginatedCategories: CategoryEntity[] = [];
+  page = 1; // Página actual
+  pageSize = 7; // Elementos por página
+  collectionSize = 0; // Total de registros
+  totalPages = 0;
+  currentPage = 1;
+  /*Paginacion*/
 
-    console.log('CATEGORY LIST'+ JSON.stringify(this.categoryList));
+  constructor(private fbCategory: FormBuilder, private toast: ToastUtility) {
+    this.getAllDataCategories();
+    //this.categoryList = this.categoryService.getAllCategories();
+
+    //console.log('CATEGORY LIST' + JSON.stringify(this.categoryList));
     this.categoryForm = this.fbCategory.group({
       categoryId: [],
       name: ['', Validators.required],
       categoryType: ['', Validators.required],
     });
+    this.updatePaginatedData();
   }
 
+  getAllDataCategories()
+  {
+     this.categoryService.getAllCategories().subscribe({
+      next: (categoriesList) => {
+        this.categories = categoriesList;
+        this.collectionSize = this.categories.length;
+        this.paginatedCategories = this.categories.slice(0, this.pageSize);
+      },
+      error: (error) => {
+        console.error(error);
+      },
+    });
+  }
+
+  /*METODOS PAGINACION*/
+  private updatePaginatedData(): void {
+    const startIndex = (this.page - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.paginatedCategories = this.categories.slice(startIndex, endIndex);
+  }
+
+  onPageChange(newPage: number): void {
+    this.page = newPage;
+    console.log(this.page);
+    this.updatePaginatedData();
+  }
+  /*FIN METODOS DE PAGINACION*/
+
   ngOnInit() {
-    
+
   }
 
   onSubmit(accion: string) {

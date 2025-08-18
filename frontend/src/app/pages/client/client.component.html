@@ -1,7 +1,7 @@
 <div>
   <tabs [tabItems]="['Consulta', 'Registro']" [tabIcons]="['folder', 'plus-circle']" (tabIndex)="getMessage($event)">>
   </tabs>
-  <div *ngIf="recivedTabIndex==0" class="my-div">
+  <div *ngIf="recivedTabIndex==0" class="containerClient">
     <div class="container mt-4">
       <h3 class="mb-4">Clientes</h3>
         <input type="text" class="form-control" placeholder="Buscar por Cliente"><!--[(ngModel)]="filterResults"-->
@@ -9,40 +9,69 @@
         <table class="table table-bordered  table-hover table-striped">
           <thead class="table-bordered">
             <tr>
-              <th>Nombre</th>
-              <th>Apellido</th>
-              <th>Tipo</th>
-              <th>Dirección</th>
+              <th>Nombre </th>
+              <!--<th>Apellido</th>-->
               <th>Teléfono</th>
+              <th>Tipo</th>
+              <!--<th>Dirección</th>
               <th>Email</th>
-              <th>Fecha Registro</th>
-              <th>Editar</th>
-              <th>Eliminar</th>
+              <th>Fecha Registro</th>-->
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let client of clientList |async">
-              <td>{{ client.name }}</td>
-              <td>{{ client.lastName }}</td>
-              <td>{{ client.clientType }}</td>
-              <td>{{ client.address }}</td>
+            <ng-container>
+             @for (client of paginatedClients; track client.clientId) {
+            <tr>
+              <td>
+                <a role="button" (click)="toggleDetails(client)">
+                    {{ client.name }}  {{ client.lastName }}
+                </a>
+              </td>
               <td>{{ client.phone }}</td>
-              <td>{{ client.email }}</td>
-              <td>{{ client.registryDate }}</td>
-              <td style="width: 8%; text-align: center; "><button class="btn btn-sm btn-primary me-2"
+              <td>{{ client.clientType }}</td>
+              <td><button class="btn btn-sm btn-primary me-2"
                   (click)="updateClient(client)"><i class="bi bi-pencil-fill"></i>
-                </button></td>
-              <td style="width: 8%; text-align: center;"><button class="btn btn-sm btn-danger"
-                  (click)="deleteClient(client)"><i class="bi bi-trash-fill"></i>
-                </button></td>
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="deleteClient(client)"><i class="bi bi-trash-fill"></i>
+                </button>
+              </td>
             </tr>
+            <tr *ngIf="client.showDetails">
+                <td colspan="4">
+                  <table class="table caption-top table-striped-columns">
+                    <caption>Detalles</caption>
+                    <thead>
+                      <tr>
+                        <th>Dirección</th>
+                        <th>Email</th>
+                        <th>Registro</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>{{ client.address }}</td>
+                        <td>{{ client.email }}</td>
+                        <td>{{ client.registryDate }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            }
+            </ng-container>
           </tbody>
         </table>
+        <!-- Paginación -->
+        <ngb-pagination class="d-flex justify-content-center" [(page)]="page" [pageSize]="pageSize"
+          [collectionSize]="clients.length" (pageChange)="onPageChange($event)" [boundaryLinks]="true" [maxSize]="5"
+          *ngIf="clients.length"> pageSize">
+        </ngb-pagination>
+        <!--Fin Paginacion-->
         </div>
-      
     </div><!--Fin container mt-4-->
   </div>
-  <div *ngIf="recivedTabIndex==1" class="my-div">
+  <div *ngIf="recivedTabIndex==1" class="containerClient">
     <div class="container mt-4">
       <h4 class="mb-4">{{clientLabel}}</h4>
       <form [formGroup]="clientForm" (ngSubmit)="onSubmit(clientButton)">

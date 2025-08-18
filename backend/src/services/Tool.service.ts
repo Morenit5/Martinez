@@ -5,19 +5,40 @@ import { EntityTool } from '../entities/Tool.entity';
 import { CreateToolDto, ToolDto, UpdateToolDto } from 'src/dto/Tool.dto';
 import { CategoryDto } from 'src/dto/Category.dto';
 import { EntityCategory } from '../entities/Category.entity';
+import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 
 @Injectable()
 export class ServiceTool {
   constructor(@InjectRepository(EntityTool) private toolRepository: Repository<EntityTool>,
-              @InjectRepository(EntityCategory) private categoryRepository: Repository<EntityCategory>) {
+              @InjectRepository(EntityCategory) private categoryRepository: Repository<EntityCategory>,
+             private readonly exceptions:TypeORMExceptions) {
     }
 
-  findAll(): Promise<ToolDto[]> {
+  /*findAll({limit, offset}: PaginationQueryDto): Promise<ToolDto[]> {
+    return this.toolRepository.find({
+      where: [
+        { enabled: true } 
+      ], skip: offset, take: limit,
+    })
+  }*/
+
+     /*findAll(): Promise<ToolDto[]> {
     return this.toolRepository.find({
       where: [
         { enabled: true },
       ],
     })
+  }*/
+
+  findAllWithCategories(): Promise<ToolDto[]> {
+    return this.toolRepository.find({
+      where: [{ enabled: true },],
+        relations: { category: true } }).then((result: any) => {
+          //console.log(result);  
+          return result;
+        }).catch((error: any) => {
+            this.exceptions.sendException(error);
+        });
   }
 
   async findOne(toolId: number): Promise<ToolDto|null> {
@@ -51,4 +72,8 @@ export class ServiceTool {
   /*findAllCat(categoryId: number) {
    return this.toolRepository.find({ where: { categoryId: categoryId } });
   }*/
+
+
+
+
 }
