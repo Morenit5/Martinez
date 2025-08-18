@@ -1,8 +1,8 @@
 
-import { IsBoolean, IsNotEmpty, IsNumber, IsString,IsDate, IsOptional } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, IsString,IsDate, IsOptional, IsObject } from 'class-validator';
 import { CategoryDto, CreateCategoryDto, UpdateCategoryDto } from './Category.dto';
 import { PartialType } from '@nestjs/mapped-types';
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
 
 
 export class ToolDto {
@@ -28,7 +28,9 @@ export class ToolDto {
 
     @Expose()
     @IsOptional()
-    @IsString()
+    //@IsString()
+    @IsObject()
+    @Type(() => CategoryDto)
     category?: CategoryDto; //@ManyToOne => category.categoryId
  
     @Expose()

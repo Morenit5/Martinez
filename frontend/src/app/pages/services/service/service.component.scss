@@ -14,3 +14,13 @@ a[role="button"]:hover {
   color: blue; /* Or a specific hex code like #0000FF */
   text-decoration:underline; 
 }
+
+.containerService {
+  //width: 85%;
+  /* Ancho deseado */
+  margin: 0 auto;
+  /* Centra horizontalmente */
+  background-color: rgba(235, 243, 238, 0.678);
+  /* Opcional, para visualizar */
+  height: 100%;
+}

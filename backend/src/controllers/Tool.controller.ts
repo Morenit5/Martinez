@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, Put, Query } from '@nestjs/common';
 import { ServiceTool } from 'src/services/Tool.service';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 import { CreateToolDto, ToolDto, UpdateToolDto } from 'src/dto/Tool.dto';
@@ -12,9 +12,24 @@ export class ControllerTool {
   updateTool: UpdateToolDto;
   constructor(private readonly serviceTool: ServiceTool, private readonly exceptions: TypeORMExceptions) { }
 
-  @Get()
+  /*@Get()
+  findAll(pagination: PaginationQueryDto): Promise<ToolDto[]> {
+    return this.serviceTool.findAll(pagination);
+  }*/
+
+  /*@Get()
   findAll(): Promise<ToolDto[]> {
     return this.serviceTool.findAll();
+  }*/
+
+  @Get('/catg')
+  findAllWithCategories(): Promise<ToolDto[]> {
+    return this.serviceTool.findAllWithCategories().then((result: any) => {
+          console.log(result);  
+          return result;
+        }).catch((error: any) => {
+            this.exceptions.sendException(error);
+        });
   }
 
   @Get(':id')

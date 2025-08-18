@@ -8,9 +8,31 @@ nav {
 
 
 
+
     /* Hide the content on screens up to a certain width (e.g., 768px for common mobile breakpoints) */
     @media only screen and (max-width: 768px) {
         .desktop-only-content {
             display: none;
         }
     }
+
+/*.manuscrita {
+  font-family: "La Belle Aurore", cursive;
+  /* Reemplaza con tu fuente deseada * /
+}*/
+
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Cookie&display=swap');
+
+.handwritten {
+  font-family: 'Dancing Script', cursive;
+}
+
+.pacifico {
+  font-family: 'Pacifico', cursive;
+}
+
+.cookie {
+  font-family: 'Cookie', cursive;
+}
+
