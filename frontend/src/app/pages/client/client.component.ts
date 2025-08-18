@@ -18,7 +18,6 @@ export class ClientComponent  {
 
   clientLabel: string = 'Registro de Clientes';
   clientButton: string = 'Registrar';
-  clients: ClientEntity[] = [];// se crea un array vacio de la interfaz
   clientId: number | null = null;
   recivedTabIndex: number = 0;
   checkoutForm;
@@ -30,8 +29,23 @@ export class ClientComponent  {
   reqTabId: number;
   opciones: any;
 
+    /*Paginacion*/
+    clients: ClientEntity[] = [];// se crea un array vacio de la interfaz
+    paginatedClients: ClientEntity[] = [];
+    page = 1; // Página actual
+    pageSize = 7; // Elementos por página
+    collectionSize = 0; // Total de registros
+    totalPages = 0;
+    currentPage = 1;
+    /*Paginacion*/
+
+    isLoading = true;
+    toggleDetails(Item: any){ Item.showDetails = !Item.showDetails; }
+
   constructor(private fbClient: FormBuilder, private toast: ToastUtility) {
-    this.clientList = this.clientService.fetchData1();
+
+    this.getAllDataClients();
+    //this.clientList = this.clientService.fetchData1();
     this.opciones = jsonData.clientes;
 
     this.clientForm = this.fbClient.group({
@@ -45,7 +59,22 @@ export class ClientComponent  {
       registryDate: ['', Validators.required]//,
       //enabled: [false],
     });
-      
+
+    this.updatePaginatedData();      
+  }
+
+  getAllDataClients()
+  {
+     this.clientService.fetchData1().subscribe({
+      next: (clientsList) => {
+        this.clients = clientsList;
+        this.collectionSize = this.clients.length;
+        this.paginatedClients = this.clients.slice(0, this.pageSize);
+      },
+      error: (error) => {
+        console.error(error);
+      },
+    });
   }
 
 
@@ -112,7 +141,7 @@ export class ClientComponent  {
       phone: clientInstance.phone,
       email: clientInstance.email,
       registryDate: clientInstance.registryDate,
-      clienType:clientInstance.clienType
+      clientType:clientInstance.clientType
     });
     console.log(clientInstance);
   }
@@ -133,7 +162,25 @@ export class ClientComponent  {
         this.clientList = this.clientService.getAllClients();
       }
     });
+
+    this.getAllDataClients();
   }
 
   getMessage(message: number) { this.recivedTabIndex = message; }
+
+    /*METODOS PAGINACION*/
+  private updatePaginatedData(): void {
+    const startIndex = (this.page - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.paginatedClients = this.clients.slice(startIndex, endIndex);
+  }
+
+  onPageChange(newPage: number): void {
+    console.log('AQUI ENTRA');
+    this.page = newPage;
+    console.log(this.page);
+    this.updatePaginatedData();
+  }
+  /*FIN METODOS DE PAGINACION*/
+
 }

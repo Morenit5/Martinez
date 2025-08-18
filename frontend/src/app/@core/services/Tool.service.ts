@@ -15,6 +15,7 @@ export class ToolService {
   // we can now access environment.apiUrl
   apiUrl = environment.apiUrl + '/tool';
   apiUrlCat = environment.apiUrl + '/category';
+  apiUrlToolCat = environment.apiUrl + '/tool/catg';
   toolId = '';
   updateDelete = this.apiUrl + '/up';
   tools: ToolEntity[] = []; // se crea un array vacio de la interfaz
@@ -22,8 +23,8 @@ export class ToolService {
 
   handleError(handleError: any) { throw new Error('Method not implemented.'); }
 
-  fetchData1(): Observable<iTool[]> {
-    return this.http.get<iTool[]>(this.apiUrl);
+  fetchData1(): Observable<ToolEntity[]> {
+    return this.http.get<ToolEntity[]>(this.apiUrlToolCat);
   }
 
   addTool(tool: ToolEntity): Observable<ToolEntity> {

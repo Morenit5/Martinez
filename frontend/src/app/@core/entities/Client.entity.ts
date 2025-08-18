@@ -5,9 +5,10 @@ export class ClientEntity {
   address?: string;
   phone?: string;
   email?: string;
-  clienType?: string;
+  clientType?: string;
   registryDate?: Date;
   enabled?: boolean;
+  showDetails: boolean = false;
 
   get fullName(): string {
     return `${this.name} ${this.lastName}`;

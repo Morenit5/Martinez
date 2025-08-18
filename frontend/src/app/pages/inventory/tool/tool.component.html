@@ -1,7 +1,7 @@
 <div>
   <tabs [tabItems]="['Consulta', 'Registro']" [tabIcons]="['folder', 'plus-circle']" (tabIndex)="getMessage($event)">
   </tabs>
-  <div *ngIf="recivedTabIndex==0" class="my-div">
+  <div *ngIf="recivedTabIndex==0" class="containerTool">
     <div class="container mt-4">
       <h3 class="mb-4">Herramientas</h3>
       <div class="table-responsive">
@@ -13,41 +13,70 @@
               <th>Nombre</th>
               <!--<th>Imagen</th>-->
               <th>Estatus</th>
-              <th>Estado de Herramienta</th>
-              <!--<th>Proveedor</th>-->
+              <!--<th>Estado de Herramienta</th>
               <th>Fecha Adquisición</th>
-              <!--<th>Activo</th>-->
-              <th>Editar</th>
-              <th>Eliminar</th>
+              <th>Categoria</th>-->
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let tool of toolList |async">
-              <!--<td>{{ tool.toolId }}</td>-->
-              <td>{{ tool.code }}</td>
-              <td>{{ tool.name }}</td>
-              <!--<td>{{ tool.image }}</td>-->
-              <td>{{ tool.status }}</td>
-              <td>{{ tool.toolState }}</td>
-              <!--<td>{{ tool.provider }}</td>-->
+            <ng-container>
+              @for (tool of paginatedTools; track tool.toolId) {
+              <tr>
+                <td>{{ tool.code}}</td>
+                <td>
+                  <a role="button" (click)="toggleDetails(tool)">
+                    {{ tool.name }}
+                  </a>
+                </td>
+                <!--<td>{{ tool.image }}</td>-->
+                <td>{{ tool.status }}</td>
+                <!--<td>{{ tool.toolState }}</td>
               <td>{{ tool.acquisitionDate | date: 'shortDate' }}</td>
-              <!--<td>{{ tool.enabled }}</td>-->
-               <td style="width: 8%; text-align: center; "><button *ngIf="tool.name.toLowerCase() !== 'general' " class="btn btn-sm btn-primary me-2" (click)="updateTool(tool)"><i
-                    class="bi bi-pencil-fill"></i>
-                </button></td>
-              <td style="width: 8%; text-align: center;"><button *ngIf="tool.name.toLowerCase() !== 'general' "  class="btn btn-sm btn-danger" (click)="deleteTool(tool)"><i
-                    class="bi bi-trash-fill"></i>
-                </button></td>
-            </tr>
+              <td>{{ tool.category }}</td>-->
+                <td><button class="btn btn-sm btn-primary me-2" (click)="updateTool(tool)"><i
+                      class="bi bi-pencil-fill"></i>
+                  </button><button class="btn btn-sm btn-danger" (click)="deleteTool(tool)"><i
+                      class="bi bi-trash-fill"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="tool.showDetails">
+                <td colspan="4">
+                  <table class="table caption-top table-striped-columns">
+                    <caption>Detalles</caption>
+                    <thead>
+                      <tr>
+                        <th>Tipo</th>
+                        <th>Nombre</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>{{ tool.category.categoryType }}</td>
+                        <td>{{ tool.category.name }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+              }
+            </ng-container>
           </tbody>
         </table>
+        <!-- Paginación -->
+        <ngb-pagination class="d-flex justify-content-center" [(page)]="page" [pageSize]="pageSize"
+          [collectionSize]="tools.length" (pageChange)="onPageChange($event)" [boundaryLinks]="true" [maxSize]="5"
+          *ngIf="tools.length"> pageSize">
+        </ngb-pagination>
+        <!--Fin Paginacion-->
       </div>
     </div><!--Fin container mt-4-->
   </div>
-  <div *ngIf="recivedTabIndex==1" class="my-div">
+  <div *ngIf="recivedTabIndex==1" class="containerTool">
     <div class="container mt-4">
       <h4 class="mb-4">{{toolLabel}}</h4>
-      <form [formGroup]="toolForm" (ngSubmit)="onSubmit(toolButton)"><!--[formGroup]="toolForm" (ngSubmit)="enviarFormulario()"-->
+      <form [formGroup]="toolForm" (ngSubmit)="onSubmit(toolButton)">
         <div class="row">
           <!-- Columna 1 -->
           <div id="Tools-Left-Column" class="col-md-6">
@@ -78,8 +107,7 @@
                 <option value="MALO">REPARACIÓN</option>
               </select>
             </div>
-          </div><!---->
-
+          </div>
           <!-- Columna 2 -->
           <div id="Tools-Right-Column" class="col-md-6">
             <div class="mb-3">
@@ -102,9 +130,9 @@
             </div>
             <div class="mb-3">
               <label for="fecha" class="">*Fecha de adquisición</label>
-              <div class="input-group"  >
-                <input class="form-control"  id="fecha" placeholder="yyyy-mm-dd" name="acquisitionDate" ngbDatepicker #d="ngbDatepicker"
-                  formControlName="acquisitionDate" />
+              <div class="input-group">
+                <input class="form-control" id="fecha" placeholder="yyyy-mm-dd" name="acquisitionDate" ngbDatepicker
+                  #d="ngbDatepicker" formControlName="acquisitionDate" />
                 <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">📅</button>
               </div>
               <div *ngIf="toolForm.get('acquisitionDate')?.invalid && toolForm.get('acquisitionDate')?.touched"
@@ -114,16 +142,15 @@
             </div>
 
             <div class="mb-3 ">
-            <label for="fecha" class=""></label>
-            <div class="input-group-append"  >
-              <div  class="text-end">
-            <button type="submit" class="btn btn-sm btn-primary">{{toolButton}}</button>
-            <button type="button" class="btn btn-sm btn-danger" (click)="onClear()">Cancelar</button></div>
-            </div>
+              <label for="fecha" class=""></label>
+              <div class="input-group-append">
+                <div class="text-end">
+                  <button type="submit" class="btn btn-sm btn-primary">{{toolButton}}</button>
+                  <button type="button" class="btn btn-sm btn-danger" (click)="onClear()">Cancelar</button>
+                </div>
+              </div>
             </div>
           </div>
-        
-        
         </div>
       </form>
     </div>

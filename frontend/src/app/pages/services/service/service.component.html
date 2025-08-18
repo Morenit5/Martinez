@@ -1,82 +1,95 @@
 <div>
-  <tabs [tabItems]="['Consulta', 'Crear Servicio', 'Pagos']" [tabIcons]="['journal-check', 'plus-circle', 'cash-coin']" (tabIndex)="getMessage($event)">
+  <tabs [tabItems]="['Consulta', 'Crear Servicio', 'Pagos']" [tabIcons]="['journal-check', 'plus-circle', 'cash-coin']"
+    (tabIndex)="getMessage($event)">
   </tabs>
-  <div *ngIf="recivedTabIndex==0" class="my-div">
+  <div *ngIf="recivedTabIndex==0" class="containerService">
     <div class="container mt-4">
       <h3 class="mb-4">Servicios</h3>
       <div class="table-responsive">
         <input type="text" class="form-control" placeholder="Buscar por nombre">
         <div class="table-responsive">
-           
-  <table class="table table-bordered table-striped">
-    <thead>
-      <tr>
-        <th>Cliente</th>
-        <th>Servicio</th>
-        <th>Fecha Servicio</th>
-        <th>Estado</th>
-        <th>Acciones</th>
-     </tr>
-    </thead>
-    <tbody>
-        @if (!isLoading) {
-    <ng-container *ngFor="let parentItem of serviceList">
-      <tr>
-        <td>{{parentItem.client.name}} {{parentItem.client.lastName}}</td>
-        <td>
-          <a  role="button"  (click)="toggleDetails(parentItem)">
-            {{ parentItem.serviceName }}
-          </a>
-        </td>
-        <td>{{ parentItem.serviceDate }}</td>
-        <td [ngClass]="{'table-success': parentItem.status === 'terminado', 'table-danger': parentItem.status === 'en progreso'}">{{ parentItem.status }}</td>
-        <td>
-            <button class="btn btn-sm btn-primary me-2" (click)="generateInvoice()"><i class="bi bi-receipt-cutoff"></i></button>
-        </td>
-      </tr>
-      <tr *ngIf="parentItem.showDetails">
-        <td colspan="5">
-            
-          <table class="table caption-top table-striped-columns">
-            <caption>Detalles del Servicio</caption>
+          <table class="table table-bordered table-striped">
             <thead>
-              <tr>  
-                <th>Tipo</th>
-                <th>Descripcion</th>
-                <th>Unidades</th>
-                <th>Cantidad</th>
-                <th>Precio</th>
+              <tr>
+                <th>Cliente</th>
+                <th>Servicio</th>
+                <th>Fecha Servicio</th>
+                <th>Estado</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let childItem of parentItem.serviceDetail" >
-                <td>{{ childItem.serviceType }}</td>
-                <td>{{ childItem.description }}</td>
-                <td>{{ childItem.unitMeasurement }}</td>
-                <td>{{ childItem.quantity }}</td>
-                <td>${{ childItem.price }}</td>
+              <!--@if (!isLoading) {-->
+              
+              <ng-container> <!--*ngFor="let parentItem of serviceList"   paginatedServices-->
+                @for (parentItem of paginatedServices; track parentItem.serviceId) {
+                <tr>
+                  <td>{{parentItem.client.name}} {{parentItem.client.lastName}}</td>
+                  <td>
+                    <a role="button" (click)="toggleDetails(parentItem)">
+                      {{ parentItem.serviceName }}
+                    </a>
+                  </td>
+                  <td>{{ parentItem.serviceDate }}</td>
+                  <td
+                    [ngClass]="{'table-success': parentItem.status === 'terminado', 'table-danger': parentItem.status === 'en progreso'}">
+                    {{ parentItem.status }}</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary me-2" (click)="generateInvoice()"><i
+                        class="bi bi-receipt-cutoff"></i></button>
+                  </td>
+                </tr>
+                <tr *ngIf="parentItem.showDetails">
+                  <td colspan="5">
+
+                    <table class="table caption-top table-striped-columns">
+                      <caption>Detalles del Servicio</caption>
+                      <thead>
+                        <tr>
+                          <th>Tipo</th>
+                          <th>Descripcion</th>
+                          <th>Unidades</th>
+                          <th>Cantidad</th>
+                          <th>Precio</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let childItem of parentItem.serviceDetail">
+                          <td>{{ childItem.serviceType }}</td>
+                          <td>{{ childItem.description }}</td>
+                          <td>{{ childItem.unitMeasurement }}</td>
+                          <td>{{ childItem.quantity }}</td>
+                          <td>${{ childItem.price }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              }
+              </ng-container>
+             <!-- } @else {
+              <tr>
+                <td colspan="5" style="text-align: center">Cargando....</td>
               </tr>
+              }-->
             </tbody>
           </table>
-        </td>
-      </tr>
-    </ng-container>
-        } @else {
-            <tr>
-              <td colspan="5" style="text-align: center">Cargando....</td>
-            </tr>
-        }
-  </tbody>
-  </table>
-
-</div>
+          <!-- Paginación -->
+        <ngb-pagination class="d-flex justify-content-center" [(page)]="page" [pageSize]="pageSize"
+          [collectionSize]="services.length" (pageChange)="onPageChange($event)" [boundaryLinks]="true" [maxSize]="2"
+          *ngIf="services.length> pageSize"> {{services.length}}
+        </ngb-pagination>
+        <!--Fin Paginacion-->
+        </div>
+        
       </div>
     </div><!--Fin container mt-4-->
   </div>
-  <div *ngIf="recivedTabIndex==1" class="my-div">
+  <div *ngIf="recivedTabIndex==1" class="containerService">
     <div class="container mt-4">
       <h4 class="mb-4">{{toolLabel}}</h4>
-      <form [formGroup]="toolForm" (ngSubmit)="onSubmit(toolButton)"><!--[formGroup]="toolForm" (ngSubmit)="enviarFormulario()"-->
+      <form [formGroup]="toolForm" (ngSubmit)="onSubmit(toolButton)">
+        <!--[formGroup]="toolForm" (ngSubmit)="enviarFormulario()"-->
         <div class="row">
           <!-- Columna 1 -->
           <div id="Tools-Left-Column" class="col-md-6">
@@ -131,9 +144,9 @@
             </div>
             <div class="mb-3">
               <label for="fecha" class="">*Fecha de adquisición</label>
-              <div class="input-group"  >
-                <input class="form-control"  id="fecha" placeholder="yyyy-mm-dd" name="acquisitionDate" ngbDatepicker #d="ngbDatepicker"
-                  formControlName="acquisitionDate" />
+              <div class="input-group">
+                <input class="form-control" id="fecha" placeholder="yyyy-mm-dd" name="acquisitionDate" ngbDatepicker
+                  #d="ngbDatepicker" formControlName="acquisitionDate" />
                 <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">📅</button>
               </div>
               <div *ngIf="toolForm.get('acquisitionDate')?.invalid && toolForm.get('acquisitionDate')?.touched"
@@ -141,18 +154,16 @@
                 Fecha de Adquisición de la Herramienta es un campo requerido!
               </div>
             </div>
-
             <div class="mb-3 ">
-            <label for="fecha" class=""></label>
-            <div class="input-group-append"  >
-              <div  class="text-end">
-            <button type="submit" class="btn btn-sm btn-primary">{{toolButton}}</button>
-            <button type="button" class="btn btn-sm btn-danger" (click)="onClear()">Cancelar</button></div>
-            </div>
+              <label for="fecha" class=""></label>
+              <div class="input-group-append">
+                <div class="text-end">
+                  <button type="submit" class="btn btn-sm btn-primary">{{toolButton}}</button>
+                  <button type="button" class="btn btn-sm btn-danger" (click)="onClear()">Cancelar</button>
+                </div>
+              </div>
             </div>
           </div>
-        
-        
         </div>
       </form>
     </div>
