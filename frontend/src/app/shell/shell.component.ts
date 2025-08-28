@@ -8,9 +8,11 @@ import { NgbOffcanvas, OffcanvasDismissReasons ,NgbDate} from '@ng-bootstrap/ng-
 @Component({
   selector: 'app-shell',
   templateUrl: './shell.component.html',
+  styleUrl: './shell.component.scss',
   standalone: false,
 })
 export class ShellComponent implements OnInit {
+
   isSidebarActive = false;
 
   constructor(

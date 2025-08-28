@@ -1,7 +1,7 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { IsNotEmpty, IsEmail, IsOptional, IsString, IsObject, isNotEmpty, IsNumber, IsBoolean, IsPhoneNumber } from 'class-validator';
 import { CreateRolDto, RolDto } from './Rol.dto';
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
 
 export class userDto {
 
@@ -33,6 +33,7 @@ export class userDto {
   @Expose()
   @IsOptional()
   @IsObject()
+  @Type(() => RolDto)
   rol: RolDto; //@OneToOne(() => EntityRol, rol => rol.rolId)
 
   @Expose()

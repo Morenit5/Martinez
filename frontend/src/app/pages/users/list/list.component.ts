@@ -1,12 +1,12 @@
 import { Component, ElementRef, inject, OnInit, SecurityContext, ViewChild } from '@angular/core';
 import { UseRandomUser } from '@core/usecases';
 import { RandomUserEntity } from '@core/entities';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { ToastUtility } from '@app/@core/utils/toast.utility';
 import { RolEntity, UserEntity } from '@app/@core/entities/User.entity';
 import { RolesInstances, UsersInstances } from '@app/@core/services/Users.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { firstValueFrom, from, timer } from 'rxjs';
+
 
 
 @Component({
@@ -30,20 +30,22 @@ export class ListComponent implements OnInit {
   reqTabId: number;
   recivedTabIndex: number = 0;
   isLoading = true;
-  
+  avatarImg;
+
   private readonly _useRandomUser = new UseRandomUser();
   fileNotFound: boolean = false; //assume we do find the correct avatar image
  
 
-  constructor(private fmBldUsers: FormBuilder, private toast: ToastUtility, private readonly userInstances:UsersInstances,private readonly rolesList: RolesInstances,private sanitizer: DomSanitizer) {
-      this.usersForm = this.fmBldUsers.group({
+  constructor(private fmBldUsers: FormBuilder, private toast: ToastUtility, private readonly userInstances:UsersInstances,private readonly rolesList: RolesInstances,private sanitizer: DomSanitizer) {  
+
+    this.usersForm = this.fmBldUsers.group({
         userId: [],
         username: ['', Validators.required],
         firstname: [''],
         lastname: [''],
-        email: ['',Validators.required],
-        password: ['', Validators.required],
-        rol: [],
+        email: ['',[Validators.required,Validators.email]],
+        password: ['', [Validators.required]],
+        rol: [RolEntity,Validators.required],
         phone: []
       });
 
@@ -75,6 +77,7 @@ export class ListComponent implements OnInit {
 
     this.usersForm.get('rol').valueChanges.subscribe({
       next: (rol) => {
+        console.log('entramos al cambio')
         if(rol != null){
           this.rolEntity = rol;
         } else{
@@ -99,21 +102,26 @@ export class ListComponent implements OnInit {
   updateUser(userInstance: UserEntity) {
     this.recivedTabIndex = 1;
     this.reqTabId = 1;
-    this.usersLabel = 'Actualizar Categoría';
+    this.usersLabel = 'Actualizar Usuario';
     this.usersButton = 'Actualizar'
+
+    this.usersForm.get('password').clearValidators(); //no password required for update, therefore i can remove it safely
+    this.usersForm.get('password').updateValueAndValidity();
+    
+    this.rolEntity = userInstance.rol;
 
     this.usersForm.patchValue({
       userId: userInstance.userId,
-      userName: userInstance.username,
-      firstName: userInstance.firstname,
-      lastName: userInstance.lastname,
-      inputEmail: userInstance.email,
-      inputPassword: userInstance.password,
+      username: userInstance.username,
+      firstname: userInstance.firstname,
+      lastname: userInstance.lastname,
+      email: userInstance.email,
+      password: userInstance.password, //Este campo no se regresa de la bd entonces esta vacio
       rol: this.rolEntity,
-      phone: userInstance.password
+      phone: userInstance.phone
     });
 
-    
+ 
   }
 
 
@@ -144,15 +152,24 @@ export class ListComponent implements OnInit {
       this.usersLabel = 'Registro de Usuarios';
       this.usersButton = 'Registrar'
     }
+    this.usersForm.get('password').setValidators(Validators.required); 
+    this.usersForm.get('password').updateValueAndValidity();
     this.usersForm.reset();
   }
 
   onSubmit(action: string) {
-    this.usersForm.updateValueAndValidity();
-
+    
     if (this.usersForm.valid) {
 
       if (action == 'Registrar') {
+         this.usersForm.get('password').setValidators(Validators.required); 
+         this.usersForm.get('password').updateValueAndValidity();
+        if (!this.usersForm.valid) {
+          this.usersForm.markAllAsTouched();
+          this.toast.showToast('Campos Invalidos, porfavor revise el formulario!!', 7000, 'x-circle', false);
+          return
+        }
+
         this.userInstances.addUser(this.usersForm.value).subscribe({
           next: (response) => {
             this.toast.showToast('Usuario registrado exitosamente!!', 7000, 'check2-circle', true);
@@ -174,6 +191,7 @@ export class ListComponent implements OnInit {
             this.toast.showToast('Usuario actualizado exitosamente!!', 7000, 'check2-circle', true);
           },
           error: (err) => {
+            //console.log(err);
             this.toast.showToast('Error al actualizar al Usuario!!', 7000, 'x-circle', false);
           },
           complete: () => {
@@ -184,7 +202,8 @@ export class ListComponent implements OnInit {
       }
 
     } else {
-      console.log(this.usersForm.valid);
+      //console.log(this.usersForm.valid);
+      //console.log(this.usersForm);
       this.usersForm.markAllAsTouched();
       this.toast.showToast('Campos Invalidos, porfavor revise el formulario!!', 7000, 'x-circle', false);
     }
@@ -219,7 +238,7 @@ export class ListComponent implements OnInit {
             },
             complete: () => {
               // This code runs when the Observable completes
-              this.avatarImg = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+              //this.avatarImg = this.sanitizer.bypassSecurityTrustUrl(objectURL);
             }
           });
 
@@ -260,7 +279,7 @@ export class ListComponent implements OnInit {
     }
   }
     
-  avatarImg; 
+  
   getUserAvatarImage(avatarName:string) {
     let result;
     try {
@@ -271,6 +290,11 @@ export class ListComponent implements OnInit {
   }
     return result;
   }
+
+  compareObjects(obj1: any, obj2: any): boolean {
+      return obj1 && obj2 ? obj1.rolId === obj2.rolId : obj1 === obj2;
+  }
+
 
   userClicked(){}
 

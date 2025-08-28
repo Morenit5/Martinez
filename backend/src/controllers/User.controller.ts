@@ -85,7 +85,7 @@ export class ControllerUser {
           this.updateUser.avatar = file.filename;
 
           const success = await this.serviceUser.update(Number(userId), this.updateUser).then((result: any) => {
-            console.log("Result:", result);
+            //console.log("Result:", result);
             return result;
           }).catch((error: any) => {
             this.exceptions.sendException(error);
@@ -116,7 +116,7 @@ export class ControllerUser {
   @Get('/images/:filename')
   async getImage(@Param('filename') filename: string, @Res() res: Response) {
     const imagePath = join(__dirname, '..', 'uploads', filename); // Replace 'uploads' with your actual image storage location
-    console.log('este es el path ' + imagePath)
+    console.log('este es el path en el User.controller.ts ' + imagePath)
     const fileStream = createReadStream(imagePath);
 
     fileStream.on('open', () => {
@@ -154,7 +154,7 @@ export class ControllerUser {
       }
   
       return await this.serviceUser.update(Number(userId), this.updateUser).then((result: any) => {
-          console.log("Result:", result);
+          //console.log("Result:", result);
           return result;
         }).catch((error: any) => {
           this.exceptions.sendException(error);

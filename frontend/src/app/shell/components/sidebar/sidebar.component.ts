@@ -28,7 +28,7 @@ export class SidebarComponent implements OnInit {
     public shellService: ShellService,
   ) {
     this.sidebarItems = webSidebarMenuItems;
-    console.log(JSON.stringify(this.sidebarItems ))
+    //console.log(JSON.stringify(this.sidebarItems ))
   }
 
   ngOnInit(): void {
@@ -62,4 +62,6 @@ export class SidebarComponent implements OnInit {
   activateSidebarSubItem(index: number, subItem: NavMenuItem): void {
     this.shellService.activateNavSubItem(index, subItem, this.sidebarItems);
   }
+
+
 }

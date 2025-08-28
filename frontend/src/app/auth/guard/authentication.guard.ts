@@ -18,10 +18,9 @@ authenticated and redirects them to the dashboard if they are. */
   providedIn: 'root',
 })
 export class AlreadyLoggedCheckGuard {
-  constructor(
-    private readonly _credentialsService: CredentialsService,
-    private readonly _router: Router,
-  ) {}
+  constructor(private readonly _credentialsService: CredentialsService,private readonly _router: Router,) {
+    
+  }
 
   async canActivate(): Promise<boolean> {
     const isAuthenticated = this._credentialsService.isAuthenticated();
@@ -40,15 +39,11 @@ to the login page if not. */
   providedIn: 'root',
 })
 export class AuthenticationGuard {
-  constructor(
-    private readonly _router: Router,
-    private readonly _credentialsService: CredentialsService,
-  ) {}
+  constructor(private readonly _router: Router, private readonly _credentialsService: CredentialsService) {
 
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot,
-  ): boolean {
+  }
+
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot,): boolean {
     if (this._credentialsService.isAuthenticated()) {
       return true;
     }
