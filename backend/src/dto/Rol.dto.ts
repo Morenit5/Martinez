@@ -19,6 +19,7 @@ export class RolDto {
     @Expose()
     @IsOptional()
     @IsObject()
+    @Type(() => userDto)
     user?: userDto;  //@OneToOne(() => EntityUser, user => user.userId)
 
     @Expose()

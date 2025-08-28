@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 import { environment } from '@env/environment';
 import { instanceToPlain, plainToInstance } from 'class-transformer';
 import { RolEntity, UserEntity } from '../entities/User.entity';
@@ -24,10 +24,22 @@ export class UsersInstances {
     }
 
     updateUser(usrInstance: UserEntity) {
-      return this.userService.updateUser(usrInstance).pipe(
+      /*return this.userService.updateUser(usrInstance).pipe(
         map((response) =>
             response.map((user: any) => plainToInstance(UserEntity, user)),
         ),
+      );*/
+
+      return this.userService.updateUser(usrInstance).pipe(
+        //tap(value => console.log('Observable value:', value))
+        map(response => {
+          if (Array.isArray(response)) {
+            return response.map((user: any) => plainToInstance(UserEntity, user))
+          } else {
+            // it's a single object, transform directly
+            return plainToInstance(UserEntity, response)
+          }
+        })
       );
     }
     
@@ -66,7 +78,8 @@ class UsersService {
     updateUser(usrInstance: UserEntity) {
         let params = new HttpParams();
         params = params.set('id', usrInstance.userId);
-        let instance = this.http.put<any>(baseUrl + '/up/' + usrInstance.userId, usrInstance, { params: params });
+        let instance = this.http.put<any>(baseUrl + userUrl + '/up/' + usrInstance.userId, usrInstance, ); //{ params: params });
+        
         return instance;
     }
 

@@ -6,15 +6,19 @@ nav {
   justify-content: space-between;
 }
 
+/* Hide the content on screens up to a certain width (e.g., 768px for common mobile breakpoints for horizontal position) */ 
+@media only screen and (max-width: 768px) {
+  .desktop-only-content {
+    display: none;
+  }
+}
 
+@media only screen and (min-width: 768px) {
+  .mobile-only-content {
+    display: none;
+  }
+}
 
-
-    /* Hide the content on screens up to a certain width (e.g., 768px for common mobile breakpoints) */
-    @media only screen and (max-width: 768px) {
-        .desktop-only-content {
-            display: none;
-        }
-    }
 
 /*.manuscrita {
   font-family: "La Belle Aurore", cursive;

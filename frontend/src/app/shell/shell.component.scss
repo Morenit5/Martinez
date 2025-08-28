@@ -1,0 +1,21 @@
+/* Custom CSS for sidebar (adjust as needed) */
+#sidebarcolumn {
+    
+    transition: margin-left 0.3s ease; /* For smooth sliding */
+    /*min-height: calc(100vh - 56px); /* To account for navbar */
+}
+
+/* Initially hidden state */
+#sidebarcolumn.hide {
+    margin-left: -58.8px; /* Push sidebar off-screen */
+}
+
+/* Shown state */
+#sidebarcolumn.show {
+    margin-left: 0;
+}
+
+#contentcolumn {
+    flex-grow: 1; /* Allow content to take remaining space */
+    transition: margin-left 0.3s ease;
+}

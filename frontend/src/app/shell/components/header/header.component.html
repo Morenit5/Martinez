@@ -1,22 +1,17 @@
-<!--nav>
-  <p style="background-color: blue;"  class="title" translate>Titulo de la Pagina</p>
-  <app-language-selector></app-language-selector>
-</nav-->
+<!--div style="background-color: #E6F0DC;" class="row pt-3"-->
 
-
-<div style="background-color: #E6F0DC;" class="row pt-3">
-
-  <div class="container">
-    <div class="row">
+  <div class="container-fluid">
+    <div style="background-color: #E6F0DC;" class="row row flex-nowrap pt-3">
       <div class="col desktop-only-content" style="align-items: center; justify-content: center;" id="logo">
         <a href="/" class=" d-flex align-items-center pb-sm-3 mb-md-0 me-md-auto text-white text-decoration-none">
           <img src="images/logo.png" width="100" height="50" class="align-items-center" />
         </a>
-        
       </div>
-      <div class="col header_toggle"> <i class='bi bi-list' id="header-toggle"></i> </div>
+      <div class="col mobile-only-content" style="align-items: center; justify-content: center;" id="btnToggle">
+        <div role="button" (click)="toggleSideMenu()" class="col header_toggle"> <i style="color: #222f04; text-decoration: none;"  class='bi bi-list' id="header-toggle"></i> </div>
+      </div>
       <div class="col" id="title">
-        <h2 style="background-color: #E6F0DC; text-align: center;" class="pacifico">Martinez Gardening</h2>
+        <h2 class="pacifico">Martinez Gardening</h2>
       </div>
       <div class="col d-flex justify-content-end" id="inoutsign">
         <div ngbDropdown  class="tex dropdown mt-sm-auto ms-auto ms-sm-0 flex-shrink-1 ">
@@ -30,7 +25,8 @@
         </div>
       </div>
     </div>
-  </div>
+  </div>  
+
 
 
 

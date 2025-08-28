@@ -26,7 +26,7 @@
                 </button>
               </td>
               <td>
-                 {{ user.fullName }}
+                 {{ user.fullName }} 
               </td>
               <td>{{ user.email }}</td>
               <td>{{ user.phone }}</td>
@@ -69,13 +69,13 @@
             <div class="mb-3">
               <label for="email" class="form-label">&#160;Correo Electronico</label>
               <input type="email" class="form-control col-form-label" id="email" formControlName="email" aria-describedby="emailHelp" >
-              <div *ngIf="usersForm.get('inputEmail')?.invalid && usersForm.get('inputEmail')?.touched" class="text-danger">
+              <div *ngIf="usersForm.get('email')?.invalid && usersForm.get('email')?.touched" class="text-danger">
                 *Requerido
               </div>
             </div><!---->
             <div class="mb-3">
               <label for="rol" class="form-label">&#160;Rol</label>
-              <select class="form-select" formControlName="rol">
+              <select class="form-select" formControlName="rol" [compareWith]="compareObjects">
                 <option [ngValue]="null">-- Select --</option>
                 <option *ngFor="let rol of roles" [ngValue]="rol">
                   {{ rol.name }}
@@ -89,7 +89,7 @@
             <div class="mb-3">
               <label for="password" class="form-label">&#160;Clave</label>
               <input type="password" class="form-control" id="password"  formControlName="password" placeholder="Password">
-              <div *ngIf="usersForm.get('inputPassword')?.invalid && usersForm.get('inputPassword')?.touched" class="text-danger">
+              <div *ngIf="usersButton=='Registrar' && usersForm.get('password')?.invalid && usersForm.get('password')?.touched" class="text-danger">
                 *Requerido
               </div>
             </div>
