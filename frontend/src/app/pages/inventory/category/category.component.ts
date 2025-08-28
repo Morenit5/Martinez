@@ -75,7 +75,6 @@ export class CategoryComponent {
   /*FIN METODOS DE PAGINACION*/
 
   ngOnInit() {
-
   }
 
   onSubmit(accion: string) {

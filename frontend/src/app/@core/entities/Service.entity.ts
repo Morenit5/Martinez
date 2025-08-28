@@ -1,4 +1,5 @@
 import { ClientEntity } from "./Client.entity";
+import { InvoiceEntity } from "./Invoice.entity";
 
 
 export class ServiceEntity {
@@ -10,6 +11,7 @@ export class ServiceEntity {
     client: ClientEntity;
     showDetails: boolean = false;
     serviceDetail: ServiceDetail[];
+    invoice:InvoiceEntity;
 
 }
 

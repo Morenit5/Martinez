@@ -26,7 +26,7 @@
                 <tr>
                   <td>{{parentItem.client.name}} {{parentItem.client.lastName}}</td>
                   <td>
-                    <a role="button" (click)="toggleDetails(parentItem)">
+                    <a role="button" (click)="toggleDetails(parentItem)" ngbTooltip="Ver más detalles">
                       {{ parentItem.serviceName }}
                     </a>
                   </td>
@@ -35,7 +35,9 @@
                     [ngClass]="{'table-success': parentItem.status === 'terminado', 'table-danger': parentItem.status === 'en progreso'}">
                     {{ parentItem.status }}</td>
                   <td>
-                    <button class="btn btn-sm btn-primary me-2" (click)="generateInvoice()"><i
+                    <button class="btn btn-sm btn-primary me-2" (click)="generateInvoice()" ngbTooltip="Generar Factura"><i
+                        class="bi bi-receipt-cutoff"></i></button>
+                        <button class="btn btn-sm btn-primary me-2" (click)="sendEmail(parentItem)" ngbTooltip="Enviar Correo"><i
                         class="bi bi-receipt-cutoff"></i></button>
                   </td>
                 </tr>

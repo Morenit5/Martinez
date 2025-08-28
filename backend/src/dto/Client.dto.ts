@@ -1,6 +1,7 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { IsBoolean, IsDate, IsEmail, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
 import { CreateServiceDto, ServiceDto } from './Service.dto';
+import { Type } from 'class-transformer';
 
 
 export class ClientDto {
@@ -39,6 +40,7 @@ export class ClientDto {
 
     @IsOptional()
     @IsObject()
+    @Type(()=>ServiceDto)
     service: ServiceDto[];  //@OneToMany(() => EntityService, service => service.serviceId)
 
 }

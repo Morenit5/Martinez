@@ -16,6 +16,9 @@ export class EntityInvoice {
     @Column({type: 'varchar', length: 40 })
     invoiceNumber: string;
 
+    @Column({type: 'varchar', length: 150, nullable:true })
+    invoiceName: string;
+
     @Column('numeric', { precision: 7, scale: 2, transformer: new ColumnNumericTransformer() })
     totalAmount: number;
 

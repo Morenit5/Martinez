@@ -3,6 +3,7 @@ import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString
 import { CreatePaymentDto, PaymentDto } from './Payment.dto';
 import { CreateInvoiceDetailsDto, InvoiceDetailsDto } from './InvoiceDetails.dto';
 import { CreateServiceDto, ServiceDto } from './Service.dto';
+import { Type } from 'class-transformer';
 
 export class InvoiceDto {
 
@@ -16,6 +17,10 @@ export class InvoiceDto {
 
     @IsOptional()
     @IsString()
+    invoiceName: string;
+
+    @IsOptional()
+    @IsString()
     invoiceNumber: string;
 
     @IsOptional()
@@ -24,17 +29,18 @@ export class InvoiceDto {
 
     @IsOptional()
     @IsObject()
+    @Type(()=>PaymentDto)
     payment: PaymentDto[];  //@OneToMany(() => EntityPayment, payment => payment.paymentId)
 
     @IsOptional()
     @IsObject()
+    @Type(()=>InvoiceDetailsDto)
     invoiceDetails: InvoiceDetailsDto[];  // @OneToMany(() => EntityInvoiceDetails, invoiceDetail => invoiceDetail.invoiceDetailId)
 
     @IsOptional()
     @IsObject()
-    service?: ServiceDto; //@OneToOne(() => EntityService, service => service.serviceId)
-
-   
+    @Type(()=> ServiceDto)
+    service?: ServiceDto; //@OneToOne(() => EntityService, service => service.serviceId)   
 }
 
 export class CreateInvoiceDto {
@@ -42,10 +48,13 @@ export class CreateInvoiceDto {
     @IsDate()
     invoiceDate: Date;
 
-    
     @IsNotEmpty({ message: 'El campo número de factura es obligatorio.' })
     @IsString()
     invoiceNumber: string;
+
+    /*@IsNotEmpty({ message: 'El campo nombre de factura es obligatorio.' })
+    @IsString()
+    invoiceName: string;*/
 
     @IsNotEmpty({ message: 'El campo cantidad total es obligatorio.' })
     @IsNumber()
