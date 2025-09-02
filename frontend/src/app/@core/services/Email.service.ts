@@ -10,7 +10,7 @@ export class EmailService {
   constructor(private http: HttpClient) {}
 
   sendEmail(service: ServiceEntity): Observable<any> {
-    console.log('EMAIL.SERVICE: '+JSON.stringify(service));
-    return this.http.post(this.apiUrl, { service });
+    //console.log('EMAIL.SERVICE: '+JSON.stringify(service));
+    return this.http.post(this.apiUrl, JSON.stringify(service));
   }
 }

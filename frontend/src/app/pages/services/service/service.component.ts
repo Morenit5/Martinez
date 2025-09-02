@@ -75,7 +75,7 @@ export class ServiceComponent {
     // si no hay, sugerir al usuario, crear factura
     // si hay,  verificar  y luego enviarla
     //verificamos el cliente-servicio seleccionado
-console.log('SERVICE.Component:  '+JSON.stringify(ServiceDto));
+    //console.log('SERVICE.Component:  '+JSON.stringify(ServiceDto));
     this.emailService.sendEmail(ServiceDto).subscribe({
       next: () => alert('Correo enviado correctamente ✅'),
       error: (err) => {
