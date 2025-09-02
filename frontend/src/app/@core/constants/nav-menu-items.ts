@@ -67,12 +67,4 @@ export const webSidebarMenuItems: NavMenuItem[] = [
       },
     ],
   },
-
-  {
-    href: '/settings',
-    title: 'Ajustes', //Settings
-    active: false,
-    icon: 'gear',
-    divider: true,
-  },
 ];

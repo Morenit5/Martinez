@@ -21,4 +21,19 @@ export class ToastUtility {
 
         this.toast.show(msg, options);
     }
+
+    public showToastWarning(msg: string, dur: number = 5000, iconName: string) {
+        const options: ToastOptions<string> = {
+            duration: dur, // 5 seconds
+            position: 'top-center',
+            icon: '<i class="bi bi-' + iconName + '"></i>',
+            style: {
+                background: '#e6bc00ff',
+                color: '#fff',
+            },
+        };
+
+        this.toast.show(msg, options);
+    }
+
 }
