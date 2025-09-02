@@ -19,6 +19,9 @@ export class ListComponent implements OnInit {
 
   users: RandomUserEntity[] = [];
   users1: UserEntity[] = [];
+  originalValues: UserEntity[] = []; //para guardar temporalmente valores originales
+  userEntitiyToGet: string;  //el usuario que queremos buscar
+
   roles: RolEntity[] = [];
   rolEntity: RolEntity;
   usersForm: FormGroup;
@@ -50,6 +53,37 @@ export class ListComponent implements OnInit {
       });
 
       this.getAllUserInstances();
+
+      
+  }
+
+  onNameChange(newValue: string) {
+    this.userEntitiyToGet = newValue;
+  }
+
+  onKeyUp(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      const searchResults: UserEntity[] = this.users1.filter(item => item.firstname.includes(this.userEntitiyToGet)); // || item.email.includes(this.userEntitiyToGet));
+
+      if (searchResults.length !== 0) {
+        if (this.originalValues && this.originalValues.length == 0) {
+          this.originalValues = this.deepCopy(this.users1); //salvamos temporalmente valores
+        }
+        this.users1.length = 0; //limpiamos el array y ponemos los nuevos datos
+        this.users1 = searchResults;
+      } else {
+        this.toast.showToastWarning('El Usuario ' + this.userEntitiyToGet + ' no existe!', 7000, 'x-circle');
+      }
+
+    } else if (event.key === 'Backspace' || event.key === 'Delete') {
+
+      if ((this.userEntitiyToGet && this.userEntitiyToGet.length == 0) || !this.userEntitiyToGet) {
+        if (this.originalValues && this.originalValues.length !== 0) {
+          this.users1.length = 0; //limpiamos el array y ponemos los nuevos datos
+          this.users1 = this.originalValues;
+        }
+      }
+    }
   }
 
   ngOnInit() {
@@ -296,6 +330,23 @@ export class ListComponent implements OnInit {
   }
 
 
-  userClicked(){}
+
+  deepCopy<T>(obj: T): T {
+    if (typeof obj !== 'object' || obj === null) {
+      return obj;
+    }
+
+    if (Array.isArray(obj)) {
+      return obj.map(item => this.deepCopy(item)) as T;
+    }
+
+    const copiedObj: { [key: string]: any } = {};
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        copiedObj[key] = this.deepCopy((obj as any)[key]);
+      }
+    }
+    return copiedObj as T;
+  }
 
 }
