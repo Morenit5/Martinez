@@ -8,6 +8,11 @@
       "include": "uploads/*", 
       "outDir": "dist/", 
       "watchAssets": true 
+    },
+    {
+      "include": "invoices/*", 
+      "outDir": "dist/", 
+      "watchAssets": true 
     }]
   }
 }

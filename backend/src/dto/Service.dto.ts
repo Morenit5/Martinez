@@ -3,9 +3,10 @@ import { PartialType } from '@nestjs/mapped-types';
 import { CreateServiceDetailDto, ServiceDetailDto } from './ServiceDetail.dto';
 import { CreateInvoiceDto, InvoiceDto } from './Invoice.dto';
 import { ClientDto, CreateClientDto } from './Client.dto';
+import { Type } from 'class-transformer';
 
 export class ServiceDto {
- 
+
     @IsOptional()
     @IsNumber()
     serviceId: number;
@@ -14,12 +15,14 @@ export class ServiceDto {
     @IsString()
     serviceName: string;
 
+
     @IsOptional()
     @IsDate()
     serviceDate: Date;
 
     @IsOptional()
     @IsObject()
+    @Type(()=>InvoiceDto)
     invoice?: InvoiceDto; // @OneToOne(() => EntityInvoice, invoice => invoice.invoiceId)
 
     @IsOptional()
@@ -31,11 +34,13 @@ export class ServiceDto {
     price: string;
 
     @IsOptional()
-    @IsObject()     
+    @IsObject()    
+    @Type(()=>ClientDto) 
     client: ClientDto; //@ManyToOne(() => EntityClient, client => client.clientId, { onUpdate: "CASCADE" })
 
     @IsOptional()
     @IsObject() 
+    @Type(()=>ServiceDetailDto)
     serviceDetail: ServiceDetailDto[]; //@OneToMany(() => EntityServiceDetail, servicedetail => servicedetail.serviceDetailsId)
   
 }
