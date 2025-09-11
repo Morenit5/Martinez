@@ -25,8 +25,8 @@ export class ServiceDetailDto {
 
     
     @IsOptional()
-    @IsNumber()
-    unitMeasurement: number; // unidad de medida litros, metros, piezas
+    @IsString()
+    unitMeasurement: string; // unidad de medida litros, metros, piezas
 
     
     @IsOptional()
@@ -51,8 +51,8 @@ export class CreateServiceDetailDto {
 
     
     @IsNotEmpty({ message: 'La unidad de medida del servicio es requerida.' })
-    @IsNumber()
-    unitMeasurement: number; // unidad de medida litros, metros, piezas
+    @IsString()
+    unitMeasurement: string; // unidad de medida litros, metros, piezas
 
     
     @IsNotEmpty({ message: 'La cantidad es requerida.' })

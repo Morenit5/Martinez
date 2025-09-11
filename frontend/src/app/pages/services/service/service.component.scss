@@ -24,3 +24,8 @@ a[role="button"]:hover {
   /* Opcional, para visualizar */
   height: 100%;
 }
+
+.list-group-scrollable {
+    max-height: 150px; /* Adjust this value as needed */
+    overflow-y: scroll;
+}

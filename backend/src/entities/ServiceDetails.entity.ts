@@ -17,8 +17,8 @@ export class EntityServiceDetail {
     @Column({ type: 'varchar', length: 400 })
     description: string;
 
-    @Column() // unidad de medida litros, metros, piezas
-    unitMeasurement: number;
+    @Column({ type: 'varchar', length: 200, nullable: true }) // unidad de medida litros, metros, piezas
+    unitMeasurement: string;
 
     @Column() // la cantidad que se uso de cada servicio
     quantity: number;

@@ -1,12 +1,230 @@
 <div>
-  <tabs [tabItems]="['Consulta', 'Crear Servicio', 'Pagos']" [tabIcons]="['journal-check', 'plus-circle', 'cash-coin']"
-    (tabIndex)="getMessage($event)">
+  <tabs [tabItems]="['Consulta', 'Crear Servicio', 'Pagos']" [tabIcons]="['journal-check', 'plus-circle', 'cash-coin']" [requiredTabId]=reqTabId  (tabIndex)="getMessage($event)">
   </tabs>
   <div *ngIf="recivedTabIndex==0" class="containerService">
     <div class="container mt-4">
       <h3 class="mb-4">Servicios</h3>
       <div class="table-responsive">
         <input type="text" class="form-control" placeholder="Buscar por nombre">
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Servicio</th>
+                <th>Fecha Servicio</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!--@if (!isLoading) {-->
+              
+              <ng-container> <!--*ngFor="let parentItem of serviceList"   paginatedServices-->
+                @for (parentItem of paginatedServices; track parentItem.serviceId) {
+                <tr>
+                  <td>{{parentItem.client.name}} {{parentItem.client.lastName}}</td>
+                  <td>
+                    <a role="button" (click)="toggleDetails(parentItem)" ngbTooltip="Ver más detalles">
+                      {{ parentItem.serviceName }}
+                    </a>
+                  </td>
+                  <td>{{ parentItem.serviceDate }}</td>
+                  <td
+                    [ngClass]="{'table-success': parentItem.status === 'terminado', 'table-danger': parentItem.status === 'en progreso'}">
+                    {{ parentItem.status }}</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary me-2" (click)="generateInvoice()" ngbTooltip="Generar Factura"><i
+                        class="bi bi-receipt-cutoff"></i></button>
+                        <button class="btn btn-sm btn-primary me-2" (click)="sendEmail(parentItem)" ngbTooltip="Enviar Correo"><i
+                        class="bi bi-receipt-cutoff"></i></button>
+                  </td>
+                </tr>
+                <tr *ngIf="parentItem.showDetails">
+                  <td colspan="5">
+                      <table class="table caption-top table-striped-columns">
+                      <caption>Detalles del Servicio</caption>
+                      <thead>
+                        <tr>
+                          <th>Tipo</th>
+                          <th>Descripcion</th>
+                          <th>Unidades</th>
+                          <th>Cantidad</th>
+                          <th>Precio</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let childItem of parentItem.serviceDetail">
+                          <td>{{ childItem.serviceType }}</td>
+                          <td>{{ childItem.description }}</td>
+                          <td>{{ childItem.unitMeasurement }}</td>
+                          <td>{{ childItem.quantity }}</td>
+                          <td>${{ childItem.price }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              }
+              </ng-container>
+             <!-- } @else {
+              <tr>
+                <td colspan="5" style="text-align: center">Cargando....</td>
+              </tr>
+              }-->
+            </tbody>
+          </table>
+          <!-- Paginación -->
+        <ngb-pagination class="d-flex justify-content-center" [(page)]="page" [pageSize]="pageSize"
+          [collectionSize]="services.length" (pageChange)="onPageChange($event)" [boundaryLinks]="true" [maxSize]="2"
+          *ngIf="services.length> pageSize"> {{services.length}}
+        </ngb-pagination>
+        <!--Fin Paginacion-->
+        </div>
+        
+      </div>
+    </div><!--Fin container mt-4-->
+  </div>
+
+  <div *ngIf="recivedTabIndex==1" class="containerService">
+    <div class="container mt-4">
+      <h3 class="mb-4">{{serviceLabel}}</h3>
+        <form [formGroup]="serviceForm" id="serviceFormId" (ngSubmit)="onSubmit(serviceButton)">
+        <div class="row">
+          <!-- Row 1 / Columna 1 -->
+          <div id="Service-Left-Column" class="col-md-6">
+            <div  class="mb-3">
+              <div formGroupName="client">
+              <label for="clientSelect">&nbsp;Cliente</label>
+              <ng-select [items]="clientList" bindLabel="name" formControlName="clientId" bindValue="clientId" placeholder="-- Seleccione --"   > </ng-select>
+              </div>
+            
+              &nbsp; Nombre del Servicio
+              <input type="text" class="form-control col-form-label" formControlName="serviceName" id="serviceName" />
+              <div *ngIf="serviceForm.get('serviceName')?.invalid && serviceForm.get('serviceName')?.touched" class="text-danger">
+                Campo requerido
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 1 / Columna 2 -->
+          <div id="Service-Right-Column" class="col-md-6">
+            <div class="mb-3">
+              <label for="fecha" class="">&nbsp;*Fecha del Servicio</label>
+              <div class="input-group">
+                <input class="form-control" id="fecha" placeholder="yyyy-mm-dd" name="serviceDate" ngbDatepicker #d="ngbDatepicker" formControlName="serviceDate" />
+                <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">📅</button>
+              </div>
+              <div *ngIf="serviceForm.get('serviceDate')?.invalid && serviceForm.get('serviceDate')?.touched" class="text-danger">
+                Campo requerido
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="status" class="form-label">&nbsp;Estado del Servicio</label>
+              <select class="form-select" formControlName="status">
+                <option value="Activo">En Proceso</option>
+                <option value="In">Terminado</option>
+              </select>
+            </div>
+          </div>
+
+          <div *ngIf="serviceDetails.length > 0" id="Botton-Column" class="col-md-12">
+            &nbsp; Lista de Tareas
+            <div class="container list-group list-group-scrollable">
+              <div class="row" *ngFor="let servDetail of serviceDetails; index as idx ">
+                <div  class="col-md-11 col-10">
+                  <button  type="button" (click)="onEditDetails(servDetail, idx)" class="list-group-item list-group-item-action">{{idx+1}}.- {{servDetail.description.slice(0,30)}}...</button>
+                </div>
+                <div class="col-md-1 col-2">
+                  <button style="padding-left:25% ; padding-right:25% ;  margin-top: 5%; margin-left: 40%;"  type="button" (click)="onDeleteDetails(idx)" class="btn btn-sm btn-outline-danger"> <i class="bi bi-trash-fill"></i>  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> 
+        <!--Termina row 1-->
+        </form>
+
+        <hr class="border-secondary border-3">
+        <h5 class="mb-4">&nbsp;&nbsp;&nbsp;&nbsp;Tareas del Servicio</h5>
+        <!--Comienza row 2-->
+        <div class="row">
+          <!-- Row 2 / Columna 1 -->
+          <div id="ServiceDeatils-Left-Column" class="col-md-4">
+            <div class="mb-3">
+              
+              <input type="text" name="serviceType" (input)="onInput($event)" [(ngModel)]="serviceType" class="form-control col-form-label" id="serviceType" placeholder="Tipo de Servicio" (blur)="onInputBlur('serviceType')" />
+              <div *ngIf="(!serviceTypeIsValid && serviceType == undefined) || (!serviceTypeIsValid && serviceType && serviceType.length <= 0) " class="text-danger">
+                Campo requerido
+              </div>
+              
+            </div>
+            <div class="mb-3">
+              
+              <input type="text"  name="quantity"  (input)="onInput($event,'is-number')" [(ngModel)]="quantity"  class="form-control col-form-label" id="quantity" placeholder="Cantidad"  (blur)="onInputBlur('quantity')"/>
+              <div *ngIf="!quantityIsValid && !quantity && typeof quantity !== 'number'" class="text-danger">
+                Campo requerido
+              </div>
+              <div *ngIf="!quantityIsValid && quantity && typeof quantity !== 'number'" class="text-danger">
+                '{{quantity}}' no es numero
+              </div>
+            </div>
+
+          </div><!---->
+          <div id="ServiceDeatils-Middle-Column" class="col-md-4">
+            <div class="mb-3">
+              
+              <input type="text" name="description"  (input)="onInput($event)"[(ngModel)]="description" class="form-control col-form-label" id="description" placeholder="Descripci&oacute;n" (blur)="onInputBlur('description')"/>
+              <div *ngIf="(!descriptionIsValid && description == undefined) || (!descriptionIsValid && description && description.length <= 0)" class="text-danger">
+                Campo requerido
+              </div>
+            </div>
+            <div class="mb-3">
+              
+              <input type="text" name="price"  (input)="onInput($event,'is-number')" [(ngModel)]="price" class="form-control col-form-label" placeholder="Precio" (blur)="onInputBlur('price')" />
+              <div *ngIf="!priceIsValid && !price && typeof price !== 'number'" class="text-danger">
+                Campo requerido
+              </div>
+              <div *ngIf="!priceIsValid && price && typeof price !== 'number'" class="text-danger">
+                '{{price}}' no es numero
+              </div>
+            </div>
+
+          </div><!---->
+
+          <!-- Row 2 /  Columna 2 -->
+          <div id="ServiceDeatils-Right-Column" class="col-md-4">
+            <div class="mb-3">
+              <input type="text" name="unitMeasurement" (input)="onInput($event)" [(ngModel)]="unitMeasurement" class="form-control col-form-label" id="unitMeasurement" placeholder="Unidades"  (blur)="onInputBlur('unitMeasurement')"/>
+              <div *ngIf="(!unitMeasurementIsValid && unitMeasurement == undefined) || (!unitMeasurementIsValid && unitMeasurement && unitMeasurement.length <= 0)" class="text-danger">
+                Campo requerido
+              </div>
+            </div>
+
+            
+            <div class="mb-3 ">
+              <label for="asdf" class=""></label>
+              <div class="input-group-append">
+                <div class="text-end">
+                  <button [disabled]="disableDetailsButton()" type="button" class="btn btn-sm btn-outline-info" (click)="onAddDetails()">Agregar Tarea</button>
+                  <button type="submit" form="serviceFormId" class="btn btn-sm btn-outline-primary">{{serviceButton}}</button>
+                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="onCancel()">Cancelar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--Termina row 2-->
+      <!--/form-->
+    </div>
+  </div>
+
+  <!--Comienza el tab de Pagos -->
+    <div *ngIf="recivedTabIndex==2" class="containerService">
+    <div class="container mt-4">
+      <h3 class="mb-4">Servicios</h3>
+      <div class="table-responsive">
+        <input type="text" class="form-control" placeholder="Buscar pagos por Cliente">
         <div class="table-responsive">
           <table class="table table-bordered table-striped">
             <thead>
@@ -87,86 +305,5 @@
       </div>
     </div><!--Fin container mt-4-->
   </div>
-  <div *ngIf="recivedTabIndex==1" class="containerService">
-    <div class="container mt-4">
-      <h4 class="mb-4">{{toolLabel}}</h4>
-      <form [formGroup]="toolForm" (ngSubmit)="onSubmit(toolButton)">
-        <!--[formGroup]="toolForm" (ngSubmit)="enviarFormulario()"-->
-        <div class="row">
-          <!-- Columna 1 -->
-          <div id="Tools-Left-Column" class="col-md-6">
-            <div class="mb-3">
-              <label for="name" class="form-label">Nombre</label>
-              <input type="text" id="name" class="form-control col-form-label" formControlName="name" />
-              <div *ngIf="toolForm.get('name')?.invalid && toolForm.get('name')?.touched" class="text-danger">
-                El Nombre de la Herramienta es un campo requerido
-              </div>
-            </div>
-            <div class="mb-3">
-              <label>Código</label>
-              <input type="text" class="form-control col-form-label" formControlName="code" id="code" />
-              <div *ngIf="toolForm.get('code')?.invalid && toolForm.get('code')?.touched" class="text-danger">
-                El Código de la Herramienta es un campo requerido
-              </div>
-            </div>
-            <div class="mb-3">
-              <label for="formFile">Seleccione imagen</label>
-              <input class="form-control col-form-label" type="file" id="formFile" value="Seleccione imagen">
-            </div><!---->
-            <div class="mb-3">
-              <label>Estado de la Herramienta</label>
-              <select class="form-select" formControlName="toolState">
-                <option value="" disabled>Seleccione un estado</option>
-                <option value="BUENO">BUENO</option>
-                <option value="MALO">MALO</option>
-                <option value="MALO">REPARACIÓN</option>
-              </select>
-            </div>
-          </div><!---->
-
-          <!-- Columna 2 -->
-          <div id="Tools-Right-Column" class="col-md-6">
-            <div class="mb-3">
-              <label for="status" class="form-label">Estatus</label>
-              <select class="form-select" formControlName="status">
-                <option value="" disabled>Seleccione un estado</option>
-                <option value="ACTIVO">ACTIVO</option>
-                <option value="INACTIVO">INACTIVO</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="categorySelect">Seleccione una Categoría:</label>
-              <select class="form-control" id="categorySelect" formControlName="categoryId"
-                (ngModelChange)="onSelectChange($event)">
-                <option [ngValue]="null">-- Select --</option>
-                <option *ngFor="let cat of categories" [ngValue]="cat.categoryId">
-                  {{ cat.name }}
-                </option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="fecha" class="">*Fecha de adquisición</label>
-              <div class="input-group">
-                <input class="form-control" id="fecha" placeholder="yyyy-mm-dd" name="acquisitionDate" ngbDatepicker
-                  #d="ngbDatepicker" formControlName="acquisitionDate" />
-                <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">📅</button>
-              </div>
-              <div *ngIf="toolForm.get('acquisitionDate')?.invalid && toolForm.get('acquisitionDate')?.touched"
-                class="text-danger">
-                Fecha de Adquisición de la Herramienta es un campo requerido!
-              </div>
-            </div>
-            <div class="mb-3 ">
-              <label for="fecha" class=""></label>
-              <div class="input-group-append">
-                <div class="text-end">
-                  <button type="submit" class="btn btn-sm btn-primary">{{toolButton}}</button>
-                  <button type="button" class="btn btn-sm btn-danger" (click)="onClear()">Cancelar</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
+  <!--Termina el tab de Pagos-->
+</div>  

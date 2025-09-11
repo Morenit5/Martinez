@@ -11,6 +11,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { PaymentComponent } from './payment/payment.component';
 import { ServiceComponent } from './services/service/service.component';
 import { InvoceComponent } from './services/invoce/invoce.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @NgModule({
   declarations: [CategoryComponent, ToolComponent, ClientComponent, PaymentComponent, ServiceComponent, InvoceComponent],
@@ -22,6 +23,7 @@ import { InvoceComponent } from './services/invoce/invoce.component';
     NavDynamicComponent,
     FormsModule,
     ReactiveFormsModule,
+    NgSelectModule
   ],
   exports: [NavDynamicComponent],
 })
