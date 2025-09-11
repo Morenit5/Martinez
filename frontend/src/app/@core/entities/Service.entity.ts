@@ -10,17 +10,17 @@ export class ServiceEntity {
     price: string;
     client: ClientEntity;
     showDetails: boolean = false;
-    serviceDetail: ServiceDetail[];
+    serviceDetail: ServiceDetailEntity[];
     invoice:InvoiceEntity;
 
 }
 
 
-class ServiceDetail {
+export class ServiceDetailEntity {
     serviceDetailsId: number;
     serviceType: string;
     description: string;
-    unitMeasurement: number;
+    unitMeasurement: string;
     quantity: number;
     price: number
 

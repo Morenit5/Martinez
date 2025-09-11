@@ -33,3 +33,23 @@
 
 // theme customization
 //@use "theme/theme";
+@use './node_modules/@ng-select/ng-select/themes/material.theme.css';
+
+.ng-select .ng-select-container {
+    height: 39px !important;
+    /* Set your desired height */
+    min-height: 39px;
+    /* Ensure minimum height */
+    background-color: white;
+    border-radius: 5%;
+    border: 1px solid #d9dee2;
+
+    .ng-value-container {
+        border-top: 20px;
+        width: 90%;
+       
+    }
+}
+    
+
+    
