@@ -14,6 +14,52 @@ import { Observable } from 'rxjs';
 })
 
 export class CategoryComponent {
+userEntitiyToGet: any;
+users1: CategoryEntity[] = [];
+originalValues: CategoryEntity[] = []; //para guardar temporalmente valores originales
+
+onKeyUp(event: KeyboardEvent) {
+  if (event.key === 'Enter') {
+        const searchResults: CategoryEntity[] = this.users1.filter(item => item.name.includes(this.userEntitiyToGet)); // || item.email.includes(this.userEntitiyToGet));
+  
+        if (searchResults.length !== 0) {
+          if (this.originalValues && this.originalValues.length == 0) {
+            this.originalValues = this.deepCopy(this.users1); //salvamos temporalmente valores
+          }
+          this.users1.length = 0; //limpiamos el array y ponemos los nuevos datos
+          this.users1 = searchResults;
+        } else {
+          this.toast.showToastWarning('La Categoría ' + this.userEntitiyToGet + ' no existe!', 7000, 'x-circle');
+        }
+  
+      } else if (event.key === 'Backspace' || event.key === 'Delete') {
+  
+        if ((this.userEntitiyToGet && this.userEntitiyToGet.length == 0) || !this.userEntitiyToGet) {
+          if (this.originalValues && this.originalValues.length !== 0) {
+            this.users1.length = 0; //limpiamos el array y ponemos los nuevos datos
+            this.users1 = this.originalValues;
+          }
+        }
+      }
+}
+
+deepCopy<T>(obj: T): T {
+    if (typeof obj !== 'object' || obj === null) {
+      return obj;
+    }
+
+    if (Array.isArray(obj)) {
+      return obj.map(item => this.deepCopy(item)) as T;
+    }
+
+    const copiedObj: { [key: string]: any } = {};
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        copiedObj[key] = this.deepCopy((obj as any)[key]);
+      }
+    }
+    return copiedObj as T;
+  }
 
   categoryLabel: string = 'Registro de Categorías';
   categoryButton: string = 'Registrar';
@@ -34,9 +80,10 @@ export class CategoryComponent {
   /*Paginacion*/
 
   constructor(private fbCategory: FormBuilder, private toast: ToastUtility) {
+    //this.reqTabId=0;
     this.getAllDataCategories();
+    this.categoryService.getAllCategories();
     //this.categoryList = this.categoryService.getAllCategories();
-
 
     this.categoryForm = this.fbCategory.group({
       categoryId: [],
@@ -45,6 +92,20 @@ export class CategoryComponent {
     });
     this.updatePaginatedData();
   }
+
+  onCancel() {
+
+   if (this.reqTabId && this.reqTabId == 1) {
+        this.recivedTabIndex = 1;
+        this.categoryLabel = 'Registro de Categoría';
+        this.categoryButton = 'Registrar'
+      }
+      this.reqTabId = 0; // al cancelar le enviamos al padre que cambie al tabulador 0
+      this.recivedTabIndex=this.reqTabId;
+      //this.categoryForm.get('categoryType').setValidators(Validators.required); 
+      //this.categoryForm.get('name').updateValueAndValidity();
+      this.categoryForm.reset();
+}
 
   getAllDataCategories()
   {
@@ -70,6 +131,7 @@ export class CategoryComponent {
   onPageChange(newPage: number): void {
     this.page = newPage;
     console.log(this.page);
+
     this.updatePaginatedData();
   }
   /*FIN METODOS DE PAGINACION*/
@@ -90,7 +152,15 @@ export class CategoryComponent {
             console.log(response);
           },
           error: (err) => {
-            this.toast.showToast('Error al registar la categoria!!', 7000, 'x-circle', false);
+            console.log('ENTRAMOS AL ERROR: '+JSON.stringify(err.error.error));
+            let errorMessage =JSON.stringify(err.error.error); 
+            console.log(errorMessage);
+            if(errorMessage.startsWith('"Error:'))
+            {
+              console.log(errorMessage);
+              errorMessage=errorMessage.slice(7,errorMessage.length-1);
+            }
+            this.toast.showToast( errorMessage/*'Error al registar la categoria!!'*/, 7000, 'x-circle', false);
           },
           complete: () => {
             this.onClear();
@@ -115,7 +185,7 @@ export class CategoryComponent {
     } else {
       console.log(this.categoryForm.valid);
       this.categoryForm.markAllAsTouched();
-      this.toast.showToast('Campos Invalidos, porfavor revise el formulario!!', 7000, 'x-circle', false);
+      this.toast.showToast('Campos inválidos, por favor revise el formulario!!', 7000, 'x-circle', false);
     }
 
   }
@@ -127,11 +197,18 @@ export class CategoryComponent {
       this.categoryLabel = 'Registro de Categorías';
       this.categoryButton = 'Registrar'
     }
+    //this.reqTabId = 0;
 
     this.categoryForm.reset();
   }
 
   getMessage(message: number) {
+
+    if(message == undefined)
+      {
+        message=0;
+        this.recivedTabIndex=0;
+      }
     this.recivedTabIndex = message;
   }
 
@@ -165,8 +242,10 @@ export class CategoryComponent {
         this.toast.showToast('Error al eliminar la categoría!!', 7000, 'x-circle', false);
       },
       complete: () => {
-        this.categoryList = this.categoryService.getAllCategories();
+        //this.categoryList = this.categoryService.getAllCategories();
+        this.getAllDataCategories();
       }
     });
   }
+  
 }

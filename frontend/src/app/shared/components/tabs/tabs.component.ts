@@ -33,7 +33,11 @@ export class NavDynamicComponent implements OnInit {
     
     if (changes['requiredTabId']) {
      this.activeTabId = this.requiredTabId;
+
+     this.sendMessageToParent();
+
      this.requiredTabId = -1;
+
     }
   }
 

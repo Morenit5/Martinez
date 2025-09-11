@@ -9,7 +9,7 @@ export class EntityCategory {
   @Column({ type: 'varchar', length: 50 }) 
   categoryType: string;
 
-  @Column({ type: 'varchar', length: 80 })
+  @Column({ unique:true, type: 'varchar', length: 80 })
   name: string;
 
   @OneToMany(() => EntityTool, (tool) => tool.category)
