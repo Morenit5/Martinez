@@ -32,7 +32,7 @@ export class NavDynamicComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['requiredTabId']) {
      this.activeTabId = this.requiredTabId;
-     
+     this.sendMessageToParent();
     }
   }
 

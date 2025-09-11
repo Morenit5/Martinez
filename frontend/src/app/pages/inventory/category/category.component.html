@@ -5,7 +5,7 @@
     <div class="container mt-4">
       <h3 class="mb-4">Categorías</h3>
       <div class="table-responsive">
-        <input type="text" class="form-control" placeholder="Buscar por Categoría"><!--[(ngModel)]="filterResults"-->
+        <input type="text" class="form-control" placeholder="Buscar por Categoría" (keyup)="onKeyUp($event)" [(ngModel)]="userEntitiyToGet" (ngModelChange)="onPageChange($event)"><!--[(ngModel)]="filterResults"-->
         <table class="table table-bordered table-hover table-striped">
           <thead class="table-bordered">
             <tr>
@@ -21,10 +21,10 @@
               <td style="width: 42%;">{{ category.categoryType }}</td>
               <td style="width: 42%;">{{ category.name }}</td>
               <!--<td>{{ category.enabled }}</td>-->
-              <td><button *ngIf="category.name.toLowerCase() !== 'general' " class="btn btn-sm btn-primary me-2" (click)="updateCategory(category)"><i
+              <td><button *ngIf="category.name.toLowerCase() !== 'general' " class="btn btn-sm btn-outline-info" (click)="updateCategory(category)" ngbTooltip="Actualizar Categoría"><i
                     class="bi bi-pencil-fill"></i>
                 </button>
-                <button *ngIf="category.name.toLowerCase() !== 'general' "  class="btn btn-sm btn-danger" (click)="deleteCategory(category)"><i
+                <button *ngIf="category.name.toLowerCase() !== 'general' "  class="btn btn-sm btn-outline-danger" (click)="deleteCategory(category)"  ngbTooltip="Eliminar Categoría"><i
                     class="bi bi-trash-fill"></i>
                 </button></td>
             </tr>
@@ -48,18 +48,18 @@
           <!-- Columna 1 -->
           <div id="Category-Left-Column" class="col-md-6">
             <div class="mb-3">
-              <label for="name" class="form-label">Nombre</label>
+              <label for="name" class="form-label">Nombre*</label>
               <input type="text" id="name" class="form-control col-form-label" formControlName="name" />
               <div *ngIf="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched" class="text-danger">
-                El Nombre de la Categoría es un campo requerido
+                Campo requerido
               </div>
             </div>
             <div class="mb-3">
-              <label>Tipo</label>
+              <label>Tipo*</label>
               <input type="text" class="form-control col-form-label" formControlName="categoryType" id="categoryType"/>
               <div *ngIf="categoryForm.get('categoryType')?.invalid && categoryForm.get('categoryType')?.touched"
                 class="text-danger">
-                El Tipo de la Categoría es un campo requerido
+                Campo requerido
               </div>
             </div>
           </div>
@@ -69,7 +69,7 @@
           
               <div class="align-self-end text-end">
                 <button type="submit" class="btn btn-sm btn-primary">{{categoryButton}}</button>
-                <button type="button" class="btn btn-sm btn-danger" (click)="onClear()">Cancelar</button>
+                <button type="button" class="btn btn-sm btn-danger" (click)="onCancel()">Cancelar</button>
               </div>
             </div>
           
