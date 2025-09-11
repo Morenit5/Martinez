@@ -29,7 +29,7 @@ export class EntityService {
     @JoinColumn({ name: "clientId" }) // Nombre de la columna en la tabla donde se une
     client: EntityClient;
 
-    @OneToMany(() => EntityServiceDetail, (servicedetail) => servicedetail.service)
+    @OneToMany(() => EntityServiceDetail, (servicedetail) => servicedetail.service, { cascade: true  })
     serviceDetail: EntityServiceDetail[];
 
     @Column({ type: 'boolean', default: true })

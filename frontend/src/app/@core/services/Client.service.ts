@@ -1,8 +1,24 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { environment } from '@env/environment';
 import { ClientEntity } from '../entities/Client.entity';
+import { plainToInstance } from 'class-transformer';
+
+
+@Injectable({ providedIn: 'root', })
+export class ClientInstances {
+
+    constructor(private readonly clientListService:ClientService ){}
+    getAllClients() {
+        return this.clientListService.getAllClients().pipe(
+            map((response) =>
+                response.map((client: any) => plainToInstance(ClientEntity, client)),
+            ),
+        );
+    }
+
+}
 
 @Injectable({
   providedIn: 'root',
