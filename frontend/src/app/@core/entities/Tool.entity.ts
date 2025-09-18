@@ -11,6 +11,7 @@ export class ToolEntity {
   provider: string;
   acquisitionDate: Date;
   enabled: boolean;
+  price:number;
   showDetails: boolean = false;
 }
 

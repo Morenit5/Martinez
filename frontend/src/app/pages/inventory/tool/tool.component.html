@@ -5,7 +5,7 @@
     <div class="container mt-4">
       <h3 class="mb-4">Herramientas</h3>
       <div class="table-responsive">
-        <input type="text" class="form-control" placeholder="Buscar por nombre"><!--[(ngModel)]="filterResults"-->
+        <input type="text" class="form-control" placeholder="Buscar por Herramienta"><!--[(ngModel)]="filterResults"-->
         <table class="table table-bordered table-hover table-striped">
           <thead class="table-bordered">
             <tr>
@@ -25,18 +25,19 @@
               <tr>
                 <td>{{ tool.code}}</td>
                 <td>
-                  <a role="button" (click)="toggleDetails(tool)">
+                  <a role="button" class="btn btn-link p-0" (click)="toggleDetails(tool)" ngbTooltip="Ver más detalles">
                     {{ tool.name }}
                   </a>
                 </td>
                 <!--<td>{{ tool.image }}</td>-->
                 <td>{{ tool.status }}</td>
-                <!--<td>{{ tool.toolState }}</td>
+                <!--<td>{{ tool.price }}</td>
+                <td>{{ tool.toolState }}</td>
               <td>{{ tool.acquisitionDate | date: 'shortDate' }}</td>
               <td>{{ tool.category }}</td>-->
-                <td><button class="btn btn-sm btn-primary me-2" (click)="updateTool(tool)"><i
+                <td><button class="btn btn-sm btn-outline-info" (click)="updateTool(tool)" ngbTooltip="Actualizar Herramienta"><i
                       class="bi bi-pencil-fill"></i>
-                  </button><button class="btn btn-sm btn-danger" (click)="deleteTool(tool)"><i
+                  </button><button class="btn btn-sm btn-outline-danger" (click)="deleteTool(tool)" ngbTooltip="Eliminar Herramienta"><i
                       class="bi bi-trash-fill"></i>
                   </button>
                 </td>
@@ -81,17 +82,17 @@
           <!-- Columna 1 -->
           <div id="Tools-Left-Column" class="col-md-6">
             <div class="mb-3">
-              <label for="name" class="form-label">Nombre</label>
+              <label for="name" class="form-label">Nombre*</label>
               <input type="text" id="name" class="form-control col-form-label" formControlName="name" />
               <div *ngIf="toolForm.get('name')?.invalid && toolForm.get('name')?.touched" class="text-danger">
-                El Nombre de la Herramienta es un campo requerido
+                Campo requerido
               </div>
             </div>
             <div class="mb-3">
-              <label>Código</label>
+              <label>Código*</label>
               <input type="text" class="form-control col-form-label" formControlName="code" id="code" />
               <div *ngIf="toolForm.get('code')?.invalid && toolForm.get('code')?.touched" class="text-danger">
-                El Código de la Herramienta es un campo requerido
+                Campo requerido
               </div>
             </div>
             <div class="mb-3">
@@ -99,7 +100,7 @@
               <input class="form-control col-form-label" type="file" id="formFile" value="Seleccione imagen">
             </div><!---->
             <div class="mb-3">
-              <label>Estado de la Herramienta</label>
+              <label>Estado de la Herramienta*</label>
               <select class="form-select" formControlName="toolState">
                 <option value="" disabled>Seleccione un estado</option>
                 <option value="BUENO">BUENO</option>
@@ -111,7 +112,7 @@
           <!-- Columna 2 -->
           <div id="Tools-Right-Column" class="col-md-6">
             <div class="mb-3">
-              <label for="status" class="form-label">Estatus</label>
+              <label for="status" class="form-label">Estatus*</label>
               <select class="form-select" formControlName="status">
                 <option value="" disabled>Seleccione un estado</option>
                 <option value="ACTIVO">ACTIVO</option>
@@ -129,7 +130,7 @@
               </select>
             </div>
             <div class="mb-3">
-              <label for="fecha" class="">*Fecha de adquisición</label>
+              <label for="fecha" class="">Fecha de adquisición*</label>
               <div class="input-group">
                 <input class="form-control" id="fecha" placeholder="yyyy-mm-dd" name="acquisitionDate" ngbDatepicker
                   #d="ngbDatepicker" formControlName="acquisitionDate" />
@@ -137,16 +138,26 @@
               </div>
               <div *ngIf="toolForm.get('acquisitionDate')?.invalid && toolForm.get('acquisitionDate')?.touched"
                 class="text-danger">
-                Fecha de Adquisición de la Herramienta es un campo requerido!
+                Campo requerido!
               </div>
             </div>
+
+           <div class="mb-3">
+              <label for="price" class="form-label">Precio</label>
+              <input type="text" id="price" class="form-control col-form-label" formControlName="price" />
+            </div>
+
+            <!--<div class="mb-3">
+    <label for="precio" class="form-label">Precio</label>
+    <input type="number" id="precio" formControlName="precio" class="form-control" placeholder="Ingrese el precio" />
+  </div>-->
 
             <div class="mb-3 ">
               <label for="fecha" class=""></label>
               <div class="input-group-append">
                 <div class="text-end">
                   <button type="submit" class="btn btn-sm btn-primary">{{toolButton}}</button>
-                  <button type="button" class="btn btn-sm btn-danger" (click)="onClear()">Cancelar</button>
+                  <button type="button" class="btn btn-sm btn-danger" (click)="onCancel()">Cancelar</button>
                 </div>
               </div>
             </div>

@@ -46,7 +46,7 @@ export class ToolDto {
     @Expose()
     @IsOptional()
     @IsString()
-    prize?: number;
+    price?: string;
 
     @Expose()
     @IsOptional()
@@ -80,7 +80,7 @@ export class CreateToolDto {
 
     @IsOptional()
     @IsString()
-    prize?: number;
+    price?: string;
 
     @IsOptional()
     @IsDate()

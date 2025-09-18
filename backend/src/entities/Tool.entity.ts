@@ -28,8 +28,8 @@ export class EntityTool {
     @Column({ type: 'varchar', length: 100 })
     toolState: string; //bueno, malo, mantenimiento
 
-    @Column({ nullable: true })
-    prize?: number;
+    @Column({ type: 'numeric', precision: 10, scale: 2, nullable: true })
+    price: string;
 
     @Column({ type: 'date', nullable: true })
     acquisitionDate?: Date;

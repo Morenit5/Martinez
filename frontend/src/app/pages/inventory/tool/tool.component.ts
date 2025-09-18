@@ -14,6 +14,19 @@ import { ToastUtility } from '@app/@core/utils/toast.utility';
 
 export class ToolComponent implements OnInit {
 
+  onCancel() {
+    if (this.reqTabId && this.reqTabId == 1) {
+      this.recivedTabIndex = 1;
+      this.toolLabel = 'Registro de Herramientas';
+      this.toolButton = 'Registrar'
+    }
+    this.reqTabId = 0; // al cancelar le enviamos al padre que cambie al tabulador 0
+    this.recivedTabIndex = this.reqTabId;
+    //this.categoryForm.get('categoryType').setValidators(Validators.required); 
+    //this.categoryForm.get('name').updateValueAndValidity();
+    this.toolForm.reset();
+  }
+
   toolLabel: string = 'Registro de Herramientas';
   toolButton: string = 'Registrar';
   categories: CategoryEntity[] = [];
@@ -27,7 +40,7 @@ export class ToolComponent implements OnInit {
   filteredToolList: ToolEntity[] = [];
   reqTabId: number;
   category: CategoryEntity;
-  
+
   /*Paginacion*/
   tools: ToolEntity[] = [];// se crea un array vacio de la interfaz
   paginatedTools: ToolEntity[] = [];
@@ -41,7 +54,7 @@ export class ToolComponent implements OnInit {
   isLoading = true;
 
   constructor(private fbTool: FormBuilder, private toast: ToastUtility) {
-   this.getAllDataTools();
+    this.getAllDataTools();
 
     this.toolForm = this.fbTool.group({
       toolId: [],
@@ -55,9 +68,8 @@ export class ToolComponent implements OnInit {
     this.updatePaginatedData();
   }
 
-  getAllDataTools()
-  {
-     this.toolService.fetchData1().subscribe({
+  getAllDataTools() {
+    this.toolService.fetchData1().subscribe({
       next: (toolsList) => {
         this.tools = toolsList;
         console.log(toolsList);
@@ -98,7 +110,7 @@ export class ToolComponent implements OnInit {
   }
 
   onPageChange(newPage: number): void {
-    console.log('AQUI ENTRA');
+    //console.log('AQUI ENTRA');
     this.page = newPage;
     console.log(this.page);
     this.updatePaginatedData();
@@ -108,8 +120,7 @@ export class ToolComponent implements OnInit {
   onSubmit(accion: string) {
     this.toolForm.updateValueAndValidity();
 
-    if (this.toolForm.valid)
-    {
+    if (this.toolForm.valid) {
       let convertDate = JSON.parse(JSON.stringify(this.toolForm.controls['acquisitionDate'].value));
       let fechaConvertida = convertDate.year + '-' + convertDate.month + '-' + convertDate.day;
       console.log(this.toolForm.valid);
@@ -183,8 +194,8 @@ export class ToolComponent implements OnInit {
       status: toolInstance.status,
       toolState: toolInstance.toolState,
       category: this.category,
-      acquisitionDate: toolInstance.acquisitionDate /*,
-        prize: toolInstance.prize*/
+      acquisitionDate: toolInstance.acquisitionDate ,
+      price: toolInstance.price/**/
     });
     console.log(toolInstance);
   }
