@@ -1,10 +1,25 @@
 <div>
   <tabs [tabItems]="['Consulta', 'Crear Servicio', 'Pagos']" [tabIcons]="['journal-check', 'plus-circle', 'cash-coin']" [requiredTabId]=reqTabId  (tabIndex)="getMessage($event)">
   </tabs>
+  <!-- **************** C O M I E N Z A   E L   T A B   D E   C O N S U L T A **************** -->
   <div *ngIf="recivedTabIndex==0" class="containerService">
     <div class="container mt-4">
       <h3 class="mb-4">Servicios</h3>
-      <div class="table-responsive">
+      <div style="margin-bottom: 25px;"> <!--Navigation Menu-->
+        <ul ngbNav #nav="ngbNav" [(activeId)]="activeService" (navChange)="onNavChange($event)"  class="nav-tabs">
+          <li [ngbNavItem]="1"> <button ngbNavLink>Servicios Fijos</button></li>
+          <li [ngbNavItem]="2"> <button ngbNavLink>Servicios Eventuales</button> </li>
+        </ul>
+        <div [ngbNavOutlet]="nav" class="mt-2"></div>
+        
+        <div *ngIf="activeService == 1"  class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" [(ngModel)]="isExtraSwitchValue" (change)="onSwitchChange()">
+          <label class="form-check-label" for="flexSwitchCheckDefault">Mostrar Servicios Extras</label>
+        </div>
+      </div>
+
+
+      <div class="table-responsive"> <!--Navigation Menu-->
         <input type="text" class="form-control" placeholder="Buscar por nombre">
         <div class="table-responsive">
           <table class="table table-bordered table-striped">
@@ -29,21 +44,21 @@
                       {{ parentItem.serviceName }}
                     </a>
                   </td>
-                  <td>{{ parentItem.serviceDate }}</td>
+                  <td>{{ parentItem.serviceDate | date:'yyyy-MM-dd' }}</td>
                   <td
-                    [ngClass]="{'table-success': parentItem.status === 'terminado', 'table-danger': parentItem.status === 'en progreso'}">
+                    [ngClass]="{'table-success': parentItem.status.toLowerCase() === 'terminado', 'table-progress': parentItem.status.toLowerCase() === 'en proceso', 'table-recurrent': parentItem.status.toLowerCase() === 'recurrente'}">
                     {{ parentItem.status }}</td>
                   <td>
-                    <button class="btn btn-sm btn-primary me-2" (click)="generateInvoice()" ngbTooltip="Generar Factura"><i
-                        class="bi bi-receipt-cutoff"></i></button>
-                        <button class="btn btn-sm btn-primary me-2" (click)="sendEmail(parentItem)" ngbTooltip="Enviar Correo"><i
-                        class="bi bi-receipt-cutoff"></i></button>
+                    <button class="btn btn-sm btn-outline-primary " (click)="generateInvoice()" ngbTooltip="Generar Factura"><i class="bi bi-receipt-cutoff"></i></button>
+                    <button class="btn btn-sm btn-outline-primary " (click)="sendEmail(parentItem)" ngbTooltip="Enviar Correo"><i class="bi bi-envelope-at"></i></button>
+                    <button *ngIf="parentItem.status.toLowerCase() != 'terminado'" class="btn btn-sm btn-outline-primary " (click)="updateServiceDetail(parentItem)" ngbTooltip="Actualizar Servicio"><i class="bi bi-pencil"></i></button>
+                    <button *ngIf="parentItem.status.toLowerCase() != 'terminado'" class="btn btn-sm btn-outline-danger " (click)="deleteServiceDetail(parentItem)" ngbTooltip="Eliminar Servicio"><i class="bi bi-trash"></i></button>
                   </td>
                 </tr>
                 <tr *ngIf="parentItem.showDetails">
                   <td colspan="5">
                       <table class="table caption-top table-striped-columns">
-                      <caption>Detalles del Servicio</caption>
+                      <caption>Detalles del Servicio </caption>
                       <thead>
                         <tr>
                           <th>Tipo</th>
@@ -60,6 +75,7 @@
                           <td>{{ childItem.unitMeasurement }}</td>
                           <td>{{ childItem.quantity }}</td>
                           <td>${{ childItem.price }}</td>
+
                         </tr>
                       </tbody>
                     </table>
@@ -76,7 +92,7 @@
           </table>
           <!-- Paginación -->
         <ngb-pagination class="d-flex justify-content-center" [(page)]="page" [pageSize]="pageSize"
-          [collectionSize]="services.length" (pageChange)="onPageChange($event)" [boundaryLinks]="true" [maxSize]="2"
+          [collectionSize]="services.length" (pageChange)="onPageChange($event)" [boundaryLinks]="true" [maxSize]="3"
           *ngIf="services.length> pageSize"> {{services.length}}
         </ngb-pagination>
         <!--Fin Paginacion-->
@@ -85,10 +101,21 @@
       </div>
     </div><!--Fin container mt-4-->
   </div>
+  <!-- **************** T E R M I N A   E L   T A B   D E   C O N S U L T A **************** -->
 
+  <!-- **************** E M P I E Z A   E L   T A B   D E   S E R V I C I O S **************** -->
   <div *ngIf="recivedTabIndex==1" class="containerService">
     <div class="container mt-4">
       <h3 class="mb-4">{{serviceLabel}}</h3>
+
+       
+        <div *ngFor="let option of radioOptions; let i = index" class="form-check form-check-inline">
+          <input class="form-check-input"  type="radio" name="isExtra"  [(ngModel)]="extraValue" [value]="option" id="{{option}}" (change)="onRadioChange()">
+          <label class="form-check-label" for="{{option}}">{{option}}</label>
+        </div>
+
+        <hr class="border-secondary border-3">
+        
         <form [formGroup]="serviceForm" id="serviceFormId" (ngSubmit)="onSubmit(serviceButton)">
         <div class="row">
           <!-- Row 1 / Columna 1 -->
@@ -96,7 +123,7 @@
             <div  class="mb-3">
               <div formGroupName="client">
               <label for="clientSelect">&nbsp;Cliente</label>
-              <ng-select [items]="clientList" bindLabel="name" formControlName="clientId" bindValue="clientId" placeholder="-- Seleccione --"   > </ng-select>
+              <ng-select readonly="{{isReadOnly}}" [items]="clientList" bindLabel="fullName" formControlName="clientId" bindValue="clientId" placeholder="-- Seleccione --"   > </ng-select>
               </div>
             
               &nbsp; Nombre del Servicio
@@ -112,7 +139,7 @@
             <div class="mb-3">
               <label for="fecha" class="">&nbsp;*Fecha del Servicio</label>
               <div class="input-group">
-                <input class="form-control" id="fecha" placeholder="yyyy-mm-dd" name="serviceDate" ngbDatepicker #d="ngbDatepicker" formControlName="serviceDate" />
+                <input class="form-control" type="text"  id="serviceDate" placeholder="yyyy-mm-dd" name="serviceDate" ngbDatepicker #d="ngbDatepicker" formControlName="serviceDate" />
                 <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">📅</button>
               </div>
               <div *ngIf="serviceForm.get('serviceDate')?.invalid && serviceForm.get('serviceDate')?.touched" class="text-danger">
@@ -121,10 +148,17 @@
             </div>
             <div class="mb-3">
               <label for="status" class="form-label">&nbsp;Estado del Servicio</label>
-              <select class="form-select" formControlName="status">
-                <option value="Activo">En Proceso</option>
-                <option value="In">Terminado</option>
-              </select>
+               <div *ngIf="extraValue == 'Extra' || extraValue == 'Eventual'" >
+                  <input type="text" readonly  class="form-control col-form-label" formControlName="status" id="status" />
+              </div>
+              <!--select class="form-select" formControlName="status">
+                <option value="En Proceso">En Proceso</option>
+                <option value="Terminado">Terminado</option>
+              </select-->
+              <div *ngIf="extraValue == 'Fijo'"  class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" [ngModelOptions]="{standalone: true}" id="flexSwitchCheckRecurrente" [(ngModel)]="isRecurrentService" (change)="onRecurrentSwitchChange()">
+                <label class="form-check-label" for="flexSwitchCheckRecurrente">Servicio Recurrente</label>
+               </div>
             </div>
           </div>
 
@@ -145,7 +179,7 @@
         <!--Termina row 1-->
         </form>
 
-        <hr class="border-secondary border-3">
+        <hr class="border-secondary border-1">
         <h5 class="mb-4">&nbsp;&nbsp;&nbsp;&nbsp;Tareas del Servicio</h5>
         <!--Comienza row 2-->
         <div class="row">
@@ -161,7 +195,7 @@
             </div>
             <div class="mb-3">
               
-              <input type="text"  name="quantity"  (input)="onInput($event,'is-number')" [(ngModel)]="quantity"  class="form-control col-form-label" id="quantity" placeholder="Cantidad"  (blur)="onInputBlur('quantity')"/>
+              <input type="text"  name="quantity"  (input)="onInput($event,'is-number')" [(ngModel)]="quantity"  class="form-control col-form-label" id="quantity" placeholder="Cantidad de Unidades"  (blur)="onInputBlur('quantity')"/>
               <div *ngIf="!quantityIsValid && !quantity && typeof quantity !== 'number'" class="text-danger">
                 Campo requerido
               </div>
@@ -195,7 +229,7 @@
           <!-- Row 2 /  Columna 2 -->
           <div id="ServiceDeatils-Right-Column" class="col-md-4">
             <div class="mb-3">
-              <input type="text" name="unitMeasurement" (input)="onInput($event)" [(ngModel)]="unitMeasurement" class="form-control col-form-label" id="unitMeasurement" placeholder="Unidades"  (blur)="onInputBlur('unitMeasurement')"/>
+              <input type="text" name="unitMeasurement" (input)="onInput($event)" [(ngModel)]="unitMeasurement" class="form-control col-form-label" id="unitMeasurement" placeholder="Unidad de Medida"  (blur)="onInputBlur('unitMeasurement')"/>
               <div *ngIf="(!unitMeasurementIsValid && unitMeasurement == undefined) || (!unitMeasurementIsValid && unitMeasurement && unitMeasurement.length <= 0)" class="text-danger">
                 Campo requerido
               </div>
@@ -218,11 +252,12 @@
       <!--/form-->
     </div>
   </div>
+  <!-- **************** T E R M I N A   E L   T A B   D E   S E R V I C I O S **************** -->
 
-  <!--Comienza el tab de Pagos -->
+  <!-- **************** C O M I E N Z A   E L   T A B   D E   P A G O S **************** -->
     <div *ngIf="recivedTabIndex==2" class="containerService">
     <div class="container mt-4">
-      <h3 class="mb-4">Servicios</h3>
+      <h3 class="mb-4">Pagos</h3>
       <div class="table-responsive">
         <input type="text" class="form-control" placeholder="Buscar pagos por Cliente">
         <div class="table-responsive">
@@ -231,60 +266,86 @@
               <tr>
                 <th>Cliente</th>
                 <th>Servicio</th>
-                <th>Fecha Servicio</th>
-                <th>Estado</th>
+                <th>Fecha Pago</th>
+                <th>Pago</th>
+                <th>Impuesto</th>
+                <th>Metodo</th>
+                <th>Estado Pago</th>
                 <th>Acciones</th>
               </tr>
             </thead>
+            
             <tbody>
               <!--@if (!isLoading) {-->
               
               <ng-container> <!--*ngFor="let parentItem of serviceList"   paginatedServices-->
                 @for (parentItem of paginatedServices; track parentItem.serviceId) {
+                
+                  
                 <tr>
-                  <td>{{parentItem.client.name}} {{parentItem.client.lastName}}</td>
-                  <td>
+                  <td> <!-- Cliente -->
+                    {{parentItem.client.name}} {{parentItem.client.lastName}}
+                  </td>
+
+                  <td> <!-- Servicio -->
                     <a role="button" (click)="toggleDetails(parentItem)" ngbTooltip="Ver más detalles">
                       {{ parentItem.serviceName }}
                     </a>
                   </td>
-                  <td>{{ parentItem.serviceDate }}</td>
-                  <td
-                    [ngClass]="{'table-success': parentItem.status === 'terminado', 'table-danger': parentItem.status === 'en progreso'}">
-                    {{ parentItem.status }}</td>
-                  <td>
-                    <button class="btn btn-sm btn-primary me-2" (click)="generateInvoice()" ngbTooltip="Generar Factura"><i
-                        class="bi bi-receipt-cutoff"></i></button>
-                        <button class="btn btn-sm btn-primary me-2" (click)="sendEmail(parentItem)" ngbTooltip="Enviar Correo"><i
-                        class="bi bi-receipt-cutoff"></i></button>
-                  </td>
-                </tr>
-                <tr *ngIf="parentItem.showDetails">
-                  <td colspan="5">
 
-                    <table class="table caption-top table-striped-columns">
-                      <caption>Detalles del Servicio</caption>
-                      <thead>
-                        <tr>
-                          <th>Tipo</th>
-                          <th>Descripcion</th>
-                          <th>Unidades</th>
-                          <th>Cantidad</th>
-                          <th>Precio</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr *ngFor="let childItem of parentItem.serviceDetail">
-                          <td>{{ childItem.serviceType }}</td>
-                          <td>{{ childItem.description }}</td>
-                          <td>{{ childItem.unitMeasurement }}</td>
-                          <td>{{ childItem.quantity }}</td>
-                          <td>${{ childItem.price }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                  <td> <!--Fecha de pago -->
+                    <div class="input-group">
+                      <input class="form-control" type="text"  placeholder="yyyy-mm-dd" ngbDatepicker #d="ngbDatepicker"  />
+                      <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">📅</button>
+                    </div>
+                  </td>
+                  
+                  <td> <!-- Pago  $$ -->
+                    <div class="mb-3">
+                      <input type="text" name="paymentAmount"  class="form-control col-form-label" id="paymentAmount"  placeholder="Cantidad de Pago"  />
+                      <div *ngIf="(!serviceTypeIsValid && serviceType == undefined) || (!serviceTypeIsValid && serviceType && serviceType.length <= 0) " class="text-danger">
+                        Campo requerido
+                      </div>
+                    </div>
+                  </td>
+
+                  <td> <!-- Impuesto $$ -->
+                    <div class="mb-3">
+                      <input type="text" name="taxAmount"  class="form-control col-form-label" id="taxAmount" placeholder="Cantidad de Impuesto"  />
+                      <div *ngIf="(!serviceTypeIsValid && serviceType == undefined) || (!serviceTypeIsValid && serviceType && serviceType.length <= 0) " class="text-danger">
+                        Campo requerido
+                      </div>
+                    </div>
+                  </td>
+
+                  <td> <!-- Metodo -->
+                    <div class="mb-3">
+                      <select class="form-select"  placeholder>
+                        <option [ngValue]="null" disabled selected>Seleccionar:</option>
+                        <option *ngFor="let method of PaymentMethod" [ngValue]="method.value">
+                          {{method.label}}
+                        </option>
+                      </select>
+                    </div>
+                  </td>
+
+                  <td> <!-- Estado del pago  -->
+                    <div  class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" [ngModelOptions]="{standalone: true}" id="flexSwitchCheckPayStatus" [(ngModel)]="isServicePaid" (change)="onServicePaySwitchChange()">
+                      <label class="form-check-label" for="flexSwitchCheckRecurrente">Pagado</label>
+                    </div>
+                  </td>
+                  <td> <!--Acciones  -->
+                    <div class="actions-container "> 
+                      <button class="btn btn-sm btn-outline-success" (click)="generateInvoice()" ngbTooltip="Pagar"><i class="bi bi-currency-dollar"></i></button>
+                      <button class="btn btn-sm btn-outline-primary" (click)="generateInvoice()" ngbTooltip="Generar Factura"><i class="bi bi-receipt-cutoff"></i></button>
+                      <button class="btn btn-sm btn-outline-info" (click)="sendEmail(parentItem)" ngbTooltip="Enviar Correo"><i class="bi bi-envelope-at"></i></button>
+                    </div>    
                   </td>
                 </tr>
+                
+                
+
               }
               </ng-container>
              <!-- } @else {
@@ -305,5 +366,5 @@
       </div>
     </div><!--Fin container mt-4-->
   </div>
-  <!--Termina el tab de Pagos-->
+  <!-- **************** T E R M I N A   E L   T A B   D E   P A G O S **************** -->
 </div>  

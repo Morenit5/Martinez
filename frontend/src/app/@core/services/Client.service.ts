@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { environment } from '@env/environment';
 import { ClientEntity } from '../entities/Client.entity';
@@ -17,6 +17,14 @@ export class ClientInstances {
             ),
         );
     }
+
+  getAllClientsBy(cltType:string) {
+    return this.clientListService.getAllClientsBy(cltType).pipe(
+      map((response) =>
+        response.map((client: any) => plainToInstance(ClientEntity, client)),
+      ),
+    );
+  }
 
 }
 
@@ -42,10 +50,20 @@ export class ClientService {
     return this.http.get<ClientEntity[]>(this.apiUrl);
   }
 
-  addClient(client: ClientEntity): Observable<ClientEntity> {
-    console.log('CLIENTE ' + JSON.stringify(client));
+  getAllClientsBy(cltType:string): Observable<ClientEntity[]> {
+    let params = new HttpParams();
+    params = params.set('typeName', cltType);
 
-    let regresa = this.http.post<ClientEntity>(this.apiUrl, JSON.stringify(client));
+
+    return this.http.get<any>(this.apiUrl + '/type', { params: params });
+            //.subscribe(data => { console.log(data); });
+  }
+
+
+  addClient(client: ClientEntity): Observable<ClientEntity> {
+    //console.log('CLIENTE ' + JSON.stringify(client));
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let regresa = this.http.post<ClientEntity>(this.apiUrl, JSON.stringify(client),{headers});
     return regresa;
   }
 

@@ -31,6 +31,9 @@ export class EntityInvoice {
     @OneToOne(() => EntityService, (service) => service.invoice)
     service?: EntityService;
 
+    @Column('numeric', { precision: 7, scale: 2, transformer: new ColumnNumericTransformer() })
+    subtotalAmount: number;
+
     @Column({ type: 'boolean', default: true })
     enabled: boolean;
 }

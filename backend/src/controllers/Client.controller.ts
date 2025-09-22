@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, Put} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, Put, Query} from '@nestjs/common';
 import { ServiceClient } from 'src/services/Client.service';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 import { ClientDto, CreateClientDto, UpdateClientDto } from 'src/dto/Client.dto';
@@ -15,9 +15,11 @@ export class  ControllerClient {
     return this.serviceClient.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: number): Promise<ClientDto|null> {
-    return this.serviceClient.findOne(id);
+  @Get('/type')
+  findAllBy(@Query('typeName') cltType: string): Promise<ClientDto[]> {
+    console.log('llegamos en el contorller  con valores ' + cltType);
+   
+    return this.serviceClient.findAllBy(cltType);
   }
 
   @Get('/serv/a')
@@ -28,6 +30,11 @@ export class  ControllerClient {
   @Get('/serv/:id')
   findOneWithServices(@Param('id') id: number): Promise<ClientDto|null> {
     return this.serviceClient.findOneWithServices(id);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: number): Promise<ClientDto|null> {
+    return this.serviceClient.findOne(id);
   }
 
   @Post()

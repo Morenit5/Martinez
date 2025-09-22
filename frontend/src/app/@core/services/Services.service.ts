@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { map } from 'rxjs';
 import { environment } from '@env/environment';
 import { instanceToPlain, plainToInstance } from 'class-transformer';
@@ -23,9 +23,38 @@ export class ServicesInstances {
         );
     }
 
-    
+  
+    updateService(serviceIstance: ServiceEntity) {
+        /*return this.userService.updateUser(usrInstance).pipe(
+          map((response) =>
+              response.map((user: any) => plainToInstance(UserEntity, user)),
+          ),
+        );*/
+
+        return this.servicesListService.updateService(serviceIstance).pipe(
+            //tap(value => console.log('Observable value:', value))
+            map(response => {
+                if (Array.isArray(response)) {
+                    return response.map((service: any) => plainToInstance(ServiceEntity, service))
+                } else {
+                    // it's a single object, transform directly
+                    return plainToInstance(ServiceEntity, response)
+                }
+            })
+        );
+    }
+
     getAllServices() {
         return this.servicesListService.getAllServices().pipe(
+            map((response) =>
+                response.map((service: any) => plainToInstance(ServiceEntity, service)),
+            ),
+        );
+    }
+
+    getAllServicesBy(clientType:string,extra?:boolean) {
+
+        return this.servicesListService.getAllServicesBy(clientType, extra ).pipe(
             map((response) =>
                 response.map((service: any) => plainToInstance(ServiceEntity, service)),
             ),
@@ -46,9 +75,31 @@ class servicesService {
         //.subscribe(data => { console.log(data); });
     }
 
+    getAllServicesBy(clientType:string,extra?:boolean) {
+        let params = new HttpParams();
+        params = params.set('typeName', clientType);
+        if(extra != undefined){
+            params = params.set('extra', extra);
+        }
+        console.log('vamos a llamar esto' + clientType)
+        return this.http.get<any>(serviceUrl + '/type',{ params: params });
+        //.subscribe(data => { console.log(data); });
+    }
+
     addService(serviceInstance: ServiceEntity) {
         let regresa = this.http.post<any>(serviceUrl, instanceToPlain(serviceInstance),);
         //console.log(regresa)
         return regresa;
     }
+
+   
+    updateService(serviceIstance: ServiceEntity)  {
+        //let params = new HttpParams();
+        //params = params.set('id', serviceIstance.serviceId);
+        let instance = this.http.put<any>(serviceUrl + '/up/' + serviceIstance.serviceId, serviceIstance,); //{ params: params });
+
+        return instance;
+    }
+
+
 }

@@ -12,7 +12,7 @@ export class ServiceEntity {
     showDetails: boolean = false;
     serviceDetail: ServiceDetailEntity[];
     invoice:InvoiceEntity;
-
+    isExtra: boolean;
 }
 
 

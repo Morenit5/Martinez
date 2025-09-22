@@ -1,6 +1,6 @@
 import { isArray, IsBoolean, IsDate, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateServiceDetailDto, ServiceDetailDto } from './ServiceDetail.dto';
+import { CreateServiceDetailDto, ServiceDetailDto, UpdateServiceDetailDto } from './ServiceDetail.dto';
 import { CreateInvoiceDto, InvoiceDto } from './Invoice.dto';
 import { ClientDto, CreateClientDto } from './Client.dto';
 import { Type } from 'class-transformer';
@@ -72,10 +72,13 @@ export class CreateServiceDto {
 
     @IsNotEmpty({ message: 'El campo service detail es obligatorio.' })
     @IsObject()
-    serviceDetail: CreateServiceDetailDto[]; //@OneToMany(() => EntityServiceDetail, servicedetail => servicedetail.serviceDetailsId)
+    serviceDetail: CreateServiceDetailDto[] | UpdateServiceDetailDto[]; //@OneToMany(() => EntityServiceDetail, servicedetail => servicedetail.serviceDetailsId)
 
     @IsBoolean()
     enabled: boolean;
+
+    @IsBoolean()
+    isExtra: boolean;
   
 }
 

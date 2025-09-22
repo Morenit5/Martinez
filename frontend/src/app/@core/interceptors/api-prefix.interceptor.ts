@@ -25,7 +25,7 @@ export class ApiPrefixInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<any>,next: HttpHandler,): Observable<HttpEvent<any>> {
 
     console.log('estamos aqui en el intercept....')
-
+return next.handle(request);
     // If the request has the 'noauth' header, don't add the Authorization header
     if (request.headers.get('noauth')) {
       console.log('con el header adecuado....')

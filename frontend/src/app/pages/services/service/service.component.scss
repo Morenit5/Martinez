@@ -1,5 +1,16 @@
 .table-success{
-    background-color: green;
+    background-color: #6dab8f ; 
+    color: white;
+}
+
+.table-progress{
+    background-color: #91c2cc ;
+    color: white;
+}
+
+.table-recurrent{
+    background-color: #88b67b ;
+    color: white;
 }
 
 .table-danger{
@@ -28,4 +39,12 @@ a[role="button"]:hover {
 .list-group-scrollable {
     max-height: 150px; /* Adjust this value as needed */
     overflow-y: scroll;
+}
+
+.actions-container {
+  display: flex;
+  /* Optional: Add space between buttons */
+  gap: 1px; 
+  /* Optional: Align buttons to the end of the container */
+  justify-content: flex-end; 
 }
