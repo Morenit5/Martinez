@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsDate, IsNotEmpty, isNumber, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
 import { CreatePaymentDto, PaymentDto } from './Payment.dto';
 import { CreateInvoiceDetailsDto, InvoiceDetailsDto } from './InvoiceDetails.dto';
 import { CreateServiceDto, ServiceDto } from './Service.dto';
@@ -40,7 +40,11 @@ export class InvoiceDto {
     @IsOptional()
     @IsObject()
     @Type(()=> ServiceDto)
-    service?: ServiceDto; //@OneToOne(() => EntityService, service => service.serviceId)   
+    service?: ServiceDto; //@OneToOne(() => EntityService, service => service.serviceId)  
+    
+    @IsOptional()
+    @IsNumber()
+    subtotalAmount
 }
 
 export class CreateInvoiceDto {
@@ -73,7 +77,10 @@ export class CreateInvoiceDto {
     @IsObject()
     service?: CreateServiceDto; //@OneToOne(() => EntityService, service => service.serviceId)
 
-    
+    @IsOptional()
+    @IsNumber()
+    subtotalAmount
+
     @IsBoolean({ message: 'El campo "activo" debe ser verdadero o falso' })
     enabled: boolean;
 }

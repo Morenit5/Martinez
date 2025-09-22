@@ -18,6 +18,15 @@ export class ServiceClient {
     })
   }
 
+  findAllBy(cltType: string): Promise<ClientDto[]> {
+    return this.clientRepository.find({
+      where: [{ 
+        enabled: true,
+        clientType: cltType
+      }],
+    })
+  }
+
 
   findOne(clientId: number): Promise<ClientDto|null> {
     return this.clientRepository.findOneBy({ clientId });

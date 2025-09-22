@@ -244,7 +244,14 @@ export class ListComponent implements OnInit {
   }
 
   getMessage(message: number) {
+   
+    if (message == undefined) {
+      message = 0;
+      this.recivedTabIndex = 0;
+      this.reqTabId = 0;
+    }
     this.recivedTabIndex = message;
+    this.reqTabId = message;
   }
 
   sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));

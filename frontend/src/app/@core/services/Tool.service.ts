@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ToolEntity } from '@app/@core/entities/Tool.entity';
 import { Observable } from 'rxjs';
 import { iTool } from '../interfaces/Tool.interface';
@@ -28,9 +28,9 @@ export class ToolService {
   }
 
   addTool(tool: ToolEntity): Observable<ToolEntity> {
-    console.log('TOOL ' + JSON.stringify(tool));
-
-    let regresa = this.http.post<ToolEntity>(this.apiUrl, JSON.stringify(tool));
+    //console.log('TOOL ' + JSON.stringify(tool));
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let regresa = this.http.post<ToolEntity>(this.apiUrl, JSON.stringify(tool),{ headers });
     return regresa;
   }
 

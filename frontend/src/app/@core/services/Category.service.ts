@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
 import { iCategory } from '../interfaces/Category.interface';
@@ -8,6 +8,7 @@ import { iCategory } from '../interfaces/Category.interface';
   providedIn: 'root',
 })
 export class CategoryService {
+
   constructor(private http: HttpClient) { }
 
   // we can now access environment.apiUrl
@@ -20,7 +21,8 @@ export class CategoryService {
   }
 
   addCategory(category: iCategory): Observable<iCategory> {
-    let regresa = this.http.post<iCategory>(this.apiUrl, JSON.stringify(category),);
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let regresa = this.http.post<iCategory>(this.apiUrl, JSON.stringify(category),{ headers });
     return regresa;
   }
 

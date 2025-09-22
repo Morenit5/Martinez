@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Param,  HttpException, HttpStatus,  Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param,  HttpException, HttpStatus,  Put, Query } from '@nestjs/common';
 import { ServiceService} from '../services/Service.service';
 import { TypeORMExceptions } from '../exceptions/TypeORMExceptions';
 import { CreateServiceDto, ServiceDto, UpdateServiceDto } from '../dto/Service.dto';
+import { log } from 'console';
 
 //@Controller('service')
 @Controller({ version: '1', path: 'service' })
@@ -15,10 +16,21 @@ export class  ControllerService {
     return this.serviceService.findAll();
   }
 
+  @Get('/type')
+  findAllBy(@Query('typeName') itemName: string,@Query('extra') isExtra?: string): Promise<ServiceDto[]> {
+    console.log('llegamos en el contorller  con valores ' + itemName + ' isExtra => ' + isExtra );
+    let val:string;
+    if(isExtra == undefined){val = 'false' } else { val = isExtra == 'true'? 'true': 'false' }
+    console.log(val);
+    return this.serviceService.findAllBy(itemName,val);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string): Promise<ServiceDto|null> {
     return this.serviceService.findOne(+id);
   }
+
+
 
   @Post()
   async create(@Body() service: CreateServiceDto) {
@@ -44,26 +56,6 @@ export class  ControllerService {
       });
   }
 
- /* @Delete(':serviceId')
-  async remove(@Param('serviceId', ParseIntPipe) serviceId: number){
-    try {
-      const payment = await this.serviceService.findOne(serviceId);
-
-      if (!payment) {
-        throw new NotFoundException(`Servicio ${serviceId} no encontrado`);
-      }
-      await this.serviceService.delete(serviceId); // También puedes usar `remove(entity)` si lo necesitas
-      return `Servicio ${serviceId} eliminado correctamente`;
-
-    } catch (error) {
-      console.error('Error al eliminar el Servicio:', error);
-
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      throw new InternalServerErrorException('Error interno al eliminar el Servicio');
-    }
-  }*/
 
   @Put('/up/:id')
   async update(@Param('id') id: string, @Body() service) {
@@ -82,7 +74,7 @@ export class  ControllerService {
 
     await this.serviceService.update(+id, this.updateService)
       .then((result: any) => {
-        console.log("Result:", result);
+        //console.log("Result:", result);
         return result;
       }).catch((error: any) => {
         this.exceptions.sendException(error);
