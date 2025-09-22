@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import * as nodemailer from 'nodemailer';
 import * as path from 'path';
-import { map } from 'rxjs';
 import { ServiceDto } from 'src/dto/Service.dto';
 
 enum EmailOptions {
@@ -81,5 +80,9 @@ export class EmailService {
 
   getHello(): string {
     return 'Hello World!';
+  }
+
+  async generateInvoice(entity: ServiceDto) {
+
   }
 }
