@@ -21,7 +21,7 @@ export class EntityPayment {
   @JoinColumn({ name: "invoiceId" }) // Nombre de la columna en la tabla donde se une
   invoice: EntityInvoice;
 
-  @Column('numeric', { precision: 7, scale: 2, transformer: new ColumnNumericTransformer()})
+  @Column('numeric', { precision: 7, scale: 2, transformer: new ColumnNumericTransformer(), nullable:true})
   taxAmount: number;
 
   @Column({ type: 'varchar', length: 40 })
@@ -29,5 +29,9 @@ export class EntityPayment {
 
   @Column({ type: 'boolean', default: true })
   enabled: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  isServicePaid: boolean;
+  
 }
 
