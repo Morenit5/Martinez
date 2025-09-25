@@ -2,6 +2,7 @@ import { formatDate } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, Inject, LOCALE_ID, SimpleChanges } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { SafeResourceUrl } from '@angular/platform-browser';
 import { ClientEntity } from '@app/@core/entities/Client.entity';
 import { PaymentEntity } from '@app/@core/entities/Payment.entity';
 import { ServiceEntity, ServiceDetailEntity } from '@app/@core/entities/Service.entity';
@@ -13,6 +14,7 @@ import { ToastUtility } from '@app/@core/utils/toast.utility';
 import { environment } from '@env/environment';
 import { NgbDateStruct, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 
 
@@ -23,6 +25,7 @@ import { v4 as uuidv4 } from 'uuid';
   styleUrl: './service.component.scss'
 })
 export class ServiceComponent {
+
 
 
   isLoading = false;
@@ -57,7 +60,6 @@ export class ServiceComponent {
   collectionSize = 0; // Total de registros
   totalPages = 0;
   currentPage = 1;
-
   /*Paginacion*/
 
   /*Email*/
@@ -65,15 +67,20 @@ export class ServiceComponent {
   enviado = false;
   respuesta = '';
   emailService: EmailService;
-  /*Email */
   user = environment.auth.user;
   pass = environment.auth.pass;
   subject = environment.subject;
+  /*Email */
 
   serviceLabel: string = 'Registro de Servicios';
   serviceButton: string = 'Registrar';
   serviceForm: FormGroup;
  
+  /*PDF*/
+  facturaDatos: any;
+  pdfUrl: string | null = null;
+  idFactura: number = 1; // valor por defecto
+  /*PDF*/
 
   recivedTabIndex: number = 0;
   inputLength: number = 0;
@@ -185,9 +192,46 @@ export class ServiceComponent {
     return this.paymentForm.get('payment') as FormArray;
   }
 
+ 
+  async generateInvoice(service: ServiceEntity) {
+    (await this.emailService.generateInvoice(service)).subscribe({
+      next: (resp) =>{
+         this.toast.showToast('Factura generada correctamente ', 5000, 'check2-square', true)
+        this.generarPdf(resp);
+        }, 
+         error: (err) => {
+        console.error(err);
+        this.toast.showToast('Factura no generada', 5000, 'check2-square', true);
+      }
+    });
 
+  }
 
-  generateInvoice() { }
+  async generarPdf(pdfBytes) {
+  
+    //const pdfBytes = await pdfDoc.save();
+    const blob = new Blob([pdfBytes as unknown as ArrayBuffer], { type: 'application/pdf' });
+    this.pdfUrl = URL.createObjectURL(blob);
+
+    // Descargar automáticamente
+    const link = document.createElement('a');
+    link.href = this.pdfUrl;
+    link.download = `Invoice.pdf`;
+    link.click();
+  }
+
+   getClientsBy(clientType: string) {
+    this.clientInstance.getAllClientsBy(clientType).subscribe({
+      next: (clientsList) => {
+        this.clientList = clientsList;
+        this.isLoading = false;
+        //console.log(JSON.stringify(this.clientList))
+      },
+      error: (error) => {
+        console.error(error);
+      },
+    });
+  }
 
 
   sendEmail(ServiceDto: ServiceEntity) {

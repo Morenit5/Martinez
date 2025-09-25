@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { execSync } from 'child_process';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 require('dotenv').config();
+import * as express from 'express';
 
 async function bootstrap() {
 
@@ -21,7 +22,7 @@ async function bootstrap() {
     type: VersioningType.URI, // Use URI versioning
     defaultVersion: '1', // Optional: Set a default version
   });
-
+app.use(express.json({ limit: '50mb' }));
   await app.listen(process.env.PORT ?? 3001);
   process.on('unhandledRejection', (e) => {
     console.log(e);
