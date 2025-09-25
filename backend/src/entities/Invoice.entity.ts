@@ -22,13 +22,14 @@ export class EntityInvoice {
     @Column('numeric', { precision: 7, scale: 2, transformer: new ColumnNumericTransformer() })
     totalAmount: number;
 
-    @OneToMany(() => EntityPayment, payment => payment.invoice)
+    @OneToMany(() => EntityPayment, payment => payment.invoice,{ cascade: true })
     payment: EntityPayment[];
 
     @OneToMany(() => EntityInvoiceDetails, (invoiceDetail) => invoiceDetail.invoice)
     invoiceDetails: EntityInvoiceDetails[];
 
-    @OneToOne(() => EntityService, (service) => service.invoice)
+    @OneToOne(() => EntityService, (service) => service.invoice,{ cascade: true })
+    @JoinColumn({ name: "serviceId" })
     service?: EntityService;
 
     @Column('numeric', { precision: 7, scale: 2, transformer: new ColumnNumericTransformer() })

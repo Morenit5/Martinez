@@ -16,7 +16,6 @@ export class EntityService {
     serviceDate: Date;
 
     @OneToOne(() => EntityInvoice, invoice => invoice.service)
-    @JoinColumn({ name: "invoiceId" })
     invoice?: EntityInvoice;
 
     @Column({ type: 'varchar', length: 60 })

@@ -33,6 +33,10 @@ export class PaymentDto {
     @IsString()
     paymentStatus: string;
 
+    @IsOptional()
+    @IsBoolean()
+    isServicePaid: boolean;
+
 }
 
 export class CreatePaymentDto {
@@ -61,7 +65,10 @@ export class CreatePaymentDto {
     paymentStatus: string;
 
     @IsBoolean()
-    enabled: boolean;    
+    enabled: boolean;   
+    
+    @IsBoolean()
+    isServicePaid: boolean;   
 
 }
 

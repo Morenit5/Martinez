@@ -53,6 +53,10 @@ export class ServiceInvoice {
 
   create(invoice: CreateInvoiceDto): Promise<InvoiceDto> {
     return this.invoiceRepository.save(invoice);
+
+
+    //Aqui tnemos que actualizar el status del Service. terminado 
+    //asdfasdfasdfasdfasdfasd 
   }
 
   async delete(id: number): Promise<void> {
