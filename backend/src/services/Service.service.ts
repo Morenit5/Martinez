@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { EntityService } from '../entities/Service.entity';
 import { CreateServiceDto, ServiceDto, UpdateServiceDto } from '../dto/Service.dto';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
@@ -42,15 +42,20 @@ export class ServiceService {
 
   async findAll(): Promise<ServiceDto[]> {
     var services: ServiceDto[] = await this.serviceRepository.find({ 
-      where: [{ enabled: true } ],
-      relations: {
+     relations: {
         client: true,
         serviceDetail:true,
         invoice: {
           payment:true,
           invoiceDetails:true
         }
-      }
+      },
+       where: [{ 
+        enabled: true,
+        status: Not('Cerrado'),
+        
+
+      } ],
     }).then((result: any) => {
       return result; // tal vez debamos manipular estos datos antes de mandar al front
     }).catch((error: any) => {

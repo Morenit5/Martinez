@@ -37,4 +37,7 @@ export class EntityInvoice {
 
     @Column({ type: 'boolean', default: true })
     enabled: boolean;
+
+    @Column({ type: 'boolean',nullable:true, default: false })
+    isGenerated: boolean;
 }

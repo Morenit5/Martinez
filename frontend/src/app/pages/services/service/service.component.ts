@@ -14,8 +14,6 @@ import { ToastUtility } from '@app/@core/utils/toast.utility';
 import { environment } from '@env/environment';
 import { NgbDateStruct, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
-
 
 
 @Component({
@@ -91,7 +89,10 @@ export class ServiceComponent {
   isExtraSwitchValue: boolean = false;
   isRecurrentService: boolean = false;
   isExtraOption: boolean = false;
-  extraValue: string = 'Fijo'; //valor seleccionado por defecto
+  extraValue: string = this.radioOptions[0]; //valor seleccionado por defecto para radio opciones es Fijo
+  lastUsedValue:string;
+  clientesFijos:string = 'Fijo';
+  clientesEventuales:string = 'Eventual';
 
   //Variables para el tab de Pagos
   //isServicePaid: boolean = false;
@@ -166,12 +167,17 @@ export class ServiceComponent {
     return this.serviceForm.get('serviceDetail') as FormArray;
   }
 
-    // Methodo para crear el item pago que pertence al invoice
-  createPaymentItemFormGroup(paymentEnt: PaymentEntity) {
+  // Methodo para crear el item pago que pertence al invoice
+  createPaymentItemFormGroup(paymentEnt: PaymentEntity): boolean {
     let metodoPago = paymentEnt.paymentMethod;
     if(this.esPagoCash){
       metodoPago = 'Cash';
     }
+    if(metodoPago == undefined || metodoPago == null){
+       this.toast.showToastWarning('Metodo de pago no ha sido seleccionado', 5000);
+       return false;
+    }
+
     let convertDate = JSON.parse(JSON.stringify(paymentEnt.paymentDate));
     let formatedDate = convertDate.year + '-' + convertDate.month + '-' + convertDate.day;
 
@@ -186,6 +192,7 @@ export class ServiceComponent {
     });
 
     this.paymentFormArray.push(paymentItem);
+    return true;
   }
 
   get paymentFormArray() {
@@ -220,20 +227,6 @@ export class ServiceComponent {
     link.click();
   }
 
-   getClientsBy(clientType: string) {
-    this.clientInstance.getAllClientsBy(clientType).subscribe({
-      next: (clientsList) => {
-        this.clientList = clientsList;
-        this.isLoading = false;
-        //console.log(JSON.stringify(this.clientList))
-      },
-      error: (error) => {
-        console.error(error);
-      },
-    });
-  }
-
-
   sendEmail(ServiceDto: ServiceEntity) {
 
     //verificar si hay factura existente
@@ -253,8 +246,9 @@ export class ServiceComponent {
 
   ngOnInit() {
 
-    this.getallClientsBy('Fijo');
-    this.getAllServicesIntancesBy('Fijo'); // de entrada traemos clientes fijos solamente
+    this.getallClientsBy(this.clientesFijos);
+    this.lastUsedValue = this.clientesFijos;
+    this.getAllServicesIntancesBy(this.clientesFijos); // de entrada traemos clientes fijos solamente
     
   }
 
@@ -263,15 +257,16 @@ export class ServiceComponent {
     this.isExtraSwitchValue = false; //reseteamos a falso esta bandera por si acaso ya que esta llama a servicios extras
 
     if (changeEvent.nextId === 1) { //para llamar  los servicios fijos
-      this.getAllServicesIntancesBy('Fijo');
+      this.getAllServicesIntancesBy(this.clientesFijos);
 
     } else if (changeEvent.nextId === 2) { //para llamar  los servicios eventuales
-      this.getAllServicesIntancesBy('Eventual');
+      this.getAllServicesIntancesBy(this.clientesEventuales);
+      
     }
   }
 
   onSwitchChange() {
-    this.getAllServicesIntancesBy(this.extraValue, this.isExtraSwitchValue);
+    this.getAllServicesIntancesBy(this.clientesFijos, this.isExtraSwitchValue);
   }
 
   onRecurrentSwitchChange(){
@@ -282,9 +277,11 @@ export class ServiceComponent {
 
  
   onRadioChange() {
-    console.log(this.extraValue );
+    //esto evita tantas llamdas al backend en caso que haga click en los radio botones varias veces a  la vez
+    if((this.lastUsedValue == 'Fijo' || this.lastUsedValue == 'Extra') &&  this.extraValue != 'Eventual') { return }
+    if((this.lastUsedValue == 'Eventual') &&  (this.extraValue != 'Fijo' && this.extraValue != 'Extra') ) { return }
 
-    if (this.extraValue == 'Extra') {
+   if (this.extraValue == 'Extra') {
       this.isExtraOption = true;
     } else {
       this.isExtraOption = false;
@@ -292,8 +289,11 @@ export class ServiceComponent {
     
     
     let cltType = this.extraValue == 'Fijo' || this.extraValue == 'Extra'? 'Fijo':'Eventual'; 
+    
     this.getallClientsBy(cltType);
+    this.lastUsedValue = cltType;
   }
+  
 
   /*METODOS PAGINACION*/
   private updatePaginatedData(): void {
@@ -381,8 +381,6 @@ export class ServiceComponent {
 
     this.serviceLabel = 'Registro de Servicios';
     this.serviceButton = 'Registrar'
-
-    this.getAllServicesIntancesBy(this.extraValue); // reseteamos
 
     this.isReadOnly = false; //enable de regreso el field cliente
     //go back to consulta tab
@@ -473,7 +471,10 @@ export class ServiceComponent {
 
   onPaymentSubmit(itemIndex:number, serviceEnt:ServiceEntity) {
 
-    this.createPaymentItemFormGroup(this.paymentObjects[itemIndex]);
+    const succesful = this.createPaymentItemFormGroup(this.paymentObjects[itemIndex]);
+    if(!succesful){
+      return;
+    }
     this.totalPrice = 0; //reset to zero prior to do final calculation
     let convertDate = JSON.parse(JSON.stringify(this.paymentObjects[itemIndex].paymentDate));
     let formatedDate = convertDate.year + '-' + convertDate.month + '-' + convertDate.day;
@@ -509,7 +510,7 @@ export class ServiceComponent {
           // aqui limpiamos el formulario
           this.paymentForm.reset()
           this.esPagoCash = undefined;
-          this.getAllServicesIntances(true);
+          this.getAllServicesIntances(true); //Traemos todas las intances que 
         }
       });
 
@@ -523,7 +524,7 @@ export class ServiceComponent {
 
   getMessage(message: number) {
     console.log('el mensaje ' + message)
-    if (message == undefined) {
+    if (message == undefined) { //es undefined en la primera vez que carga, por default ponemos al tab 0 para q se muestre
       message = 0;
       this.recivedTabIndex = 0;
       this.reqTabId = 0;
@@ -531,8 +532,15 @@ export class ServiceComponent {
     this.recivedTabIndex = message;
     this.reqTabId = message;
 
+
+    //debemos ver si esto ya esta cargado tal vez usar un metodo para cache values
+    //y no ir tantas veces a la backend
+    if(message == 0){
+      this.getAllServicesIntancesBy(this.clientesFijos,false);
+    }
+
     if(message == 2){
-      this.getAllServicesIntances();
+      this.getAllServicesIntances(false);
     }
   }
 
@@ -634,6 +642,7 @@ export class ServiceComponent {
       paymentDetail.isServicePaid  = arr[0]?.isServicePaid;
       paymentDetail.paymentStatus =  arr[0]?.paymentStatus;
       paymentDetail.paymentDate = this.getFormatedDate(new Date(arr[0]?.paymentDate.toString()));
+
       
     } else { 
       paymentDetail.isServicePaid  = false;
@@ -744,10 +753,14 @@ export class ServiceComponent {
           
         }
       }
+
+       //console.log(this.clientEntitiyToGet )
     }
 
     onNameChange(newValue: string) {
       this.clientEntitiyToGet = newValue;
+
+      //console.log(this.clientEntitiyToGet )
     }  
 
 

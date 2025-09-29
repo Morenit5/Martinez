@@ -22,7 +22,7 @@ export class ToastUtility {
         this.toast.show(msg, options);
     }
 
-    public showToastWarning(msg: string, dur: number = 5000, iconName: string) {
+    public showToastWarning(msg: string, dur: number = 5000, iconName: string = 'exclamation-triangle-fill') {
         const options: ToastOptions<string> = {
             duration: dur, // 5 seconds
             position: 'top-center',
