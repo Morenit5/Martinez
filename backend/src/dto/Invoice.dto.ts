@@ -45,6 +45,9 @@ export class InvoiceDto {
     @IsOptional()
     @IsNumber()
     subtotalAmount
+
+    @IsBoolean()
+    isGenerated: boolean;
 }
 
 export class CreateInvoiceDto {
@@ -83,6 +86,10 @@ export class CreateInvoiceDto {
 
     @IsBoolean({ message: 'El campo "activo" debe ser verdadero o falso' })
     enabled: boolean;
+
+       
+    @IsBoolean()
+    isGenerated: boolean;
 }
 
 export class UpdateInvoiceDto  extends PartialType(CreateInvoiceDto) {

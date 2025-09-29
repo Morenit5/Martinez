@@ -12,6 +12,7 @@ export class InvoiceEntity {
     payment: PaymentEntity[];  //@OneToMany(() => EntityPayment, payment => payment.paymentId)
     invoiceDetails: InvoiceDetailsEntity[];  // @OneToMany(() => EntityInvoiceDetails, invoiceDetail => invoiceDetail.invoiceDetailId)
     service?: ServiceEntity; //@OneToOne(() => EntityService, service => service.serviceId)
-
+    
+    isGenerated: boolean;
    
 }

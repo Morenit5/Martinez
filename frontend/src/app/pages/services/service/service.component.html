@@ -37,8 +37,10 @@
               
               <ng-container> <!--*ngFor="let parentItem of serviceList"   paginatedServices-->
                 @for (parentItem of paginatedServices; track parentItem.serviceId) {
+                  
                 <tr>
-                  <td>{{parentItem.client.name}} {{parentItem.client.lastName}}</td>
+                  
+                  <td>{{parentItem.client.name}} {{parentItem.client.lastName}} {{parentItem.invoice?.payment[0].isServicePaid}}</td>
                   <td>
                     <a role="button" (click)="toggleDetails(parentItem)" ngbTooltip="Ver más detalles">
                       {{ parentItem.serviceName }}
@@ -50,8 +52,9 @@
                     {{ parentItem.status }}</td>
                   <td>
 
-                    <button *ngIf="parentItem.status.toLowerCase() != 'terminado'" class="btn btn-sm btn-outline-primary " (click)="updateServiceDetail(parentItem)" ngbTooltip="Actualizar Servicio"><i class="bi bi-pencil"></i></button>
-                    <button *ngIf="parentItem.status.toLowerCase() != 'terminado'" class="btn btn-sm btn-outline-danger " (click)="deleteServiceDetail(parentItem)" ngbTooltip="Eliminar Servicio"><i class="bi bi-trash"></i></button>
+                    <button *ngIf="(parentItem.status.toLowerCase() != 'terminado' && !parentItem.invoice?.payment[0].isServicePaid) " class="btn btn-sm btn-outline-primary " (click)="updateServiceDetail(parentItem)" ngbTooltip="Actualizar Servicio"><i class="bi bi-pencil"></i></button>
+                    <button *ngIf="(parentItem.status.toLowerCase() != 'terminado' && !parentItem.invoice?.payment[0].isServicePaid) " class="btn btn-sm btn-outline-danger " (click)="deleteServiceDetail(parentItem)" ngbTooltip="Eliminar Servicio"><i class="bi bi-trash"></i></button>
+                    <button *ngIf="parentItem.invoice?.payment[0].isServicePaid && parentItem.invoice?.isGenerated" class="btn btn-sm btn-outline-info" (click)="sendEmail(parentItem)" ngbTooltip="Enviar Correo y Cerrar Servicio"><i class="bi bi-envelope-at"></i></button>
                   </td>
                 </tr>
                 <tr *ngIf="parentItem.showDetails">
@@ -287,9 +290,7 @@
                   </td>
 
                   <td> <!-- Servicio -->
-                    <a role="button" (click)="toggleDetails(parentItem)" ngbTooltip="Ver más detalles">
-                      {{ parentItem.serviceName }}
-                    </a>
+                    {{ parentItem.serviceName }}
                   </td>
 
                   <td> <!--Fecha de pago -->
@@ -345,8 +346,8 @@
                     <div class="actions-container "> 
 
                       <button *ngIf="!paymentObjects[i].isServicePaid" class="btn btn-sm btn-outline-success" (click)="onPaymentSubmit(i,parentItem)" ngbTooltip="Confirmar Pago"><i class="bi bi-currency-dollar"></i></button>
-                      <button *ngIf="paymentObjects[i].isServicePaid" class="btn btn-sm btn-outline-primary" (click)="generateInvoice(parentItem)" ngbTooltip="Generar Factura"><i class="bi bi-receipt-cutoff"></i></button>
-                      <button *ngIf="paymentObjects[i].isServicePaid" class="btn btn-sm btn-outline-info" (click)="sendEmail(parentItem)" ngbTooltip="Enviar Correo y Cerrar Servicio"><i class="bi bi-envelope-at"></i></button>
+                      <button *ngIf="paymentObjects[i].isServicePaid && !parentItem.invoice?.isGenerated" class="btn btn-sm btn-outline-primary" (click)="generateInvoice(parentItem)" ngbTooltip="Generar Factura"><i class="bi bi-receipt-cutoff"></i></button>
+                      <button *ngIf="paymentObjects[i].isServicePaid && parentItem.invoice?.isGenerated" class="btn btn-sm btn-outline-info" (click)="sendEmail(parentItem)" ngbTooltip="Enviar Correo y Cerrar Servicio"><i class="bi bi-envelope-at"></i></button>
 
                     </div>    
                   </td>
