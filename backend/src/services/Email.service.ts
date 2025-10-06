@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { ConsoleLogger, Injectable } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import * as nodemailer from 'nodemailer';
 import * as path from 'path';
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts, PDFPage } from 'pdf-lib';
 import { EntityService } from 'src/entities/Service.entity';
 import * as fs from 'fs';
 import { ServiceDetailDto } from 'src/dto/ServiceDetail.dto';
@@ -96,40 +96,11 @@ export class EmailService {
     const pageWidth = 612;   // A4 ancho - 595
     const pageHeight = 792;  // A4 alto - 842
     const margin = 70;
-    const lineHeight = 20;
-    const maxRowsPerPage = 25; // filas por página
-
-    let currentY = pageHeight - margin - 80; // espacio para encabezado
-    let rowCount = 0;
-
-
-    function wrapText(text: string, font: any, size: number, maxWidth: number): string[] {
-      const words = text.split(' ');
-      const lines: string[] = [];
-      let currentLine = '';
-
-      words.forEach(word => {
-        const testLine = currentLine ? currentLine + ' ' + word : word;
-        const textWidth = font.widthOfTextAtSize(testLine, size);
-
-        if (textWidth > maxWidth) {
-          lines.push(currentLine);
-          currentLine = word;
-        } else {
-          currentLine = testLine;
-        }
-      });
-
-      if (currentLine) lines.push(currentLine);
-      return lines;
-    }
 
     // Crear primera página
     let page = pdfDoc.addPage([pageWidth, pageHeight]);
 
     // Crear documento PDF
-    // Si tienes un logo en base64 puedes importarlo o pegarlo aquí
-    const logoBase64 = "data:image/png;base64,..."; // coloca aquí tu logo en base64
     const { height } = page.getSize();
     let y = height - 50;
 
@@ -137,14 +108,8 @@ export class EmailService {
     const timesRoman = await pdfDoc.embedFont(StandardFonts.TimesRoman);
     const timesRomanBold = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
 
-    async function loadImage(url: string): Promise<Uint8Array> {
-  const response = await fetch(url);
-  const arrayBuffer = await response.arrayBuffer();
-  return new Uint8Array(arrayBuffer);
-}
-
     // === Cargar logo desde backend/assets/logo.png ===
-    const logoPath: string = path.join(__dirname, '..', 'assets','logo.png');
+    const logoPath: string = path.join(__dirname, '..', 'invoiceimages', 'logo.png');
     const logoBytes = fs.readFileSync(logoPath);
     const logoImage = await pdfDoc.embedPng(logoBytes);
     const logoDims = logoImage.scale(0.04);
@@ -152,7 +117,7 @@ export class EmailService {
     // Insertar logo
     page.drawImage(logoImage, {
       x: 60,
-      y:  height -90,
+      y: height - 90,
       width: logoDims.width,
       height: logoDims.height,
     });
@@ -167,7 +132,7 @@ export class EmailService {
       start: { x: margin, y: pageHeight - margin - 15 },
       end: { x: pageWidth - margin, y: pageHeight - margin - 15 },
       thickness: 2,
-      color: rgb(0, 0.4, 0),
+      color: rgb(128 / 255, 128 / 255, 128 / 255),//color: rgb(0, 0.4, 0),
     });
     page.drawLine({
       start: { x: 0, y: 70 },       // inicio (abajo)
@@ -183,7 +148,7 @@ export class EmailService {
     });
 
     //
-    const meses = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
+    const meses = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const fecha = new Date();
     const mesActual = meses[fecha.getMonth()]; // getMonth() devuelve 0-11
     let fechaActual = mesActual + ` ${fecha.getDate()}, ${fecha.getFullYear()}`;
@@ -200,7 +165,6 @@ export class EmailService {
     y -= 15;
     page.drawText("Invoice Date: " + fechaActual, { x: 70, y, size: 10, font: timesRoman });
 
-
     // Assuming you have a UUID string
     const invoiceNumber = service.invoice?.invoiceNumber.substring(service.invoice?.invoiceNumber.lastIndexOf('-') + 1, service.invoice?.invoiceNumber.length);
 
@@ -214,73 +178,156 @@ export class EmailService {
     y -= 15;
     page.drawText("Invoice Number: " + invoiceNumber, { x: 415, y, size: 10, font: timesRoman });
 
+    page.drawRectangle({
+      x: 70,
+      y: 520,
+      width: 480,
+      height: 20, //25
+      borderColor: rgb(128 / 255, 128 / 255, 128 / 255),
+      //color: rgb(0, 0, 0),
+      borderWidth: .5,
+    });
+
+    y -= 45;
+    page.drawText("SERVICE: " + service.serviceName, { x: 73, y: 526, size: 10, font: timesRomanBold });
+
+    /////////////////////
+    // 🔹 Función para envolver texto
+    function wrapText(text: string) {
+
+      let desc = text;//;"esto es la descripcion que cuenta con un chiingo de palabras que tenemos que subdividir usando el carriage return para formar filas de 30 caracteres"
+      const descArray: string[] = desc.split(' ');
+      let frase = '';
+      let fraseL = frase.length;
+      let maxL = 45;
+      for (let i = 0; i < descArray.length; i++) {
+        const sumatoria = fraseL + descArray[i].length;
+        //console.log('sumatoria ' + sumatoria)
+        if (sumatoria < maxL) {
+          frase += descArray[i] + ' ';
+        } else {
+          frase += '\n' + descArray[i] + ' ';
+          maxL += 45;
+        }
+        fraseL = frase.length;
+      } // termino del For
+      return frase;
+    }
+
+    /////////////////////
     // === Tabla de productos ===
     y -= 70;
     const headers = ['Type', 'Description', 'Unit', 'Quantity', 'Price'];
-    const colWidths = [100, 200, 50, 50, 80];
-    const rowHeight = 25;
+    const colWidths = [100, 200, 50, 60, 70];
+    const rowHH = 18;
+    const rowHeight = 12.5;
     let startX = 70;
-    const rowPadding = 10;
 
     // Dibujar encabezados
     let currentX = startX;
     headers.forEach((header, i) => {
       page.drawRectangle({
         x: currentX,
-        y: y - rowHeight,
+        y: y - rowHH,
         width: colWidths[i],
-        height: rowHeight,
-        borderColor: rgb(0, 0, 0),
+        height: rowHH,
+        borderColor: rgb(128 / 255, 128 / 255, 128 / 255),// rgb(0, 0, 0),
         color: rgb(0, 128 / 255, 0),
-        borderWidth: 1,
+        borderWidth: .5,
       });
-      page.drawText(header, { x: currentX + 5, y: y - 18, size: 12, color: rgb(1.0, 1.0, 1.0), font: timesRomanBold });
+      page.drawText(header, {
+        x: currentX + 5,
+        y: y - 12,
+        size: 10,
+        color: rgb(1.0, 1.0, 1.0),
+        font: timesRomanBold
+      });
       currentX += colWidths[i];
     });
 
-   
-    y -= rowHeight;
+    y = 504; //aqui el valor es 497 // los 50 son del servicio y header
+
+    let yDesc = 0;
+    let numFilas;
+    let firstTime: boolean = true;
+    let fontSize = 9;
+
     service.serviceDetail.forEach((p: ServiceDetailDto) => {
-      const row = [
+      if (firstTime == true) { firstTime = false; }
+
+      let descWrap = wrapText(p.description);
+      numFilas = descWrap.length < 46 ? 1 : descWrap.length > 92 ? 3 : 2;
+
+      const column = [
         p.serviceType,
-        p.description,
+        descWrap,//p.description,
         p.unitMeasurement,
         p.quantity,
         `$${p.price.toFixed(2)}`,
       ];
 
       currentX = startX;
-      row.forEach((cell, i) =>{
+      column.forEach((cell, i) => {
         page.drawRectangle({
           x: currentX,
-          y: y - rowHeight,
+          y: y,
           width: colWidths[i],
-          height: rowHeight,
-          borderColor: rgb(0, 0, 0),
-          borderWidth: 1,
-        });        
+          height: -(rowHeight * numFilas),
+          borderColor: rgb(128 / 255, 128 / 255, 128 / 255),
+          borderWidth: .5,
+        });
         page.drawText(cell.toString(), {
           x: currentX + 5,
-          y: y - 17,
-          size: 9,
-          //font: times,
+          y: y - 9, // 447 si i es = a 1 descripcion ponle 10, si no, le pones los 17 
+          size: fontSize,
+          font: timesRoman,
+          maxWidth: 200, // This is the key for text wrapping
+          lineHeight: fontSize * 0.9, // Adjust line height for better readability
         });
         currentX += colWidths[i];
-      });
+      }); //termina el recorrido de las columnas
 
-      y -= rowHeight;
-    });
+      if (!firstTime) { y -= rowHeight * numFilas; }
+    }); // termino del foreach de las filas
+    firstTime = true; // se resetea la bandera para la siguiente tanda
 
     let tax = service.invoice?.payment[0].taxAmount;
     if (tax == null) { tax = 0; }
 
     // === Totales ===
-    y -= 30;
+    y -= 50;
     page.drawText("Subtotal: $" + service.invoice?.subtotalAmount.toFixed(2), { x: 440, y, size: 12, font: timesRoman });
     y -= 15;
     page.drawText("Tax:        $" + tax.toFixed(2), { x: 440, y, size: 12, font: timesRoman });
     y -= 15;
     page.drawText("Total:     $" + service.invoice?.totalAmount.toFixed(2), { x: 440, y, size: 12, color: rgb(0, 0, 0), font: timesRomanBold });
+
+    let method;
+    method = service.invoice?.payment[0].paymentMethod;
+    const traductions: Record<string, string> = {
+      Efectivo: "Cash",
+      Transferencia: "Transfer",
+      Cheque: "Check",
+      Deposito: "Deposit",
+    };
+
+    // Función para traducir
+    function traducirMetodoPago(metodo: string): string {
+      return traductions[metodo] || metodo; // Si no existe, devuelve el original
+    }
+
+    if (tax != undefined || tax != null) {
+      if (tax > 0) {
+
+        y -= 15;
+        page.drawText(`Payment made through: ${traducirMetodoPago(method)}.`,
+          { x: 70, y, size: 12, color: rgb(0, 0, 0), font: timesRoman });
+      }
+    }
+    else {
+      y -= 15;
+      page.drawText(" ");
+    }
 
     // Guardar PDF
     const pdfBytes = await pdfDoc.save();
