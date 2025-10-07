@@ -28,8 +28,7 @@ export class EntityInvoice {
     @OneToMany(() => EntityInvoiceDetails, (invoiceDetail) => invoiceDetail.invoice)
     invoiceDetails: EntityInvoiceDetails[];
 
-    @OneToOne(() => EntityService, (service) => service.invoice,{ cascade: true })
-    @JoinColumn({ name: "serviceId" })
+    @OneToOne(() => EntityService, (service) => service.invoice)
     service?: EntityService;
 
     @Column('numeric', { precision: 7, scale: 2, transformer: new ColumnNumericTransformer() })
