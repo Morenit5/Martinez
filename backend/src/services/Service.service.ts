@@ -47,14 +47,11 @@ export class ServiceService {
         serviceDetail:true,
         invoice: {
           payment:true,
-          invoiceDetails:true
         }
       },
        where: [{ 
         enabled: true,
         status: Not('Cerrado'),
-        
-
       } ],
     }).then((result: any) => {
       return result; // tal vez debamos manipular estos datos antes de mandar al front
@@ -69,14 +66,13 @@ export class ServiceService {
   async findAllBy(clntType: string, extra: string ): Promise<ServiceDto[]> {
     var services: ServiceDto[];
     if (extra == 'true') {
-      console.log('en el if con tipo ' + clntType + ' y extra es ' + extra)
+      //console.log('en el if con tipo ' + clntType + ' y extra es ' + extra)
       services = await this.serviceRepository.find({
         relations: {
           client: true,
           serviceDetail: true,
           invoice: {
             payment: true,
-            invoiceDetails: true
           }
         },
         where: [{
@@ -96,19 +92,19 @@ export class ServiceService {
       });
 
     } else {
-      console.log('en el else with ' + clntType)
+      //console.log('en el else with ' + clntType)
       services = await this.serviceRepository.find({
         relations: {
           client: true,
           serviceDetail: true,
           invoice: {
             payment: true,
-            invoiceDetails: true
           }
         },
         where: [{
           enabled: true,
           isExtra: false,
+          status: Not('Cerrado'),
           client: {
             clientType: clntType
           }

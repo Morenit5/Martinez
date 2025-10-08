@@ -4,27 +4,28 @@ import { Component, Inject, LOCALE_ID, SimpleChanges } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { ClientEntity } from '@app/@core/entities/Client.entity';
-import { PaymentEntity } from '@app/@core/entities/Payment.entity';
 import { ServiceEntity, ServiceDetailEntity } from '@app/@core/entities/Service.entity';
 import { ClientInstances } from '@app/@core/services/Client.service';
 import { EmailService } from '@app/@core/services/Email.service';
 import { InvoiceInstances } from '@app/@core/services/invoice.service';
 import { ServicesInstances } from '@app/@core/services/Services.service';
 import { ToastUtility } from '@app/@core/utils/toast.utility';
+import { DateAdapterService } from '@app/shared/services/date-adapter.service';
 import { environment } from '@env/environment';
-import { NgbDateStruct, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDateAdapter, NgbDateStruct, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
-
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-service',
   standalone: false,
   templateUrl: './service.component.html',
-  styleUrl: './service.component.scss'
+  styleUrl: './service.component.scss',
+  providers: [{ provide: NgbDateAdapter, useClass: DateAdapterService}]
 })
 export class ServiceComponent {
 
-
+  valueSubscription: Subscription;
 
   isLoading = false;
   isUpdating = false; // bandera para saber cuando el servicio esta actualizando
@@ -54,7 +55,7 @@ export class ServiceComponent {
   services: ServiceEntity[] = [];// se crea un array vacio de la interfaz
   paginatedServices: ServiceEntity[] = [];
   page = 1; // Página actual
-  pageSize = 6; // Elementos por página
+  pageSize = 2; // Elementos por página
   collectionSize = 0; // Total de registros
   totalPages = 0;
   currentPage = 1;
@@ -102,7 +103,6 @@ export class ServiceComponent {
     { value: 'Cheque', label: 'Cheque' },
     { value: 'Deposito', label: 'Deposito' }
   ];
-  paymentObjects:PaymentEntity[] = [];
   paymentDateIsValid: boolean = true;
   paymentAmountIsValid: boolean = true;
   paymentMethodIsValid: boolean = true;
@@ -113,7 +113,8 @@ export class ServiceComponent {
   clientEntitiyToGet: string;  //el cliente que queremos buscar su pago, esto tambien puede contener el pago en efectivo
   esPagoCash:string;
 
-  
+  initialServiceFormValues: any;
+  initialPaymentFormValues: any;
 
   constructor(private toast: ToastUtility, private readonly serviceInstance: ServicesInstances, private readonly invoiceInstance: InvoiceInstances,
     private readonly clientInstance: ClientInstances, http: HttpClient, private serviceFrm: FormBuilder, @Inject(LOCALE_ID) private locale: string) {
@@ -131,9 +132,18 @@ export class ServiceComponent {
         clientId: ['', Validators.required],
       }),
       serviceDetail: this.serviceFrm.array([]),
+      invoice:  this.serviceFrm.group({
+        invoiceId: [],
+        invoiceDate: ['1980-12-18'],
+        invoiceNumber: [1],
+        totalAmount: [0],
+        invoiceName: [''],
+        subtotalAmount: [0],
+        payment: this.serviceFrm.array([]),
+      }),
       isExtra: [''] 
     });
-
+    this.initialServiceFormValues = this.serviceForm.value;
 
     this.paymentForm = this.serviceFrm.group({
       invoiceId: [],
@@ -148,6 +158,7 @@ export class ServiceComponent {
       payment: this.serviceFrm.array([]),
       
     });
+    this.initialPaymentFormValues = this.paymentForm.value;
   }
 
   // Method to create a new FormGroup for an item
@@ -167,36 +178,55 @@ export class ServiceComponent {
     return this.serviceForm.get('serviceDetail') as FormArray;
   }
 
-  // Methodo para crear el item pago que pertence al invoice
-  createPaymentItemFormGroup(paymentEnt: PaymentEntity): boolean {
-    let metodoPago = paymentEnt.paymentMethod;
+  createPaymentItemFormGroup(servEnt: ServiceEntity): boolean {
+    let metodoPago = servEnt.invoice.payment[0].paymentMethod; // paymentEnt.paymentMethod;
     if(this.esPagoCash){
       metodoPago = 'Cash';
     }
-    if(metodoPago == undefined || metodoPago == null){
+    if(metodoPago == undefined || metodoPago == null || metodoPago == 'none'){
        this.toast.showToastWarning('Metodo de pago no ha sido seleccionado', 5000);
        return false;
     }
 
-    let convertDate = JSON.parse(JSON.stringify(paymentEnt.paymentDate));
-    let formatedDate = convertDate.year + '-' + convertDate.month + '-' + convertDate.day;
-
     let paymentItem = this.serviceFrm.group({
-      paymentId: [],
-      paymentDate: [formatedDate],
-      paymentAmount: [paymentEnt.paymentAmount],
+      paymentId: [servEnt.invoice.payment[0].paymentId],
+      paymentDate: [servEnt.invoice.payment[0].paymentDate],
+      paymentAmount: [servEnt.price],
       paymentMethod: [metodoPago],
-      taxAmount: [paymentEnt.taxAmount],
+      taxAmount: [servEnt.invoice.payment[0].taxAmount],
       paymentStatus: ['Pagado'],
       isServicePaid: [true]
     });
 
+    this.paymentFormArray.clear();
     this.paymentFormArray.push(paymentItem);
     return true;
   }
 
   get paymentFormArray() {
     return this.paymentForm.get('payment') as FormArray;
+  }
+
+
+
+  // Methodo para crear el item pago que pertence al invoice con valores por default
+  createDefaultPaymentItemFormGroup(formatedDate:any) {
+   let paymentItem = this.serviceFrm.group({
+      paymentId: [],
+      paymentDate: [formatedDate],
+      paymentAmount: [0],
+      paymentMethod: ['none'],
+      taxAmount: [0],
+      paymentStatus: ['Por_Pagar'],
+      isServicePaid: [false]
+    });
+
+    this.defaultPaymentFormArray.clear();
+    this.defaultPaymentFormArray.push(paymentItem);
+  }
+
+  get defaultPaymentFormArray() {
+    return this.serviceForm.get('invoice').get('payment') as FormArray;
   }
 
  
@@ -245,11 +275,14 @@ export class ServiceComponent {
 
 
   ngOnInit() {
-
+    /*this.valueSubscription = this.serviceForm.valueChanges.subscribe(newValue => {
+      console.log('Value changed:', newValue);
+      // Perform actions based on the new value
+    });*/
     this.getallClientsBy(this.clientesFijos);
     this.lastUsedValue = this.clientesFijos;
     this.getAllServicesIntancesBy(this.clientesFijos); // de entrada traemos clientes fijos solamente
-    
+
   }
 
 
@@ -277,9 +310,6 @@ export class ServiceComponent {
 
  
   onRadioChange() {
-    //esto evita tantas llamdas al backend en caso que haga click en los radio botones varias veces a  la vez
-    if((this.lastUsedValue == 'Fijo' || this.lastUsedValue == 'Extra') &&  this.extraValue != 'Eventual') { return }
-    if((this.lastUsedValue == 'Eventual') &&  (this.extraValue != 'Fijo' && this.extraValue != 'Extra') ) { return }
 
    if (this.extraValue == 'Extra') {
       this.isExtraOption = true;
@@ -287,9 +317,12 @@ export class ServiceComponent {
       this.isExtraOption = false;
     }
     
-    
     let cltType = this.extraValue == 'Fijo' || this.extraValue == 'Extra'? 'Fijo':'Eventual'; 
     
+    //esto evita tantas llamdas al backend en caso que haga click en los radio botones varias veces a  la vez
+    if((this.lastUsedValue == 'Fijo' || this.lastUsedValue == 'Extra') &&  this.extraValue != 'Eventual') { return }
+    if((this.lastUsedValue == 'Eventual') &&  (this.extraValue != 'Fijo' && this.extraValue != 'Extra') ) { return }
+
     this.getallClientsBy(cltType);
     this.lastUsedValue = cltType;
   }
@@ -308,27 +341,16 @@ export class ServiceComponent {
   }
   /*FIN METODOS DE PAGINACION*/
 
-  getAllServicesIntances(cleanArray:boolean= false) {
+  getAllServicesIntances() {
     this.isLoading = true;
-    //before filling up the array make sure is clean if anything is there
-    if(cleanArray && this.paymentObjects.length > 0){
-      this.paymentObjects.length = 0;
-    }
-
+   
     this.serviceInstance.getAllServices().subscribe({
       next: (servList) => {
         this.serviceList = servList;
-        
-
-        this.serviceList.forEach((entity: ServiceEntity) => {
-          this.onAddPaymentDetails(entity);
-        });
 
         this.services = this.serviceList;
         this.collectionSize = this.services.length;
         this.paginatedServices = this.services.slice(0, this.pageSize);
-        //console.log(JSON.stringify(this.serviceList))
-        
       },
       error: (error) => {
         console.error(error);
@@ -362,8 +384,6 @@ export class ServiceComponent {
     this.clientInstance.getAllClientsBy(clientType).subscribe({
       next: (clientsList) => {
         this.clientList = clientsList;
-        //this.isLoading = false;
-        //console.log(JSON.stringify(this.clientList))
       },
       error: (error) => {
         console.error(error);
@@ -386,11 +406,12 @@ export class ServiceComponent {
     //go back to consulta tab
     this.recivedTabIndex = 0;
     this.reqTabId = 0;
+    this.activeService = 1;
     
   }
 
   resetFields(){
-    this.serviceForm.reset({ status: 'En Proceso'});
+    this.serviceForm.reset(this.initialServiceFormValues);
     this.itemsFormArray.clear();
     this.serviceDetails.length = 0; //remove from UI
 
@@ -410,14 +431,13 @@ export class ServiceComponent {
   onSubmit(action: string) {
 
     if (this.serviceForm.valid) {
+
       if (this.isRecurrentService) {
-        this.serviceForm.value['status'] = 'Recurrente';
+        this.serviceForm.get('status').setValue('Recurrente');
       }
       this.totalPrice = 0; //reset to zero prior to do final calculation
-      let convertDate = JSON.parse(JSON.stringify(this.serviceForm.controls['serviceDate'].value));
-      let formatedDate = convertDate.year + '-' + convertDate.month + '-' + convertDate.day;
-      this.serviceForm.value['serviceDate'] = formatedDate;
-      this.serviceForm.value['isExtra'] = this.isExtraOption; //this is boolean therefore we change its value here to either true or false according to value in isExtraOption 
+
+      this.serviceForm.get('isExtra').setValue(this.isExtraOption);  //this is boolean therefore we change its value here to either true or false according to value in isExtraOption 
       this.serviceForm.value['serviceDetail'].forEach((item: any) => {
         this.calculateTotal(item.price);
         const mustRemove = item.serviceDetailsId == '' || item.serviceDetailsId == undefined;
@@ -425,8 +445,11 @@ export class ServiceComponent {
           delete item.serviceDetailsId;
         }
       });
-      this.serviceForm.value['price'] = this.totalPrice //contiene la sumatoria del total de la factura
-      
+
+      this.serviceForm.get('price').setValue(this.totalPrice); // totalPrice contiene la sumatoria del total de la factura
+      this.createDefaultPaymentItemFormGroup(this.serviceForm.get('serviceDate').value);
+
+
       if (action == 'Registrar') {
 
         console.log(this.serviceForm);
@@ -468,33 +491,32 @@ export class ServiceComponent {
     }
   }
 
+  onPaymentSubmit(serviceEnt:ServiceEntity) {
 
-  onPaymentSubmit(itemIndex:number, serviceEnt:ServiceEntity) {
-
-    const succesful = this.createPaymentItemFormGroup(this.paymentObjects[itemIndex]);
-    if(!succesful){
+    const succesful = this.createPaymentItemFormGroup(serviceEnt);
+    if(!succesful){ 
+      //console.log('onPaymentSubmit2 - Fallo la creacion del payment object para este invoice')
       return;
     }
+
     this.totalPrice = 0; //reset to zero prior to do final calculation
-    let convertDate = JSON.parse(JSON.stringify(this.paymentObjects[itemIndex].paymentDate));
-    let formatedDate = convertDate.year + '-' + convertDate.month + '-' + convertDate.day;
-    //calculamos valor total, es decir cantidad a pagar + el impuesto
-    this.calculateTotal(this.paymentObjects[itemIndex].paymentAmount? this.paymentObjects[itemIndex].paymentAmount.toString(): '0');
-    this.calculateTotal(this.paymentObjects[itemIndex].taxAmount? this.paymentObjects[itemIndex].taxAmount.toString(): '0');
+    this.calculateTotal(serviceEnt.price? serviceEnt.price.toString(): '0');
+    this.calculateTotal(serviceEnt.invoice.payment[0].taxAmount? serviceEnt.invoice.payment[0].taxAmount.toString(): '0');
     
 
     let invoiceNum = uuidv4();
     this.paymentForm.patchValue({ //puede ser patchValue(para llenado parcial de la forma) en lugar de setValue,
-      invoiceDate: formatedDate,
+      invoiceId: serviceEnt.invoice.invoiceId,
+      invoiceDate: serviceEnt.invoice.payment[0].paymentDate,
       invoiceNumber: invoiceNum,
       totalAmount: this.totalPrice,
       invoiceName: serviceEnt.client.name + '_' + serviceEnt.client.lastName + '_' + invoiceNum + '.pdf',
-      subtotalAmount: this.paymentObjects[itemIndex].paymentAmount,
+      subtotalAmount: serviceEnt.invoice.payment[0].paymentAmount,
       service: {
         serviceId: serviceEnt.serviceId,
         status:'Terminado'
       }
-      //payment: este se llena cuando llamos a this.createPaymentItemFormGroup en la linea 194
+      //payment: este se llena cuando llamos a this.createPaymentItemFormGroup2 en la linea 194
     })
 
     if (this.paymentForm.valid) {
@@ -508,22 +530,20 @@ export class ServiceComponent {
         },
         complete: () => {
           // aqui limpiamos el formulario
-          this.paymentForm.reset()
+          this.paymentForm.reset(this.initialPaymentFormValues);
           this.esPagoCash = undefined;
-          this.getAllServicesIntances(true); //Traemos todas las intances que 
+          this.getAllServicesIntances(); //Traemos todas las intances que 
         }
       });
 
     } else {
-      //console.log(this.serviceForm.valid);
-      //console.log(this.serviceForm);
       this.paymentForm.markAllAsTouched();
       this.toast.showToast('Campos Invalidos, porfavor revise el formulario de Pago!!', 7000, 'x-circle', false);
     }
   }
 
   getMessage(message: number) {
-    console.log('el mensaje ' + message)
+   
     if (message == undefined) { //es undefined en la primera vez que carga, por default ponemos al tab 0 para q se muestre
       message = 0;
       this.recivedTabIndex = 0;
@@ -539,13 +559,18 @@ export class ServiceComponent {
       this.getAllServicesIntancesBy(this.clientesFijos,false);
     }
 
+    if(message == 1){
+      
+      this.onRadioChange();
+    }
+
     if(message == 2){
-      this.getAllServicesIntances(false);
+      this.getAllServicesIntances();
     }
   }
 
   deleteServiceDetail(serviceDTO: ServiceEntity) {
-    throw new Error('Method not implemented.');
+    this.toast.showToast('Hay que implementar este metodo', 7000, 'x-circle', false);
   }
 
   getFormatedDate(dateToformat:any): NgbDateStruct{
@@ -569,19 +594,33 @@ export class ServiceComponent {
 
     this.client = serviceDTO.client;
 
-    
-    let initialDate = this.getFormatedDate(serviceDTO.serviceDate);
+    if (this.client.clientType == 'Fijo') {
+      if(!serviceDTO.isExtra){
+        this.extraValue = this.radioOptions[0];
+      }else{
+        this.extraValue = this.radioOptions[1];
+      }
 
-    this.isRecurrentService = serviceDTO.status == 'Recurrente'?true:false;
+    } else { //Eventual
+      this.extraValue = this.radioOptions[2];
+    }
+    
+    
+    this.getallClientsBy(this.extraValue);
+
+    this.isRecurrentService = serviceDTO.status == 'Recurrente'? true:false;
+
     this.serviceForm = this.serviceFrm.group({
       //campos del servicio
       serviceId: serviceDTO.serviceId,
       serviceName: serviceDTO.serviceName,
-      serviceDate: initialDate,
+      serviceDate: serviceDTO.serviceDate,
       status: serviceDTO.status,
       price: serviceDTO.price,
       client: this.serviceFrm.group({
         clientId: this.client.clientId,
+        //name:this.client.name,
+        //lastName: this.client.lastName
       }),
       serviceDetail: this.serviceFrm.array([]),
     });
@@ -628,35 +667,8 @@ export class ServiceComponent {
     this.serviceDetails.push(servDetail);
   }
 
-  onAddPaymentDetails(entity: ServiceEntity) {
-    
-    let paymentDetail: PaymentEntity = new PaymentEntity()
-    let inv = entity.invoice;
-    let arr =  inv != null && inv != undefined? inv.payment:null;
-    
-    paymentDetail.paymentAmount = Number(entity.price);
-    paymentDetail.paymentMethod;
-    paymentDetail.taxAmount;
-    
-    if(arr && arr.length >= 0){ 
-      paymentDetail.isServicePaid  = arr[0]?.isServicePaid;
-      paymentDetail.paymentStatus =  arr[0]?.paymentStatus;
-      paymentDetail.paymentDate = this.getFormatedDate(new Date(arr[0]?.paymentDate.toString()));
-
-      
-    } else { 
-      paymentDetail.isServicePaid  = false;
-      paymentDetail.paymentStatus = 'Por_Pagar';
-      paymentDetail.paymentDate = this.getFormatedDate(new Date());
-      
-    }
-
-    this.paymentObjects.push(paymentDetail);
-  }
-
   private calculateTotal(itemPrice: string){
     this.totalPrice += parseInt(itemPrice, 10) ;
-    console.log(this.totalPrice)
   }
 
   onDeleteDetails(itemIndex: number) {
@@ -699,11 +711,11 @@ export class ServiceComponent {
       if (!(/^\d+(\.\d+)?$/.test(inputValue))) { //contiene solo numeros
         this.inputLength = 0; //si contiene numeros y letras reseteamos a 0 ya que no prenderemos el boton "agregar detalles" en este caso
       }
-      this.onInputBlur((event.target as HTMLInputElement).name);
+      this.onInputBlur((event.target as HTMLInputElement).name,'');
     }
   }
 
-  onInputBlur(control: string, itemIdx: number = 0) {
+  onInputBlur(control: string, value:any) {
     if (control == 'serviceType') {
       this.serviceTypeIsValid = this.serviceType && this.serviceType.length > 0 ? true : false;
 
@@ -719,49 +731,41 @@ export class ServiceComponent {
     } else if (control == 'unitMeasurement') {
       this.unitMeasurementIsValid = this.unitMeasurement && this.unitMeasurement.length > 0 ? true : false;
 
-    } 
-    /*else if (control == 'paymentDate') {
-      this.paymentDateIsValid = this.paymentObjects[itemIdx].paymentDate? true : false;
-    } 
-    else if (control == 'paymentAmount') {
-      this.paymentAmountIsValid = this.paymentObjects[itemIdx].paymentAmount && !isNaN(this.paymentObjects[itemIdx].paymentAmount)? true : false;
-      console.log(itemIdx);
-      console.log(this.paymentObjects[itemIdx].paymentAmount)
+    } else if (control == 'paymentAmount') {
+      this.paymentAmountIsValid = value && !isNaN(value)? true : false;
+
     } 
     else if (control == 'taxAmount') {
-      this.taxAmountIsValid = this.paymentObjects[itemIdx].taxAmount && !isNaN(this.paymentObjects[itemIdx].taxAmount)? true : false;
+      this.taxAmountIsValid = value && !isNaN(value)? true : false;
+
+    } else if (control == 'paymentMethod') {
+      
+      this.paymentMethodIsValid = value? value =='none'? false: true: false;
     } 
-    else if (control == 'paymentMethod') {
-      this.paymentMethodIsValid = this.paymentObjects[itemIdx].paymentMethod? true : false;
-    } */
     
   }
    
-    onKeyUp(event: KeyboardEvent) {
-      if (event.key === 'Enter') {
-        if ((this.clientEntitiyToGet && this.clientEntitiyToGet.length > 0)) {
-          if(this.clientEntitiyToGet == 'pago cash'.toLocaleLowerCase().trim()){ 
-            this.clientEntitiyToGet = '';
-            this.esPagoCash = 'Cash'
-            return;
-          }
-        }
-  
-      } else if (event.key === 'Backspace' || event.key === 'Delete') {
-  
-        if ((this.clientEntitiyToGet && this.clientEntitiyToGet.length == 0) || !this.clientEntitiyToGet) {
-          
+  onKeyUp(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      if ((this.clientEntitiyToGet && this.clientEntitiyToGet.length > 0)) {
+        if (this.clientEntitiyToGet == 'pago cash'.toLocaleLowerCase().trim()) {
+          this.clientEntitiyToGet = '';
+          this.esPagoCash = 'Cash'
+          return;
         }
       }
 
-       //console.log(this.clientEntitiyToGet )
+    } else if (event.key === 'Backspace' || event.key === 'Delete') {
+
+      if ((this.clientEntitiyToGet && this.clientEntitiyToGet.length == 0) || !this.clientEntitiyToGet) {
+
+      }
     }
+  }
 
-    onNameChange(newValue: string) {
-      this.clientEntitiyToGet = newValue;
-
-      //console.log(this.clientEntitiyToGet )
-    }  
+  onNameChange(newValue: string) {
+    this.clientEntitiyToGet = newValue;
+  }  
 
 
 }

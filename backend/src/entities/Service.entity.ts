@@ -15,7 +15,8 @@ export class EntityService {
     @Column()
     serviceDate: Date;
 
-    @OneToOne(() => EntityInvoice, invoice => invoice.service)
+    @OneToOne(() => EntityInvoice, invoice => invoice.service,{ cascade: true })
+    @JoinColumn({ name: "invoiceId" })
     invoice?: EntityInvoice;
 
     @Column({ type: 'varchar', length: 60 })
