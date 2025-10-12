@@ -8,9 +8,9 @@ import * as fs from 'fs';
 import { ServiceDetailDto } from 'src/dto/ServiceDetail.dto';
 
 enum EmailOptions {
-  subject = "Envío de Factura Martínez",
-  text = "Adjunto al correo encontrará en archivo PDF la Factura correspondiente a su servicio.",
-  html = '<p>Adjunto al correo encontrará en archivo PDF la Factura correspondiente a su servicio.</p>'
+  subject = "Martinez Gardening Invoice",
+  text = "Please find attached the PDF document outlining the service provided. It includes all the relevant details regarding prices and details of each service.",
+  html = '<p>Please find attached the PDF document outlining the service provided. It includes all the relevant details regarding prices and details of each service.</p>'
 }
 
 @Injectable()
@@ -29,39 +29,12 @@ export class EmailService {
         pass: '',     // ⚠️ Contraseña de aplicación
       },
     });
-
-    const mailOptions =
-    {
-      from: 'francisco.usa.227@gmail.com',
-      to: "rejon.yesenia@gmail.com",
-      subject: "Envío de Factura Martínez",
-      text: "Adjunto al correo encontrará en archivo PDF la Factura correspondiente a su servicio.",
-      html: '<p>Adjunto al correo encontrará en archivo PDF la Factura correspondiente a su servicio.</p>',
-      attachments: [
-        {
-          filename: 'FACTURA.pdf',
-          path: path.join(__dirname, '..', 'pdfs', 'FACTURA.pdf'), // Ruta absoluta
-          contentType: 'application/pdf',
-        },
-      ],
-    };
   }
 
   async sendMail(entity: EntityService) {
     var variable: EntityService = plainToInstance(EntityService, entity);
-
-    //var correo = JSON.stringify(entity.client.email);
-    //console.log('CORREOoooooooooooo: '+correo);
-    //let v2= JSON.stringify(entity);
-    //console.log(variable);
-    //console.log(JSON.parse(v2));
-    // Ruta del PDF en el servidor
-    //const filePath3 = path.join(__dirname, '..', 'invoices', 'FACTURA.pdf');
-    //console.log(filePath3);
-    let invoice = entity.invoice?.invoiceName || '';
-    //console.log( JSON.stringify(variable.client.email));
-    //console.log( JSON.stringify(v2));
-    const filePath = path.resolve(process.cwd(), 'src', 'invoices', 'YeseniaRejon-20250824.pdf');
+    
+    const filePath = path.resolve(process.cwd(), 'src', 'invoices'/*,'YeseniaRejon-20250824.pdf'*/);
     //const filePath2 = path.resolve(process.cwd(), 'src', 'invoices', invoice); /*'YeseniaRejon-20250824.pdf');*/
     const info = await this.transporter.sendMail({
       from: 'francisco.usa.227@gmail.com',
@@ -127,8 +100,11 @@ export class EmailService {
     });
 
     // === Encabezado ===
-    page.drawText('INVOICE', {
-      x: margin + 275, y: pageHeight - margin, size: 45, color: rgb(0, 0.6, 0), font: timesRomanBold // verde
+    page.drawText('I', {
+      x: margin + 310, y: pageHeight - margin, size: 45, color: rgb(128 / 255, 128 / 255, 128 / 255),/*rgb(0, 0.6, 0),*/ font: timesRomanBold // verde
+    });
+    page.drawText('NVOICE', {
+      x: margin + 330, y: pageHeight - margin, size: 35, color: rgb(128 / 255, 128 / 255, 128 / 255),/*rgb(0, 0.6, 0),*/ font: timesRomanBold // verde
     });
 
     // Línea verde bajo el título
@@ -300,7 +276,7 @@ export class EmailService {
 
     // === Totales ===
     y -= 50;
-    page.drawText("Subtotal: $" + service.invoice?.subtotalAmount.toFixed(2), { x: 440, y, size: 12, font: timesRoman });
+    page.drawText("Subtotal: $" + service.invoice?.payment[0].paymentAmount.toFixed(2), { x: 440, y, size: 12, font: timesRoman });
     y -= 15;
     page.drawText("Tax:        $" + tax.toFixed(2), { x: 440, y, size: 12, font: timesRoman });
     y -= 15;
