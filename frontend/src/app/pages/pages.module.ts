@@ -12,9 +12,11 @@ import { PaymentComponent } from './payment/payment.component';
 import { ServiceComponent } from './services/service/service.component';
 import { InvoceComponent } from './services/invoce/invoce.component';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { PdfviewerComponent } from './services/pdfviewer/pdfviewer.component';
+import { SafePipePipe } from '@app/@core/pipes/safe-pipe.pipe';
 
 @NgModule({
-  declarations: [CategoryComponent, ToolComponent, ClientComponent, PaymentComponent, ServiceComponent, InvoceComponent],
+  declarations: [CategoryComponent, ToolComponent, ClientComponent, PaymentComponent, ServiceComponent, InvoceComponent, PdfviewerComponent,SafePipePipe],
   imports: [
     CommonModule,
     PagesRoutingModule,

@@ -61,6 +61,14 @@ export class ServicesInstances {
         );
     }
 
+     getAllClosedServicesBy(clientFirst?:string,clientLast?:string,month?:string) {
+        return this.servicesListService.getAllClosedServicesBy(clientFirst,clientLast,month).pipe(
+            map((response) =>
+                response.map((service: any) => plainToInstance(ServiceEntity, service)),
+            ),
+        );
+    }
+
 }
 
 
@@ -75,13 +83,31 @@ class servicesService {
         //.subscribe(data => { console.log(data); });
     }
 
+    getAllClosedServicesBy(clientFirst?:string,clientLast?:string,month?:string) {
+
+        let params = new HttpParams();
+       
+        if(clientFirst != undefined){
+            params = params.set('name', clientFirst);
+        }
+        if(clientLast != undefined){
+            params = params.set('lastName', clientLast);
+        }
+        if(month != undefined){
+            params = params.set('date', month);
+        }
+
+        return this.http.get<any>(serviceUrl + '/closed',{ params: params });
+        //.subscribe(data => { console.log(data); });
+    }
+
     getAllServicesBy(clientType:string,extra?:boolean) {
         let params = new HttpParams();
         params = params.set('typeName', clientType);
         if(extra != undefined){
             params = params.set('extra', extra);
         }
-        console.log('vamos a llamar esto' + clientType)
+        //console.log('vamos a llamar esto' + clientType)
         return this.http.get<any>(serviceUrl + '/type',{ params: params });
         //.subscribe(data => { console.log(data); });
     }

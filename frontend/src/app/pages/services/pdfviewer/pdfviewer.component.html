@@ -1,0 +1,15 @@
+<ng-template #modal>
+
+  <div class="modal-body">
+    <ng-content> </ng-content>
+  </div>
+  <div class="modal-footer">
+    <button type="button"
+            class="btn btn-outline-primary"
+            (click)="close()"
+            *ngIf="modalConfig.hideCloseButton === undefined || !modalConfig.hideCloseButton()"
+            [disabled]="modalConfig.disableCloseButton !== undefined && modalConfig.disableCloseButton()">
+      {{ modalConfig.closeButtonLabel }}
+    </button>
+  </div>
+</ng-template>
