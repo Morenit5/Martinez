@@ -7,7 +7,8 @@ import { ServiceEntity } from '../entities/Service.entity';
 export class EmailService {
   private apiUrl = 'http://localhost:3001/api/v1/mail/send';
   private apiUrl2 = 'http://localhost:3001/api/v1/mail/download';
-
+  private apiUrl3 = 'http://localhost:3001/api/v1/mail/invoice';
+  
   constructor(private http: HttpClient) {}
 
   sendEmail(service: ServiceEntity): Observable<any> {
@@ -25,5 +26,21 @@ export class EmailService {
         return variable;
         
   }
+
+  async getInvoiceByClient(invoiceName: string): Promise<Observable<any>> {
+    let myparams = new HttpParams();
+    myparams = myparams.append('name', invoiceName);
+    
+    let variable = this.http.get(this.apiUrl3, {
+      responseType: 'blob', // Important: Set responseType to 'blob'
+      params: myparams,
+      headers: {
+        'Accept': 'application/pdf'
+      }
+    });
+    return variable;
+
+  }
+
 
 }

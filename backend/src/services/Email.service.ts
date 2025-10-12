@@ -85,6 +85,10 @@ export class EmailService {
     return 'Hello World!';
   }
 
+  getClientInvoice(fileName: string) {
+    const filePath = path.join(__dirname, '..', 'invoices', fileName); // Or any other desired directory
+    return fs.promises.readFile(filePath);
+  }
 
 
   async generateInvoice(service: EntityService) {

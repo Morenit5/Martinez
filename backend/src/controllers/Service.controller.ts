@@ -18,11 +18,19 @@ export class  ControllerService {
 
   @Get('/type')
   findAllBy(@Query('typeName') itemName: string,@Query('extra') isExtra?: string): Promise<ServiceDto[]> {
-    console.log('llegamos en el contorller  con valores ' + itemName + ' isExtra => ' + isExtra );
+    //console.log('llegamos en el contorller  con valores ' + itemName + ' isExtra => ' + isExtra );
     let val:string;
     if(isExtra == undefined){val = 'false' } else { val = isExtra == 'true'? 'true': 'false' }
-    console.log(val);
+    //console.log(val);
     return this.serviceService.findAllBy(itemName,val);
+  }
+
+  @Get('/closed')
+  findAllClosedBy(@Query('name') name?: string,@Query('lastName') lastName?: string,@Query('date') date?: string): Promise<ServiceDto[]> {
+    console.log('llegamos en el contorller  con valores Name ' + name + " Last " + lastName + ' date ' + date );
+  
+    
+    return this.serviceService.findAllClosed(name,lastName,date);
   }
 
   @Get(':id')

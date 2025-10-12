@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
+import { Between, Not, Repository } from 'typeorm';
 import { EntityService } from '../entities/Service.entity';
 import { CreateServiceDto, ServiceDto, UpdateServiceDto } from '../dto/Service.dto';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
@@ -60,6 +60,90 @@ export class ServiceService {
     });
 
     return services;
+  }
+
+  async findAllClosed(first?: string, last?: string, month?: string): Promise<ServiceDto[]> {
+    var services: ServiceDto[];
+    const currentYear  = new Date().getFullYear();
+    let months: string[] = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'] 
+    
+
+    if (!first && !last && !month) {
+      services = await this.serviceRepository.find({
+        relations: {
+          client: true,
+          serviceDetail: true,
+          invoice: {
+            payment: true,
+          }
+        },
+        where: [{
+          enabled: true,
+          status: 'Cerrado',
+        }],
+      }).then((result: any) => {
+        return result; // tal vez debamos manipular estos datos antes de mandar al front
+      }).catch((error: any) => {
+        this.exceptions.sendException(error);
+      });
+
+    } else {
+
+      let whereClause: { enabled: boolean, client?: { name?: string, lastName?:string }, invoice?: { invoiceDate?:any, }}[] = [];
+      if(first && !last && !month) { 
+        whereClause.push({
+          enabled: true,
+          client: {
+            name: 'Fijo',
+          }
+        })
+      } else if(last && !first && !month){
+        whereClause.push({
+          enabled: true,
+          client: {
+            lastName:''
+          },
+        })
+      }
+      else if(first && last && !month){
+        whereClause.push({
+          enabled: true,
+          client: {
+            name: 'Fijo',
+            lastName:''
+          }
+        })
+      }
+      else if(month && !first && !last){
+        const startDate = new Date(currentYear.toString() + '-' + months.indexOf(month).toString + '-01');
+        const endDate = new Date(currentYear.toString() + '-' + months.indexOf(month).toString + '-31');
+        whereClause.push({
+          enabled: true,
+          invoice: {
+            invoiceDate:  Between(startDate, endDate),
+          }
+        })
+        
+      }
+
+      services = await this.serviceRepository.find({
+        relations: {
+          client: true,
+          serviceDetail: true,
+          invoice: {
+            payment: true,
+          }
+        },
+        where: whereClause,
+      }).then((result: any) => {
+        return result; // tal vez debamos manipular estos datos antes de mandar al front
+      }).catch((error: any) => {
+        this.exceptions.sendException(error);
+      });
+    }
+
+    return services;
+
   }
 
   //buscamos todos los servicios para el tipo de cliente solicitado ==> eventual. fijo

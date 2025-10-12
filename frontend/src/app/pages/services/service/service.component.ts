@@ -115,6 +115,10 @@ export class ServiceComponent {
 
   initialServiceFormValues: any;
   initialPaymentFormValues: any;
+  initialInvoiceUpdateValues: any;
+
+  //Forms para actualizacion de la factura (Generar Y Mandar)
+  invoiceUpdateform:FormGroup; 
 
   constructor(private toast: ToastUtility, private readonly serviceInstance: ServicesInstances, private readonly invoiceInstance: InvoiceInstances,
     private readonly clientInstance: ClientInstances, http: HttpClient, private serviceFrm: FormBuilder, @Inject(LOCALE_ID) private locale: string) {
@@ -159,11 +163,33 @@ export class ServiceComponent {
       
     });
     this.initialPaymentFormValues = this.paymentForm.value;
+
+
+    this.invoiceUpdateform = this.serviceFrm.group({
+      serviceId: [null,Validators.required],
+      status: [''], //valor debe ser T e r m i n a d o
+      //invoice: este lo llamamos en  
+    });
+    this.initialInvoiceUpdateValues = this.invoiceUpdateform.value;
+  }
+
+  // add the invoice group
+  addInvoiceGroup() {
+    const serviceGroup = this.serviceFrm.group({
+        invoiceId: [null,Validators.required],
+        isGenerated:[true]
+    });
+
+    this.invoiceUpdateform.setControl('invoice', serviceGroup);
+  }
+
+  //remove the invoice group
+  removeInvoiceGroup() {
+    this.invoiceUpdateform.removeControl('invoice');
   }
 
   // Method to create a new FormGroup for an item
   createItemFormGroup(servDetail: ServiceDetailEntity): FormGroup {
-
     return this.serviceFrm.group({
       serviceDetailsId: [],
       serviceType: [servDetail.serviceType],
@@ -231,17 +257,86 @@ export class ServiceComponent {
 
  
   async generateInvoice(service: ServiceEntity) {
+    //Al “Generar Factura” necesitamos actualizar ==> entity_service, entity_invoice con los siguientes valores:
+    //entitiy_service >> Status = T e r m i n a d o
+    //entity_invoice >> isGenerated = True
+
+    let pdfBlob:any;
     (await this.emailService.generateInvoice(service)).subscribe({
-      next: (resp) =>{
-         this.toast.showToast('Factura generada correctamente ', 5000, 'check2-square', true)
-        this.generarPdf(resp);
-        }, 
-         error: (err) => {
+      next: (resp) => {
+        //this.toast.showToast('Factura generada correctamente ', 5000, 'check2-square', true)
+        //this.generarPdf(resp);
+        pdfBlob = resp;
+      },
+      error: (err) => {
         console.error(err);
         this.toast.showToast('Factura no generada', 5000, 'check2-square', true);
-      }
+      },
+      complete: () => this.onInvoiceGenerationComplete(service,pdfBlob),
     });
 
+  }
+
+  onInvoiceGenerationComplete(service: ServiceEntity, pdfBlob:any): void {
+    this.updateGenerateInvoiceStatus(service, pdfBlob)
+  }
+
+  private updateGenerateInvoiceStatus(service: ServiceEntity, pdfBlob:any) {
+  
+    this.addInvoiceGroup();
+  
+    this.invoiceUpdateform.patchValue({ //puede ser patchValue(para llenado parcial de la forma) en lugar de setValue,
+      serviceId: service.serviceId,
+      status:'Terminado',
+      invoice: {
+        invoiceId: service.invoice.invoiceId,
+        isGenerated: true
+      }
+    })
+
+    if (this.invoiceUpdateform.valid) {
+      this.serviceInstance.addService(this.invoiceUpdateform.value).subscribe({  
+        next: (response) => { },
+        error: (err) => {
+          console.log(err);
+          this.toast.showToast('Error al generar la Factura!!', 7000, 'x-circle', false);
+        },
+        complete: () => {
+          this.toast.showToast('Factura generada correctamente ', 5000, 'check2-square', true)
+          this.invoiceUpdateform.reset(this.initialInvoiceUpdateValues);
+          this.getAllServicesIntances(); //Traemos todas las intances  
+          this.generarPdf(pdfBlob);
+        }
+      });
+
+    } else {
+      this.invoiceUpdateform.markAllAsTouched();
+      this.toast.showToast('Error al generar el fomulario de Factura !!', 7000, 'x-circle', false);
+    }
+  }
+
+  updateSendMailAndCloseStatus(service: ServiceEntity) {
+
+    this.invoiceUpdateform.patchValue({ //puede ser patchValue(para llenado parcial de la forma) en lugar de setValue,
+      serviceId: service.serviceId,
+      status: 'Cerrado',
+    })
+
+    if (this.invoiceUpdateform.valid) {
+      this.serviceInstance.addService(this.invoiceUpdateform.value).subscribe({
+        next: (response) => { },
+        error: (err) => {
+          console.log(err);
+          this.toast.showToast('Error al enviar el correo!!', 7000, 'x-circle', false);
+        },
+        complete: () => this.sendEmail(service)
+        
+      });
+
+    } else {
+      this.invoiceUpdateform.markAllAsTouched();
+      this.toast.showToast('Error al generar el fomulario para enviar el correo !!', 7000, 'x-circle', false);
+    }
   }
 
   async generarPdf(pdfBytes) {
@@ -251,10 +346,13 @@ export class ServiceComponent {
     this.pdfUrl = URL.createObjectURL(blob);
 
     // Descargar automáticamente
-    const link = document.createElement('a');
-    link.href = this.pdfUrl;
-    link.download = `Invoice.pdf`;
-    link.click();
+    const a = document.createElement('a');
+    a.href = this.pdfUrl;
+    a.download;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(this.pdfUrl);
   }
 
   sendEmail(ServiceDto: ServiceEntity) {
@@ -265,11 +363,17 @@ export class ServiceComponent {
     //verificamos el cliente-servicio seleccionado
 
     this.emailService.sendEmail(ServiceDto).subscribe({
-      next: () => this.toast.showToast('Correo enviado correctamente ', 5000, 'check2-square', true),
+      next: () => {},
       error: (err) => {
         console.error(err);
-        this.toast.showToast('Correo enviado correctamente ', 5000, 'check2-square', true);
-      }
+        this.toast.showToast('Error al enviar el correo ', 5000, 'check2-square', true);
+      },
+      complete: () => {
+          this.toast.showToast('Correo Enviado ', 5000, 'check2-square', true)
+          this.invoiceUpdateform.reset(this.initialInvoiceUpdateValues);
+          this.getAllServicesIntances(); //Traemos todas las intances  
+          
+        }
     });
   }
 
@@ -514,7 +618,6 @@ export class ServiceComponent {
       subtotalAmount: serviceEnt.invoice.payment[0].paymentAmount,
       service: {
         serviceId: serviceEnt.serviceId,
-        status:'Terminado'
       }
       //payment: este se llena cuando llamos a this.createPaymentItemFormGroup2 en la linea 194
     })
@@ -769,3 +872,4 @@ export class ServiceComponent {
 
 
 }
+

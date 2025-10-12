@@ -48,7 +48,7 @@
                   </td>
                   <td>{{ parentItem.serviceDate | date:'yyyy-MM-dd' }}</td>
                   <td
-                    [ngClass]="{'table-success': parentItem.status.toLowerCase() === 'terminado', 'table-progress': parentItem.status.toLowerCase() === 'en proceso', 'table-recurrent': parentItem.status.toLowerCase() === 'recurrente'}">
+                    [ngClass]="{'table-success': parentItem.status.toLowerCase() == 'terminado', 'table-progress': parentItem.status.toLowerCase() == 'en proceso', 'table-recurrent': parentItem.status.toLowerCase() == 'recurrente'}">
                     {{ parentItem.status }}</td>
                   <td>
 
@@ -347,7 +347,7 @@
 
                       <button *ngIf="!parentItem.invoice?.payment[0].isServicePaid" class="btn btn-sm btn-outline-success" (click)="onPaymentSubmit(parentItem)" ngbTooltip="Confirmar Pago"><i class="bi bi-currency-dollar"></i></button>
                       <button *ngIf="parentItem.invoice?.payment[0].isServicePaid && !parentItem.invoice?.isGenerated" class="btn btn-sm btn-outline-primary" (click)="generateInvoice(parentItem)" ngbTooltip="Generar Factura"><i class="bi bi-receipt-cutoff"></i></button>
-                      <button *ngIf="parentItem.invoice?.payment[0].isServicePaid && parentItem.invoice?.isGenerated" class="btn btn-sm btn-outline-info" (click)="sendEmail(parentItem)" ngbTooltip="Enviar Correo y Cerrar Servicio"><i class="bi bi-envelope-at"></i></button>
+                      <button *ngIf="parentItem.invoice?.payment[0].isServicePaid && parentItem.invoice?.isGenerated" class="btn btn-sm btn-outline-info" (click)="updateSendMailAndCloseStatus(parentItem)" ngbTooltip="Enviar Correo y Cerrar Servicio"><i class="bi bi-envelope-at"></i></button>
 
                     </div>    
                   </td>
