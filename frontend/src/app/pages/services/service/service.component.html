@@ -20,7 +20,8 @@
 
 
       <div class="table-responsive"> <!--Navigation Menu-->
-        <input type="text" class="form-control" placeholder="Buscar por nombre">
+        <input type="text" class="form-control" placeholder="Buscar por Servicio" (keyup)="onSearchServiceKeyUp($event)" [(ngModel)]="serviceEntitiyToGet">
+         
         <div class="table-responsive">
           <table class="table table-bordered table-striped">
             <thead>

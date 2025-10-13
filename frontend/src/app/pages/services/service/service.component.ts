@@ -111,6 +111,7 @@ export class ServiceComponent {
   
   //search bar para pagos
   clientEntitiyToGet: string;  //el cliente que queremos buscar su pago, esto tambien puede contener el pago en efectivo
+  originalClientServicesValues: ServiceEntity[] = [];  //para detener valores originales cuando se hace una busqueda en el tab de pagos
   esPagoCash:string;
 
   initialServiceFormValues: any;
@@ -119,6 +120,10 @@ export class ServiceComponent {
 
   //Forms para actualizacion de la factura (Generar Y Mandar)
   invoiceUpdateform:FormGroup; 
+
+  //para buscar por services 
+  originalValues: ServiceEntity[] = [];  //para detener valores originales cuando se hace una busqueda en el tab de Consulta
+  serviceEntitiyToGet: any;
 
   constructor(private toast: ToastUtility, private readonly serviceInstance: ServicesInstances, private readonly invoiceInstance: InvoiceInstances,
     private readonly clientInstance: ClientInstances, http: HttpClient, private serviceFrm: FormBuilder, @Inject(LOCALE_ID) private locale: string) {
@@ -445,11 +450,16 @@ export class ServiceComponent {
   }
   /*FIN METODOS DE PAGINACION*/
 
+  /**
+   * Metodo Usado para el tab de Pagos
+   * es decir getAllServices() funciona con todo lo relacionado a pagos
+   */
   getAllServicesIntances() {
     this.isLoading = true;
    
     this.serviceInstance.getAllServices().subscribe({
       next: (servList) => {
+        this.originalClientServicesValues = servList;
         this.serviceList = servList;
 
         this.services = this.serviceList;
@@ -465,11 +475,16 @@ export class ServiceComponent {
     });
   }
 
+  /**
+   * Metodo Usado para el tab de Pagos
+   * es decir getAllServicesBy() funciona con todo lo relacionado a Consulta
+   */
   getAllServicesIntancesBy(clientType: string, extra?: boolean) {
     this.serviceList = null;
 
     this.serviceInstance.getAllServicesBy(clientType, extra).subscribe({
       next: (servList) => {
+        this.originalValues = servList;
         this.serviceList = servList;
         //this.isLoading = false;
 
@@ -658,16 +673,16 @@ export class ServiceComponent {
 
     //debemos ver si esto ya esta cargado tal vez usar un metodo para cache values
     //y no ir tantas veces a la backend
-    if(message == 0){
+    if(message == 0){  //Consulta
       this.getAllServicesIntancesBy(this.clientesFijos,false);
     }
 
-    if(message == 1){
+    if(message == 1){  // Crear Servicio
       
       this.onRadioChange();
     }
-
-    if(message == 2){
+ 
+    if(message == 2){  //Pagos
       this.getAllServicesIntances();
     }
   }
@@ -850,25 +865,111 @@ export class ServiceComponent {
    
   onKeyUp(event: KeyboardEvent) {
     if (event.key === 'Enter') {
-      if ((this.clientEntitiyToGet && this.clientEntitiyToGet.length > 0)) {
-        if (this.clientEntitiyToGet == 'pago cash'.toLocaleLowerCase().trim()) {
-          this.clientEntitiyToGet = '';
-          this.esPagoCash = 'Cash'
-          return;
+      if (this.clientEntitiyToGet == undefined || this.clientEntitiyToGet.length <= 0) { return; }
+
+
+      if (this.clientEntitiyToGet == 'pago cash'.toLocaleLowerCase().trim()) { //este es para ocultar pagos en efectivo
+        this.clientEntitiyToGet = '';
+        this.esPagoCash = 'Cash'
+        return;
+      } else {
+        // de lo contrario hacemos busqueda requerida
+
+        //console.log(this.originalValues)
+
+        let listEntities: ServiceEntity[];
+
+        listEntities = this.pagosFindByCientService();
+
+        if (listEntities.length !== 0) {
+
+          this.serviceList = listEntities;
+          this.collectionSize = this.serviceList.length;
+          this.paginatedServices = this.serviceList.slice(0, this.pageSize);
+
+        } else {
+          this.toast.showToastWarning('No se econtraron Pagos para ese nombre o servicio', 5000, 'x-circle');
         }
+
       }
+
 
     } else if (event.key === 'Backspace' || event.key === 'Delete') {
 
       if ((this.clientEntitiyToGet && this.clientEntitiyToGet.length == 0) || !this.clientEntitiyToGet) {
+        if (this.originalValues && this.originalValues.length !== 0) {
+
+          this.serviceList = this.originalValues;
+          this.collectionSize = this.serviceList.length;
+          this.paginatedServices = this.serviceList.slice(0, this.pageSize);
+        }
+
+      }
+
+    }
+  }
+
+   onNameChange(newValue: string) {
+    this.clientEntitiyToGet = newValue;
+  }
+
+  onSearchServiceKeyUp(event: KeyboardEvent) {
+    //console.log('entramos')
+    if (event.key === 'Enter') {
+      if (this.serviceEntitiyToGet == undefined || this.serviceEntitiyToGet.length <= 0) { return; }
+      //console.log(this.originalValues)
+
+      let listEntities: ServiceEntity[];
+
+      listEntities = this.findByService();
+
+      if (listEntities.length !== 0) {
+
+        this.serviceList = listEntities;
+        this.collectionSize = this.serviceList.length;
+        this.paginatedServices = this.serviceList.slice(0, this.pageSize);
+
+      } else {
+        this.toast.showToastWarning('No se econtraron servicios con ese nombre', 5000, 'x-circle');
+      }
+
+    } else if (event.key === 'Backspace' || event.key === 'Delete') {
+
+
+      if ((this.serviceEntitiyToGet && this.serviceEntitiyToGet.length == 0) || !this.serviceEntitiyToGet) {
+        if (this.originalValues && this.originalValues.length !== 0) {
+
+          this.serviceList = this.originalValues;
+          this.collectionSize = this.serviceList.length;
+          this.paginatedServices = this.serviceList.slice(0, this.pageSize);
+        }
 
       }
     }
   }
 
-  onNameChange(newValue: string) {
-    this.clientEntitiyToGet = newValue;
-  }  
+  findByService(): ServiceEntity[] {
+
+    let searchResults: ServiceEntity[] = this.originalValues.filter(item => item.serviceName.includes(this.serviceEntitiyToGet));
+
+    //si no encontramos nada atraves de nombre buscamos atraves de nombre
+    if (searchResults.length <= 0) {
+      searchResults = this.originalValues.filter(item => item.client.name.includes(this.serviceEntitiyToGet));
+    }
+    return searchResults;
+  }
+
+  pagosFindByCientService(): ServiceEntity[] {
+
+    //buscamos primero por cliente de lo contrario nos movemos a buscar por services
+    let searchResults: ServiceEntity[] = this.originalClientServicesValues.filter(item => item.client.name.includes(this.clientEntitiyToGet)); 
+
+    //si no encontramos nada atraves de nombre buscamos atraves de nombre
+    if (searchResults.length <= 0) {
+      searchResults = this.originalClientServicesValues.filter(item => item.serviceName.includes(this.clientEntitiyToGet));
+    }
+    return searchResults;
+  }
 
 
 }

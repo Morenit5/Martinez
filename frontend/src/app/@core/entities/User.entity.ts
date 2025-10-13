@@ -1,3 +1,4 @@
+import { SafeUrl } from "@angular/platform-browser";
 
 export class UserEntity {
 
@@ -24,6 +25,8 @@ export class UserEntity {
   avatar: string;
   
   enabled: boolean;
+  
+  imgBlob: SafeUrl;
   
   get fullName(): string {
     return `${this.firstname} ${this.lastname}`;

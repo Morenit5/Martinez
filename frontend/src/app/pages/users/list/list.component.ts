@@ -18,7 +18,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 export class ListComponent implements OnInit {
 
   users: RandomUserEntity[] = [];
-  users1: UserEntity[] = [];
+  
   originalValues: UserEntity[] = []; //para guardar temporalmente valores originales
   userEntitiyToGet: string;  //el usuario que queremos buscar
 
@@ -35,24 +35,35 @@ export class ListComponent implements OnInit {
   isLoading = true;
   avatarImg;
 
+  /*Paginacion*/
+  usersList: UserEntity[] = [];// se crea un array vacio de la interfaz
+  paginatedUsersList: UserEntity[] = [];
+  page = 1; // Página actual
+  pageSize = 2; // Elementos por página
+  collectionSize = 0; // Total de registros
+  currentPage = 1;
+  /*Paginacion*/
+
   private readonly _useRandomUser = new UseRandomUser();
   fileNotFound: boolean = false; //assume we do find the correct avatar image
  
+  initialUsersFormValues:any;
 
-  constructor(private fmBldUsers: FormBuilder, private toast: ToastUtility, private readonly userInstances:UsersInstances,private readonly rolesList: RolesInstances,private sanitizer: DomSanitizer) {  
+  constructor(private fmBldUsers: FormBuilder, private toast: ToastUtility, private readonly userInstances: UsersInstances, private readonly rolesList: RolesInstances, private sanitizer: DomSanitizer) {
 
     this.usersForm = this.fmBldUsers.group({
-        userId: [],
-        username: ['', Validators.required],
-        firstname: [''],
-        lastname: [''],
-        email: ['',[Validators.required,Validators.email]],
-        password: ['', [Validators.required]],
-        rol: [RolEntity,Validators.required],
-        phone: []
-      });
+      userId: [],
+      username: ['', Validators.required],
+      firstname: [''],
+      lastname: [''],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]],
+      rol: [RolEntity, Validators.required],
+      phone: []
+    });
+    this.initialUsersFormValues = this.usersForm.value;
 
-      this.getAllUserInstances();
+    this.getAllUserInstances();
 
       
   }
@@ -63,25 +74,33 @@ export class ListComponent implements OnInit {
 
   onKeyUp(event: KeyboardEvent) {
     if (event.key === 'Enter') {
-      const searchResults: UserEntity[] = this.users1.filter(item => item.firstname.includes(this.userEntitiyToGet)); // || item.email.includes(this.userEntitiyToGet));
+      if(this.userEntitiyToGet == undefined || this.userEntitiyToGet.length <= 0){return;}
+
+
+      const searchResults: UserEntity[] = this.usersList.filter(item => item.firstname.includes(this.userEntitiyToGet)); // || item.email.includes(this.userEntitiyToGet));
 
       if (searchResults.length !== 0) {
-        if (this.originalValues && this.originalValues.length == 0) {
-          this.originalValues = this.deepCopy(this.users1); //salvamos temporalmente valores
-        }
-        this.users1.length = 0; //limpiamos el array y ponemos los nuevos datos
-        this.users1 = searchResults;
+        
+        //this.usersList.length = 0; //limpiamos el array y ponemos los nuevos datos
+        this.usersList = searchResults;
+        this.updatePaginatedData();
+
       } else {
         this.toast.showToastWarning('El Usuario ' + this.userEntitiyToGet + ' no existe!', 7000, 'x-circle');
       }
 
     } else if (event.key === 'Backspace' || event.key === 'Delete') {
-
+      
+      
       if ((this.userEntitiyToGet && this.userEntitiyToGet.length == 0) || !this.userEntitiyToGet) {
+        
         if (this.originalValues && this.originalValues.length !== 0) {
-          this.users1.length = 0; //limpiamos el array y ponemos los nuevos datos
-          this.users1 = this.originalValues;
+          //this.usersList.length = 0; //limpiamos el array y ponemos los nuevos datos
+          console.log('Valores originales ' + this.originalValues);
+          this.usersList = this.originalValues;
         }
+
+        this.updatePaginatedData();
       }
     }
   }
@@ -188,7 +207,7 @@ export class ListComponent implements OnInit {
     }
     this.usersForm.get('password').setValidators(Validators.required); 
     this.usersForm.get('password').updateValueAndValidity();
-    this.usersForm.reset();
+    this.usersForm.reset(this.initialUsersFormValues);
   }
 
   onSubmit(action: string) {
@@ -209,8 +228,17 @@ export class ListComponent implements OnInit {
             this.toast.showToast('Usuario registrado exitosamente!!', 7000, 'check2-circle', true);
           },
           error: (err) => {
-            console.log(err);
-            this.toast.showToast('Error al registar al Usuario!!', 7000, 'x-circle', false);
+           
+            let errorMessage = JSON.stringify(err.error.error); 
+           
+            if(errorMessage.includes('duplicate key value violates unique constraint')){
+              this.toast.showToast( 'El usuario ya existe, porfavor revisa usuario y correo electronico', 5000, 'x-circle', false);
+             
+            } else {
+              this.toast.showToast( errorMessage, 7000, 'x-circle', false);
+            }
+           
+
           },
           complete: () => {
             this.onCancel();
@@ -260,40 +288,45 @@ export class ListComponent implements OnInit {
 
     this.userInstances.getAllUsers().subscribe({
       next: async (usersL) => {
-        this.users1 = usersL;
-        this.isLoading = false;
-        let imgName;
-        let objectURL;
-        for (const usr of this.users1) {
-          this.avatarImg = null;
-
-          if (usr.avatar == null || usr.avatar == undefined) {
-            imgName = 'placeholder.png';
-          } else {
-            imgName = usr.avatar 
-          }
-
-          this.getUserAvatarImage(imgName).subscribe({
-            next: (imageBlob) => {
-              objectURL = URL.createObjectURL(imageBlob);
-            },
-            complete: () => {
-              // This code runs when the Observable completes
-              //this.avatarImg = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-            }
-          });
-
-          await this.sleep(2000); 
-
-        }
+        this.originalValues = usersL;
         
+        this.isLoading = false;
+
+        this.usersList = usersL;
+        this.collectionSize = this.usersList.length;
+        this.paginatedUsersList = this.usersList.slice(0, this.pageSize);
       },
       error: (error) => {
         console.error(error);
       },
+      complete: () => {
+        this.getCurrentPageAvatars();
+      }
     });
   }
 
+  getCurrentPageAvatars() {
+
+    for (const usr of this.paginatedUsersList) {
+      let x = this.getUserAvatarImage(usr.avatar).subscribe({
+        next: (imageBlob) => {
+          usr.imgBlob = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(imageBlob));
+        },
+      });
+    }
+  }
+
+
+  getUserAvatarImage(avatarName: string) {
+    let result;
+    try {
+      result = this.userInstances.getUserAvatar(avatarName);
+
+    } catch (error) {
+      console.log(error);
+    }
+    return result;
+  }
 
   onFileSelected(event, userInstance: any) {
 
@@ -318,19 +351,11 @@ export class ListComponent implements OnInit {
       this.getAllUserInstances();
 
     }
+
+
   }
     
-  
-  getUserAvatarImage(avatarName:string) {
-    let result;
-    try {
-     result = this.userInstances.getUserAvatar(avatarName);
-   
-  } catch (error) {
-    console.log(error);
-  }
-    return result;
-  }
+
 
   compareObjects(obj1: any, obj2: any): boolean {
       return obj1 && obj2 ? obj1.rolId === obj2.rolId : obj1 === obj2;
@@ -355,5 +380,21 @@ export class ListComponent implements OnInit {
     }
     return copiedObj as T;
   }
+
+   /*METODOS PAGINACION*/
+  private updatePaginatedData(): void {
+    const startIndex = (this.page - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.paginatedUsersList = this.usersList.slice(startIndex, endIndex);
+    this.getCurrentPageAvatars();
+  }
+
+  onPageChange(newPage: number): void {
+    //console.log('AQUI ENTRA');
+    this.page = newPage;
+    console.log(this.page);
+    this.updatePaginatedData();
+  }
+  /*FIN METODOS DE PAGINACION*/
 
 }

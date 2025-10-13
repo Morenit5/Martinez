@@ -6,7 +6,7 @@ export class EntityUser {
   @PrimaryGeneratedColumn()
   userId: number;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 100, unique:true })
   username: string;
 
   @Column({ type: 'varchar', length: 50 })
@@ -28,7 +28,7 @@ export class EntityUser {
   @Column({ unique: true, nullable:true }) //para que el correo no se repita en la bd
   phone?: string;
 
-  @Column({ type: 'varchar', nullable:true}) //para que el correo no se repita en la bd
+  @Column({ type: 'varchar', nullable:true, default:'placeholder.png'}) //para que el correo no se repita en la bd
   avatar: string;
 
   @Column({ type: 'boolean', default: true })
