@@ -20,14 +20,14 @@ if (colMenuElement) {
         const value = colMenuElement.value;
         console.log(value);
     } else {
-        console.error('Element with ID "myInputElementId" not found.');
+        //console.error('Element with ID "myInputElementId" not found.');
     }
 
     if (colContentElement) {
         const value = colContentElement.value;
         console.log(value);
     } else {
-        console.error('Element with ID "myInputElementId" not found.');
+       // console.error('Element with ID "myInputElementId" not found.');
     }
 
   }

@@ -17,12 +17,12 @@
           </thead>
           <tbody>
             @if (!isLoading) {
-            @for (user of users1; track user.email) {
+            @for (user of paginatedUsersList; track user.email) {
             <tr >
               <td style="text-align:center;">
                 <input type="file" (change)="onFileSelected($event,user)" #fileInput accept="image/png" name="thumbnail" >
-                <button class="btn btn-sm " (click)="fileInput.click()">
-                  <img [src]="avatarImg" (error)="onImgError($event)" />
+                <button class="btn btn-sm " ngbTooltip="Actualizar Avatar" (click)="fileInput.click()">
+                  <img [src]="user.imgBlob" (error)="onImgError($event)" />
                 </button>
               </td>
               <td>
@@ -31,9 +31,9 @@
               <td>{{ user.email }}</td>
               <td>{{ user.phone }}</td>
               <td style="width: 8%; text-align: center; ">
-                <button class="btn btn-sm btn-outline-info" (click)="updateUser(user)"><i class="bi bi-pencil-fill"></i>
+                <button class="btn btn-sm btn-outline-info" (click)="updateUser(user)" ngbTooltip="Actualizar Usuario"><i class="bi bi-pencil-fill"></i>
                 </button>
-                <button  class="btn btn-sm btn-outline-danger" (click)="deleteUser(user)"><i class="bi bi-trash-fill"></i>
+                <button  class="btn btn-sm btn-outline-danger" (click)="deleteUser(user)" ngbTooltip="Eliminar Usuario"><i class="bi bi-trash-fill"></i>
                 </button></td>
             </tr>
             }
@@ -45,6 +45,11 @@
           </tbody>
         </table>
       </div>
+      <!-- Paginación -->
+      <ngb-pagination class="d-flex justify-content-center"  [collectionSize]="usersList.length"  [(page)]="page" [pageSize]="pageSize" (pageChange)="onPageChange($event)"
+                      [boundaryLinks]="true" [maxSize]="5" *ngIf="usersList.length > pageSize">
+      </ngb-pagination>
+        <!--Fin Paginacion-->
     </div><!--Fin container mt-4-->
   </div>
   <!--**************************Seccion de  Registro****************************-->
