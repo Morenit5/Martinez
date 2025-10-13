@@ -1,11 +1,11 @@
 <div>
-  <tabs [tabItems]="['Consulta', 'Registro']" [tabIcons]="['folder', 'plus-circle']" (tabIndex)="getMessage($event)">
+  <tabs [tabItems]="['Consulta', 'Registro']" [tabIcons]="['folder', 'plus-circle']" [requiredTabId]=reqTabId (tabIndex)="getMessage($event)">
   </tabs>
   <div *ngIf="recivedTabIndex==0" class="containerTool">
     <div class="container mt-4">
       <h3 class="mb-4">Herramientas</h3>
       <div class="table-responsive">
-        <input type="text" class="form-control" placeholder="Buscar por Herramienta"><!--[(ngModel)]="filterResults"-->
+        <input type="text" class="form-control" placeholder="Buscar por Herramienta" (keyup)="onKeyUp($event)" [(ngModel)]="toolEntitiyToGet"><!--[(ngModel)]="filterResults"-->
         <table class="table table-bordered table-hover table-striped">
           <thead class="table-bordered">
             <tr>
@@ -13,6 +13,7 @@
               <th>Nombre</th>
               <!--<th>Imagen</th>-->
               <th>Estatus</th>
+              <th>Precio</th>
               <!--<th>Estado de Herramienta</th>
               <th>Fecha Adquisición</th>
               <th>Categoria</th>-->
@@ -31,8 +32,8 @@
                 </td>
                 <!--<td>{{ tool.image }}</td>-->
                 <td>{{ tool.status }}</td>
-                <!--<td>{{ tool.price }}</td>
-                <td>{{ tool.toolState }}</td>
+                <td>{{ tool.price }}</td>
+                <!--<td>{{ tool.toolState }}</td>
               <td>{{ tool.acquisitionDate | date: 'shortDate' }}</td>
               <td>{{ tool.category }}</td>-->
                 <td><button class="btn btn-sm btn-outline-info" (click)="updateTool(tool)" ngbTooltip="Actualizar Herramienta"><i
@@ -68,7 +69,7 @@
         <!-- Paginación -->
         <ngb-pagination class="d-flex justify-content-center" [(page)]="page" [pageSize]="pageSize"
           [collectionSize]="tools.length" (pageChange)="onPageChange($event)" [boundaryLinks]="true" [maxSize]="5"
-          *ngIf="tools.length"> pageSize">
+          *ngIf="tools.length > pageSize">
         </ngb-pagination>
         <!--Fin Paginacion-->
       </div>
@@ -156,8 +157,10 @@
               <label for="fecha" class=""></label>
               <div class="input-group-append">
                 <div class="text-end">
-                  <button type="submit" class="btn btn-sm btn-primary">{{toolButton}}</button>
-                  <button type="button" class="btn btn-sm btn-danger" (click)="onCancel()">Cancelar</button>
+                  <button type="submit" class="btn btn-sm btn-outline-primary" >{{toolButton}}</button>
+                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="onCancel()" >Cancelar</button>
+                  <button type="reset" class="btn btn-sm btn-outline-warning" (click)="onClearForm()"><i class="bi bi-arrow-counterclockwise" ngbTooltip="Limpiar formulario"></i> 
+</button>
                 </div>
               </div>
             </div>

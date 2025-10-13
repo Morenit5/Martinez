@@ -14,36 +14,34 @@ import { Observable } from 'rxjs';
 })
 
 export class CategoryComponent {
-userEntitiyToGet: any;
-users1: CategoryEntity[] = [];
-originalValues: CategoryEntity[] = []; //para guardar temporalmente valores originales
+  categoryEntitiyToGet: any;
+  originalValues: CategoryEntity[] = []; //para guardar temporalmente valores originales
 
-onKeyUp(event: KeyboardEvent) {
-  if (event.key === 'Enter') {
-        const searchResults: CategoryEntity[] = this.users1.filter(item => item.name.includes(this.userEntitiyToGet)); // || item.email.includes(this.userEntitiyToGet));
-  
-        if (searchResults.length !== 0) {
-          if (this.originalValues && this.originalValues.length == 0) {
-            this.originalValues = this.deepCopy(this.users1); //salvamos temporalmente valores
-          }
-          this.users1.length = 0; //limpiamos el array y ponemos los nuevos datos
-          this.users1 = searchResults;
-        } else {
-          this.toast.showToastWarning('La Categoría ' + this.userEntitiyToGet + ' no existe!', 7000, 'x-circle');
-        }
-  
-      } else if (event.key === 'Backspace' || event.key === 'Delete') {
-  
-        if ((this.userEntitiyToGet && this.userEntitiyToGet.length == 0) || !this.userEntitiyToGet) {
-          if (this.originalValues && this.originalValues.length !== 0) {
-            this.users1.length = 0; //limpiamos el array y ponemos los nuevos datos
-            this.users1 = this.originalValues;
-          }
+  onKeyUp(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      const searchResults: CategoryEntity[] = this.originalValues.filter(item => item.name.includes(this.categoryEntitiyToGet)); // || item.email.includes(this.userEntitiyToGet));
+
+      if (searchResults.length !== 0) {
+        this.categories = searchResults;
+        this.collectionSize = this.categories.length;
+        this.paginatedCategories = this.categories.slice(0, this.pageSize);
+
+      } else {
+        this.toast.showToastWarning('La Categoría ' + this.categoryEntitiyToGet + ' no existe!', 7000, 'x-circle');
+      }
+
+    } else if (event.key === 'Backspace' || event.key === 'Delete') {
+
+      if ((this.categoryEntitiyToGet && this.categoryEntitiyToGet.length == 0) || !this.categoryEntitiyToGet) {
+        if (this.originalValues && this.originalValues.length !== 0) {
+
+          this.categories = this.originalValues;
         }
       }
-}
+    }
+  }
 
-deepCopy<T>(obj: T): T {
+  deepCopy<T>(obj: T): T {
     if (typeof obj !== 'object' || obj === null) {
       return obj;
     }
@@ -95,22 +93,20 @@ deepCopy<T>(obj: T): T {
 
   onCancel() {
 
-   if (this.reqTabId && this.reqTabId == 1) {
-        this.recivedTabIndex = 1;
-        this.categoryLabel = 'Registro de Categoría';
-        this.categoryButton = 'Registrar'
-      }
-      this.reqTabId = 0; // al cancelar le enviamos al padre que cambie al tabulador 0
-      this.recivedTabIndex=this.reqTabId;
-      //this.categoryForm.get('categoryType').setValidators(Validators.required); 
-      //this.categoryForm.get('name').updateValueAndValidity();
-      this.categoryForm.reset();
-}
+    if (this.reqTabId && this.reqTabId == 1) {
+      this.recivedTabIndex = 1;
+      this.categoryLabel = 'Registro de Categoría';
+      this.categoryButton = 'Registrar'
+    }
+    this.reqTabId = 0; // al cancelar le enviamos al padre que cambie al tabulador 0
+    this.recivedTabIndex = this.reqTabId;
+    this.categoryForm.reset();
+  }
 
-  getAllDataCategories()
-  {
-     this.categoryService.getAllCategories().subscribe({
+  getAllDataCategories() {
+    this.categoryService.getAllCategories().subscribe({
       next: (categoriesList) => {
+        this.originalValues = categoriesList;
         this.categories = categoriesList;
         this.collectionSize = this.categories.length;
         this.paginatedCategories = this.categories.slice(0, this.pageSize);
@@ -152,15 +148,14 @@ deepCopy<T>(obj: T): T {
             console.log(response);
           },
           error: (err) => {
-            console.log('ENTRAMOS AL ERROR: '+JSON.stringify(err.error.error));
-            let errorMessage =JSON.stringify(err.error.error); 
+            console.log('ENTRAMOS AL ERROR: ' + JSON.stringify(err.error.error));
+            let errorMessage = JSON.stringify(err.error.error);
             console.log(errorMessage);
-            if(errorMessage.startsWith('"Error:'))
-            {
+            if (errorMessage.startsWith('"Error:')) {
               console.log(errorMessage);
-              errorMessage=errorMessage.slice(7,errorMessage.length-1);
+              errorMessage = errorMessage.slice(7, errorMessage.length - 1);
             }
-            this.toast.showToast( errorMessage/*'Error al registar la categoria!!'*/, 7000, 'x-circle', false);
+            this.toast.showToast(errorMessage/*'Error al registar la categoria!!'*/, 7000, 'x-circle', false);
           },
           complete: () => {
             this.onClear();
@@ -204,11 +199,10 @@ deepCopy<T>(obj: T): T {
 
   getMessage(message: number) {
 
-    if(message == undefined)
-      {
-        message=0;
-        this.recivedTabIndex=0;
-      }
+    if (message == undefined) {
+      message = 0;
+      this.recivedTabIndex = 0;
+    }
     this.recivedTabIndex = message;
   }
 
@@ -227,7 +221,6 @@ deepCopy<T>(obj: T): T {
     console.log(categoryInstance);
   }
 
-
   async deleteCategory(category: iCategory) {
     const categoryObject = new CategoryEntity();
 
@@ -242,10 +235,8 @@ deepCopy<T>(obj: T): T {
         this.toast.showToast('Error al eliminar la categoría!!', 7000, 'x-circle', false);
       },
       complete: () => {
-        //this.categoryList = this.categoryService.getAllCategories();
         this.getAllDataCategories();
       }
     });
   }
-  
 }

@@ -14,6 +14,7 @@ import * as jsonData from '@core/enums/data.json';
   styleUrl: './client.component.scss',
 })
 export class ClientComponent  {
+
   onSelectChange($event: any) { throw new Error('Method not implemented.'); }
 
   clientLabel: string = 'Registro de Clientes';
@@ -28,6 +29,18 @@ export class ClientComponent  {
   filteredToolList: ClientEntity[] = [];
   reqTabId: number;
   opciones: any;
+  
+  inputLength: number = 0;
+  
+
+initialClientFormValues: any;
+  name: string= undefined;
+      lastName: string= undefined;
+      address: string= undefined;
+      phone: string= undefined;
+      email: string= undefined;
+      clientType: string= undefined;
+      registryDate: string= undefined;
 
     /*Paginacion*/
     clients: ClientEntity[] = [];// se crea un array vacio de la interfaz
@@ -97,7 +110,7 @@ export class ClientComponent  {
             this.toast.showToast('Error al registar al cliente!!', 7000, 'x-circle', false);
           },
           complete: () => {
-            this.onClear();
+            this.onCancel();
           }
         });
       }else if (accion == 'Actualizar') {
@@ -110,21 +123,40 @@ export class ClientComponent  {
             this.toast.showToast('Error al actualizar al cliente!!', 7000, 'x-circle', false);
           },
           complete: () => {
-            this.onClear();
+            this.onCancel();
           }
         });
       }
     }
   }
 
-  onClear() {
-    if (this.reqTabId && this.reqTabId != 0) {
-      this.recivedTabIndex = 0;
-      this.reqTabId = 0;
-      this.clientLabel = 'Registro de Clientes';
-      this.clientButton = 'Registrar'
-    }
-    this.clientForm.reset();
+ 
+  onCancel() {
+
+    this.resetFields();
+    this.clientLabel = 'Registro de Clientes';
+    this.clientButton = 'Registrar'
+
+    //this.isReadOnly = false; //enable de regreso el field cliente
+    //go back to consulta tab
+    this.recivedTabIndex = 0;
+    this.reqTabId = 0;
+
+  }
+
+resetFields(){
+    this.clientForm.reset(this.initialClientFormValues);
+    
+    //cleanup UI for next service details
+ this.name= undefined;
+      this.lastName= undefined;
+      this.address= undefined;
+      this.phone= undefined;
+      this.email= undefined;
+      this.clientType= undefined;
+      this.registryDate= undefined;
+
+    
   }
 
   updateClient(clientInstance: ClientEntity) {
@@ -166,7 +198,15 @@ export class ClientComponent  {
     this.getAllDataClients();
   }
 
-  getMessage(message: number) { this.recivedTabIndex = message; }
+ getMessage(message: number) {
+
+    if(message == undefined)
+      {
+        message=0;
+        this.recivedTabIndex=0;
+      }
+    this.recivedTabIndex = message;
+  }
 
     /*METODOS PAGINACION*/
   private updatePaginatedData(): void {

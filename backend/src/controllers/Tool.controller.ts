@@ -68,6 +68,7 @@ export class ControllerTool {
   @Put('/up/:id')
   async update(@Param('id') toolId: string, @Body() tool): Promise<ToolDto | null> {
 
+    console.log("entra a esta sección");
     //buscar por id, nombre, categoria
     try {
       this.updateTool = tool;
@@ -80,7 +81,7 @@ export class ControllerTool {
         cause: error
       });
     }
-
+console.log("entra a esta sección2");
     return await this.serviceTool.update(Number(toolId), this.updateTool).then((result: any) => {
         console.log("Result:", result);
         return result;

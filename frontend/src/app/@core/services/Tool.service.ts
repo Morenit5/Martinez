@@ -34,16 +34,20 @@ export class ToolService {
     return regresa;
   }
 
-  async update(id: number, tool: ToolEntity) {
+  async update(tool: ToolEntity) {
     let params = new HttpParams();
-    params = params.set('id', id).set('enabled', tool.enabled);
-    this.http.put(this.updateDelete + '/' + id, tool, { params: params }).subscribe();
+    params = params.set('id', tool.toolId).set('enabled', tool.enabled);
+
+    console.log("ID del toolservice: "+ tool.toolId);
+    this.http.put(this.updateDelete + '/' + tool.toolId, tool, { params: params }).subscribe();
   }
 
   updateTool(tool: ToolEntity): Observable<ToolEntity> {
       let params = new HttpParams();
       params = params.set('id', tool.toolId);
       let instance = this.http.put<ToolEntity>(this.apiUrl + '/up/' + tool.toolId, tool, { params: params });
+
+      console.log("INSTANCE: "+instance)
       return instance;
     }
 

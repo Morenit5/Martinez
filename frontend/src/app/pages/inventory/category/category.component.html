@@ -5,7 +5,7 @@
     <div class="container mt-4">
       <h3 class="mb-4">Categorías</h3>
       <div class="table-responsive">
-        <input type="text" class="form-control" placeholder="Buscar por Categoría" (keyup)="onKeyUp($event)" [(ngModel)]="userEntitiyToGet" (ngModelChange)="onPageChange($event)"><!--[(ngModel)]="filterResults"-->
+        <input type="text" class="form-control" placeholder="Buscar por Categoría" (keyup)="onKeyUp($event)" [(ngModel)]="categoryEntitiyToGet"><!--[(ngModel)]="filterResults"-->
         <table class="table table-bordered table-hover table-striped">
           <thead class="table-bordered">
             <tr>
@@ -68,8 +68,8 @@
             <div class="d-flex justify-content-end" style="height: 90%;">
           
               <div class="align-self-end text-end">
-                <button type="submit" class="btn btn-sm btn-primary">{{categoryButton}}</button>
-                <button type="button" class="btn btn-sm btn-danger" (click)="onCancel()">Cancelar</button>
+                <button type="submit" class="btn btn-sm btn-outline-primary">{{categoryButton}}</button>
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="onCancel()">Cancelar</button>
               </div>
             </div>
           
