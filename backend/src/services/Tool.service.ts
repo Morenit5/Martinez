@@ -1,4 +1,4 @@
-import {Injectable, NotFoundException } from '@nestjs/common';
+import {ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EntityTool } from '../entities/Tool.entity';
@@ -61,10 +61,23 @@ export class ServiceTool {
       tool.category = cat;
     }
      console.log(JSON.stringify(tool));
-    return this.toolRepository.save(tool);
+
+
+      // 2) Intentar guardar y capturar error único de BD
+         try {
+           const newTool = this.toolRepository.create(tool);
+           return await this.toolRepository.save(newTool);
+         } catch (e: any) {
+           // Postgres
+           //console.log('EL ERROR ES: '+e);
+           if (e.code === '23505') throw new ConflictException('La Herramienta ya está registrada, por favor intente con otro código.');
+           throw e;
+         }
+
   }
 
   async update(toolId: number, entity: UpdateToolDto): Promise<ToolDto | null> {
+    console.log("Llega a update service back");
      await this.toolRepository.update(toolId, entity);
      return this.toolRepository.findOneBy({ toolId })
   }

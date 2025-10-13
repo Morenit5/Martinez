@@ -1,5 +1,5 @@
 <div>
-  <tabs [tabItems]="['Consulta', 'Registro']" [tabIcons]="['folder', 'plus-circle']" (tabIndex)="getMessage($event)">>
+  <tabs [tabItems]="['Consulta', 'Registro']" [tabIcons]="['folder', 'plus-circle']" [requiredTabId]=reqTabId (tabIndex)="getMessage($event)">
   </tabs>
   <div *ngIf="recivedTabIndex==0" class="containerClient">
     <div class="container mt-4">
@@ -24,16 +24,16 @@
              @for (client of paginatedClients; track client.clientId) {
             <tr>
               <td>
-                <a role="button" (click)="toggleDetails(client)">
+                <a role="button" class="btn btn-link p-0" (click)="toggleDetails(client)" ngbTooltip="Ver más detalles">
                     {{ client.name }}  {{ client.lastName }}
                 </a>
               </td>
               <td>{{ client.phone }}</td>
               <td>{{ client.clientType }}</td>
-              <td><button class="btn btn-sm btn-primary me-2"
+              <td><button class="btn btn-sm btn-outline-info"
                   (click)="updateClient(client)"><i class="bi bi-pencil-fill"></i>
                 </button>
-                <button class="btn btn-sm btn-danger" (click)="deleteClient(client)"><i class="bi bi-trash-fill"></i>
+                <button class="btn btn-sm btn-outline-danger" (click)="deleteClient(client)"><i class="bi bi-trash-fill"></i>
                 </button>
               </td>
             </tr>
@@ -45,7 +45,7 @@
                       <tr>
                         <th>Dirección</th>
                         <th>Email</th>
-                        <th>Registro</th>
+                        <th>Fecha de Registro</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -116,8 +116,8 @@
             <div class="row">
               <div class="col text-end">
                 <div class="mt-3 text-end">
-                  <button type="submit" class="btn btn-sm btn-primary">{{clientButton}}</button>
-                  <button type="button" class="btn btn-sm btn-danger" (click)="onClear()">Cancelar</button>
+                  <button type="submit" class="btn btn-sm btn-outline-primary">{{clientButton}}</button>
+                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="onCancel()">Cancelar</button>
                 </div>
               </div>
             </div><!--Fin class=row-->

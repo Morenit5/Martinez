@@ -9,7 +9,7 @@ export class EntityTool {
     @Column({ type: 'varchar', length: 150 })
     name: string;
 
-    @Column({ type: 'varchar', length: 60 })
+    @Column({ type: 'varchar', length: 60, unique: true })
     code: string;
 
     @Column({ type: 'varchar', length: 150, nullable: true  })
