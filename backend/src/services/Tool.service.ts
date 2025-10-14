@@ -34,7 +34,7 @@ export class ServiceTool {
     return this.toolRepository.find({
       where: [{ enabled: true },],
         relations: { category: true } }).then((result: any) => {
-          //console.log(result);  
+          
           return result;
         }).catch((error: any) => {
             this.exceptions.sendException(error);
@@ -44,13 +44,13 @@ export class ServiceTool {
   async findOne(toolId: number): Promise<ToolDto|null> {
   const toolExist = await this.toolRepository.findOne({ where: { toolId: toolId } });
 
-    //console.log("ERROR ToolService "+toolExist)
+    
     if (!toolExist) throw new NotFoundException('La herramienta no existe');
     return toolExist;
   }
 
   async create(tool: CreateToolDto): Promise<ToolDto> {
-    console.log(JSON.stringify(tool));
+    
     if(tool.category == null){
       var cat:CategoryDto = await this.categoryRepository.findOne({ where:[ { name: 'General' },{ name: 'general' },{ name: 'GENERAL' }] }).then((result: any) => {
         return result;
@@ -60,7 +60,7 @@ export class ServiceTool {
 
       tool.category = cat;
     }
-     console.log(JSON.stringify(tool));
+    
 
 
       // 2) Intentar guardar y capturar error único de BD
@@ -68,8 +68,7 @@ export class ServiceTool {
            const newTool = this.toolRepository.create(tool);
            return await this.toolRepository.save(newTool);
          } catch (e: any) {
-           // Postgres
-           //console.log('EL ERROR ES: '+e);
+
            if (e.code === '23505') throw new ConflictException('La Herramienta ya está registrada, por favor intente con otro código.');
            throw e;
          }
@@ -77,7 +76,7 @@ export class ServiceTool {
   }
 
   async update(toolId: number, entity: UpdateToolDto): Promise<ToolDto | null> {
-    console.log("Llega a update service back");
+
      await this.toolRepository.update(toolId, entity);
      return this.toolRepository.findOneBy({ toolId })
   }
