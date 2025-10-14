@@ -1,19 +1,22 @@
 
-import { Component, inject} from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ClientEntity } from '@app/@core/entities/Client.entity';
 import { ClientService } from '@app/@core/services/Client.service';
 import { ToastUtility } from '@app/@core/utils/toast.utility';
 import { Observable } from 'rxjs';
 import * as jsonData from '@core/enums/data.json';
+import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
+import { DateAdapterService } from '@app/shared/services/date-adapter.service';
 
 @Component({
   selector: 'app-category',
   standalone: false,
   templateUrl: './client.component.html',
   styleUrl: './client.component.scss',
+  providers: [{ provide: NgbDateAdapter, useClass: DateAdapterService}]
 })
-export class ClientComponent  {
+export class ClientComponent {
 
   onSelectChange($event: any) { throw new Error('Method not implemented.'); }
 
@@ -29,36 +32,33 @@ export class ClientComponent  {
   filteredToolList: ClientEntity[] = [];
   reqTabId: number;
   opciones: any;
-  
   inputLength: number = 0;
-  
+  initialClientFormValues: any;
+  name: string = undefined;
+  lastName: string = undefined;
+  address: string = undefined;
+  phone: string = undefined;
+  email: string = undefined;
+  clientType: string = undefined;
+  registryDate: string = undefined;
+  originalValues: ClientEntity[] = []; //para guardar temporalmente valores originales
+  clientEntitiyToGet: any;
+  /*Paginacion*/
+  clients: ClientEntity[] = [];// se crea un array vacio de la interfaz
+  paginatedClients: ClientEntity[] = [];
+  page = 1; // Página actual
+  pageSize = 7; // Elementos por página
+  collectionSize = 0; // Total de registros
+  totalPages = 0;
+  currentPage = 1;
+  /*Paginacion*/
 
-initialClientFormValues: any;
-  name: string= undefined;
-      lastName: string= undefined;
-      address: string= undefined;
-      phone: string= undefined;
-      email: string= undefined;
-      clientType: string= undefined;
-      registryDate: string= undefined;
-
-    /*Paginacion*/
-    clients: ClientEntity[] = [];// se crea un array vacio de la interfaz
-    paginatedClients: ClientEntity[] = [];
-    page = 1; // Página actual
-    pageSize = 7; // Elementos por página
-    collectionSize = 0; // Total de registros
-    totalPages = 0;
-    currentPage = 1;
-    /*Paginacion*/
-
-    isLoading = true;
-    toggleDetails(Item: any){ Item.showDetails = !Item.showDetails; }
+  isLoading = true;
+  toggleDetails(Item: any) { Item.showDetails = !Item.showDetails; }
 
   constructor(private fbClient: FormBuilder, private toast: ToastUtility) {
 
     this.getAllDataClients();
-    //this.clientList = this.clientService.fetchData1();
     this.opciones = jsonData.clientes;
 
     this.clientForm = this.fbClient.group({
@@ -73,14 +73,14 @@ initialClientFormValues: any;
       //enabled: [false],
     });
 
-    this.updatePaginatedData();      
+    this.updatePaginatedData();
   }
 
-  getAllDataClients()
-  {
-     this.clientService.fetchData1().subscribe({
+  getAllDataClients() {
+    this.clientService.fetchData1().subscribe({
       next: (clientsList) => {
         this.clients = clientsList;
+         this.originalValues = clientsList;
         this.collectionSize = this.clients.length;
         this.paginatedClients = this.clients.slice(0, this.pageSize);
       },
@@ -90,21 +90,17 @@ initialClientFormValues: any;
     });
   }
 
-
   onSubmit(accion: string) {
     this.clientForm.updateValueAndValidity();
 
     if (this.clientForm.valid) {
 
-      let convertDate = JSON.parse(JSON.stringify(this.clientForm.controls['registryDate'].value));
-        let fechaConvertida = convertDate.year + '-' + convertDate.month + '-' + convertDate.day;
-        this.clientForm.value['registryDate'] = fechaConvertida;
+     
       if (accion == 'Registrar') {
-        
+
         this.clientService.addClient(this.clientForm.value).subscribe({
           next: (response) => {
             this.toast.showToast('Cliente registrado exitosamente!!', 7000, 'check2-circle', true);
-            console.log(response);
           },
           error: (err) => {
             this.toast.showToast('Error al registar al cliente!!', 7000, 'x-circle', false);
@@ -113,9 +109,8 @@ initialClientFormValues: any;
             this.onCancel();
           }
         });
-      }else if (accion == 'Actualizar') {
-
-        this.clientService.updateClient(this.clientForm.value).subscribe({
+      } else if (accion == 'Actualizar') {
+          this.clientService.updateClient(this.clientForm.value).subscribe({
           next: (response) => {
             this.toast.showToast('Cliente actualizado exitosamente!!', 7000, 'check2-circle', true);
           },
@@ -124,14 +119,78 @@ initialClientFormValues: any;
           },
           complete: () => {
             this.onCancel();
+            this.getAllDataClients(); 
           }
         });
       }
-    }
+    }else {
+      
+      this.clientForm.markAllAsTouched();
+      this.toast.showToast('Campos inválidos, por favor revise el formulario!!', 7000, 'x-circle', false);
+    } 
   }
 
- 
-  onCancel() {
+  resetFields() {
+    this.clientForm.reset(this.initialClientFormValues);
+
+    //cleanup UI for next service details
+    this.name = undefined;
+    this.lastName = undefined;
+    this.address = undefined;
+    this.phone = undefined;
+    this.email = undefined;
+    this.clientType = undefined;
+    this.registryDate = undefined;
+  }
+
+  updateClient(clientInstance: ClientEntity) {
+    this.recivedTabIndex = 1;
+    this.reqTabId = 1;
+    this.clientLabel = 'Actualizar Cliente';
+    this.clientButton = 'Actualizar'
+
+  
+    this.clientForm.patchValue({
+      clientId: clientInstance.clientId,
+      name: clientInstance.name,
+      lastName: clientInstance.lastName,
+      address: clientInstance.address,
+      phone: clientInstance.phone,
+      email: clientInstance.email,
+      registryDate: clientInstance.registryDate,
+      clientType: clientInstance.clientType
+    });
+  }
+
+  async deleteClient(client: ClientEntity) {
+    const clientObject = new ClientEntity();
+    clientObject.enabled = false; // deshabilitamos el objeto
+    clientObject.clientId = client.clientId;
+    delete clientObject.showDetails;
+    this.clientService.updateClient(clientObject).subscribe({
+      next: (response) => {
+        this.toast.showToast('Cliente eliminado exitosamente!!', 7000, 'check2-circle', true);
+      },
+      error: (err) => {
+        this.toast.showToast('Error al eliminar al cliente!!', 7000, 'x-circle', false);
+      },
+      complete: () => {
+        this.clientList = this.clientService.getAllClients();
+      }
+    });
+    this.getAllDataClients();
+  }
+
+  getMessage(message: number) {
+
+    if (message == undefined) {
+      message = 0;
+      this.recivedTabIndex = 0;
+    }
+    this.recivedTabIndex = message;
+  }
+
+    onCancel() {
 
     this.resetFields();
     this.clientLabel = 'Registro de Clientes';
@@ -144,71 +203,7 @@ initialClientFormValues: any;
 
   }
 
-resetFields(){
-    this.clientForm.reset(this.initialClientFormValues);
-    
-    //cleanup UI for next service details
- this.name= undefined;
-      this.lastName= undefined;
-      this.address= undefined;
-      this.phone= undefined;
-      this.email= undefined;
-      this.clientType= undefined;
-      this.registryDate= undefined;
-
-    
-  }
-
-  updateClient(clientInstance: ClientEntity) {
-    this.recivedTabIndex = 1;
-    this.reqTabId = 1;
-    this.clientLabel = 'Actualizar Cliente';
-    this.clientButton = 'Actualizar'
-
-    this.clientForm.patchValue({
-      clientId: clientInstance.clientId,
-      name: clientInstance.name,
-      lastName: clientInstance.lastName,
-      address: clientInstance.address,
-      phone: clientInstance.phone,
-      email: clientInstance.email,
-      registryDate: clientInstance.registryDate,
-      clientType:clientInstance.clientType
-    });
-    console.log(clientInstance);
-  }
-
-  async deleteClient(client: ClientEntity) {
-    const clientObject = new ClientEntity();
-    clientObject.enabled = false; // deshabilitamos el objeto
-    clientObject.clientId = client.clientId;
-
-    this.clientService.updateClient(clientObject).subscribe({
-      next: (response) => {
-        this.toast.showToast('Cliente eliminado exitosamente!!', 7000, 'check2-circle', true);
-      },
-      error: (err) => {
-        this.toast.showToast('Error al eliminar al cliente!!', 7000, 'x-circle', false);
-      },
-      complete: () => {
-        this.clientList = this.clientService.getAllClients();
-      }
-    });
-
-    this.getAllDataClients();
-  }
-
- getMessage(message: number) {
-
-    if(message == undefined)
-      {
-        message=0;
-        this.recivedTabIndex=0;
-      }
-    this.recivedTabIndex = message;
-  }
-
-    /*METODOS PAGINACION*/
+  /*METODOS PAGINACION*/
   private updatePaginatedData(): void {
     const startIndex = (this.page - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
@@ -216,11 +211,33 @@ resetFields(){
   }
 
   onPageChange(newPage: number): void {
-    console.log('AQUI ENTRA');
     this.page = newPage;
-    console.log(this.page);
     this.updatePaginatedData();
   }
   /*FIN METODOS DE PAGINACION*/
 
+
+  onKeyUp(event: KeyboardEvent) {
+      if (event.key === 'Enter') {
+        const searchResults: ClientEntity[] = this.originalValues.filter(item => item.name.includes(this.clientEntitiyToGet)); 
+  
+        if (searchResults.length !== 0) {
+          this.clients = searchResults;
+          this.collectionSize = this.clients.length;
+          this.paginatedClients = this.clients.slice(0, this.pageSize);
+  
+        } else {
+          this.toast.showToastWarning('El Cliente ' + this.clientEntitiyToGet + ' no existe!', 7000, 'x-circle');
+        }
+  
+      } else if (event.key === 'Backspace' || event.key === 'Delete') {
+  
+        if ((this.clientEntitiyToGet && this.clientEntitiyToGet.length == 0) || !this.clientEntitiyToGet) {
+          if (this.originalValues && this.originalValues.length !== 0) {
+  
+            this.clients = this.originalValues;
+          }
+        }
+      }
+    }
 }
