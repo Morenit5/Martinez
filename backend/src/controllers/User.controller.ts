@@ -58,6 +58,7 @@ export class ControllerUser {
       destination: join(__dirname, '..', 'uploads'),
       filename: (req, file, cb) => {
         // Generate a unique filename
+        console.log(req.body);
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         const ext = '.png';
         const userid = file.originalname; //este tiene el valor de user Id
@@ -115,23 +116,32 @@ export class ControllerUser {
 
   @Get('/images/:filename')
   async getImage(@Param('filename') filename: string, @Res() res: Response) {
+    
     const imagePath = join(__dirname, '..', 'uploads', filename); // Replace 'uploads' with your actual image storage location
-    console.log('este es el path en el User.controller.ts ' + imagePath)
+    //console.log('este es el path en el User.controller.ts ' + imagePath)
+    const defaultImg = join(__dirname, '..', 'uploads', 'placeholer.png');
     const fileStream = createReadStream(imagePath);
 
-    fileStream.on('open', () => {
-      res.setHeader('Content-Type', 'image/png'); // Adjust content type based on image type
-      fileStream.pipe(res);
-    });
-
     fileStream.on('error', (err) => {
-      throw new HttpException({
+      try{
+        fileStream.close();
+         this.getImage(defaultImg,res); 
+
+      }catch(error ){
+        throw new HttpException({
           status: HttpStatus.INTERNAL_SERVER_ERROR,
           error: "image not found"
         },
           HttpStatus.INTERNAL_SERVER_ERROR, {
           cause: err
         });
+      }
+      
+    });
+
+    fileStream.on('open', () => {
+      res.setHeader('Content-Type', 'image/png'); // Adjust content type based on image type
+      fileStream.pipe(res);
     });
   }
 

@@ -98,7 +98,7 @@
             </div>
             <div class="mb-3">
               <label for="formFile">Seleccione imagen</label>
-              <input class="form-control col-form-label" type="file" id="formFile" value="Seleccione imagen">
+              <input class="form-control col-form-label" type="file" id="formFile" (change)="onFileChange($event)" value="Seleccione imagen">
             </div><!---->
             <div class="mb-3">
               <label>Estado de la Herramienta*</label>

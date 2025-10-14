@@ -16,6 +16,7 @@ export class ToolService {
   apiUrl = environment.apiUrl + '/tool';
   apiUrlCat = environment.apiUrl + '/category';
   apiUrlToolCat = environment.apiUrl + '/tool/catg';
+  apiUrlUpload = this.apiUrl + '/upload';
   toolId = '';
   updateDelete = this.apiUrl + '/up';
   tools: ToolEntity[] = []; // se crea un array vacio de la interfaz
@@ -34,20 +35,25 @@ export class ToolService {
     return regresa;
   }
 
-  async update(tool: ToolEntity) {
-    let params = new HttpParams();
-    params = params.set('id', tool.toolId).set('enabled', tool.enabled);
+   uploadToolImage(data: any) {
+      let ret =  this.http.post<any>(this.apiUrlUpload, data) //.subscribe(resp => { console.log(JSON.stringify(resp)); });
+      return ret;
+    }
 
-    console.log("ID del toolservice: "+ tool.toolId);
-    this.http.put(this.updateDelete + '/' + tool.toolId, tool, { params: params }).subscribe();
+  updateDeleteTool(tool: ToolEntity): Observable<ToolEntity> {
+
+    let params = new HttpParams();
+      params = params.set('id', tool.toolId);
+      let instance = this.http.put<ToolEntity>(this.apiUrl + '/up/' + tool.toolId, tool, { params: params });
+
+      
+      return instance;
   }
 
   updateTool(tool: ToolEntity): Observable<ToolEntity> {
       let params = new HttpParams();
       params = params.set('id', tool.toolId);
       let instance = this.http.put<ToolEntity>(this.apiUrl + '/up/' + tool.toolId, tool, { params: params });
-
-      console.log("INSTANCE: "+instance)
       return instance;
     }
 
@@ -72,7 +78,4 @@ export class ToolService {
     return toolJson[0] ?? {};
   }
 
-  /*submitApplication(name: string, code: string, status: string) {
-    console.log(`Herramienta: nombre: ${name}, código: ${code}, estatus: ${status}.`,);
-  }*/
 }
