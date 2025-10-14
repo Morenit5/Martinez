@@ -71,7 +71,7 @@ export class CategoryComponent {
   categories: CategoryEntity[] = [];// se crea un array vacio de la interfaz
   paginatedCategories: CategoryEntity[] = [];
   page = 1; // Página actual
-  pageSize = 7; // Elementos por página
+  pageSize = 1; // Elementos por página
   collectionSize = 0; // Total de registros
   totalPages = 0;
   currentPage = 1;
@@ -159,6 +159,7 @@ export class CategoryComponent {
           },
           complete: () => {
             this.onClear();
+            this.getAllDataCategories();
           }
         });
 
@@ -173,6 +174,7 @@ export class CategoryComponent {
           },
           complete: () => {
             this.onClear();
+            this.getAllDataCategories();
           }
         });
       }

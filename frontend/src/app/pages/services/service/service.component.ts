@@ -556,7 +556,7 @@ export class ServiceComponent {
       }
       this.totalPrice = 0; //reset to zero prior to do final calculation
 
-      this.serviceForm.get('isExtra').setValue(this.isExtraOption);  //this is boolean therefore we change its value here to either true or false according to value in isExtraOption 
+      this.serviceForm.get('isExtra').setValue(this.isExtraOption?this.isExtraOption:false);  //this is boolean therefore we change its value here to either true or false according to value in isExtraOption 
       this.serviceForm.value['serviceDetail'].forEach((item: any) => {
         this.calculateTotal(item.price);
         const mustRemove = item.serviceDetailsId == '' || item.serviceDetailsId == undefined;
