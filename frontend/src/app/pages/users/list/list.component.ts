@@ -39,7 +39,7 @@ export class ListComponent implements OnInit {
   usersList: UserEntity[] = [];// se crea un array vacio de la interfaz
   paginatedUsersList: UserEntity[] = [];
   page = 1; // Página actual
-  pageSize = 2; // Elementos por página
+  pageSize = 1; // Elementos por página
   collectionSize = 0; // Total de registros
   currentPage = 1;
   /*Paginacion*/

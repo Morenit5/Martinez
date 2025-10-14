@@ -30,10 +30,9 @@
               </td>
               <td>{{ client.phone }}</td>
               <td>{{ client.clientType }}</td>
-              <td><button class="btn btn-sm btn-outline-info"
-                  (click)="updateClient(client)"><i class="bi bi-pencil-fill"></i>
+              <td><button class="btn btn-sm btn-outline-info" (click)="updateClient(client)" ngbTooltip="Actualizar Cliente"><i class="bi bi-pencil-fill"></i>
                 </button>
-                <button class="btn btn-sm btn-outline-danger" (click)="deleteClient(client)"><i class="bi bi-trash-fill"></i>
+                <button class="btn btn-sm btn-outline-danger" (click)="deleteClient(client)" ngbTooltip="Eliminar Cliente"><i class="bi bi-trash-fill"></i>
                 </button>
               </td>
             </tr>
@@ -82,7 +81,7 @@
               <label for="name" class="form-label">Nombre</label>
               <input type="text" id="name" class="form-control" formControlName="name">
               <div *ngIf="clientForm.get('name')?.invalid && clientForm.get('name')?.touched" class="text-danger">
-                El Nombre del cliente es un campo requerido
+                Campo requerido
               </div>
               <label for="lastName" class="form-label">Apellido</label>
               <input type="text" id="lastName" class="form-control" formControlName="lastName">
@@ -102,7 +101,7 @@
               </div>
               <div *ngIf="clientForm.get('registryDate')?.invalid && clientForm.get('registryDate')?.touched"
                 class="text-danger">
-                La Fecha de Registro del Cliente es un campo requerido!
+                Campo requerido
               </div>
               <label for="opcion" class="form-label">Tipo de Cliente:</label>
               <select id="opcion" class="form-select" formControlName="clientType">

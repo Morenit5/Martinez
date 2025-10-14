@@ -64,7 +64,7 @@
               <label for="userName" class="form-label">&#160;Usuario</label>
               <input type="text" id="username" class="form-control col-form-label" formControlName="username" />
               <div *ngIf="usersForm.get('username')?.invalid && usersForm.get('username')?.touched" class="text-danger">
-                *Requerido
+                Campo requerido
               </div>
             </div>
             <div class="mb-3">
@@ -75,7 +75,7 @@
               <label for="email" class="form-label">&#160;Correo Electronico</label>
               <input type="email" class="form-control col-form-label" id="email" formControlName="email" aria-describedby="emailHelp" >
               <div *ngIf="usersForm.get('email')?.invalid && usersForm.get('email')?.touched" class="text-danger">
-                *Requerido
+                Campo requerido
               </div>
             </div><!---->
             <div class="mb-3">
@@ -95,7 +95,7 @@
               <label for="password" class="form-label">&#160;Clave</label>
               <input type="password" class="form-control" id="password"  formControlName="password" placeholder="Password">
               <div *ngIf="usersButton=='Registrar' && usersForm.get('password')?.invalid && usersForm.get('password')?.touched" class="text-danger">
-                *Requerido
+                 Campo requerido
               </div>
             </div>
             <div class="mb-3">
@@ -111,8 +111,8 @@
             <label class="form-label">&#160;</label>
             <div class="input-group-append"  >
               <div  class="text-end">
-            <button type="submit" class="btn btn-sm btn-primary">{{usersButton}}</button>
-            <button type="button" class="btn btn-sm btn-danger" (click)="onCancel()">Cancelar</button></div>
+            <button type="submit" class="btn btn-sm btn-outline-primary">{{usersButton}}</button>
+            <button type="button" class="btn btn-sm btn-outline-danger" (click)="onCancel()">Cancelar</button></div>
             </div>
             </div>
           </div>          

@@ -34,7 +34,7 @@
         <!-- Paginación -->
         <ngb-pagination class="d-flex justify-content-center" [(page)]="page" [pageSize]="pageSize"
           [collectionSize]="categories.length" (pageChange)="onPageChange($event)" [boundaryLinks]="true" [maxSize]="5"
-          *ngIf="categories.length"> pageSize">
+          *ngIf="categories.length> pageSize">
         </ngb-pagination>
         <!--Fin Paginacion-->
       </div>
