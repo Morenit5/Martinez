@@ -19,6 +19,10 @@ export class CategoryComponent {
 
   onKeyUp(event: KeyboardEvent) {
     if (event.key === 'Enter') {
+              if(this.categoryEntitiyToGet== undefined || this.categoryEntitiyToGet.length==0)
+        {
+          return;
+        }
       const searchResults: CategoryEntity[] = this.originalValues.filter(item => item.name.includes(this.categoryEntitiyToGet)); // || item.email.includes(this.userEntitiyToGet));
 
       if (searchResults.length !== 0) {

@@ -103,7 +103,11 @@ export class ClientComponent {
             this.toast.showToast('Cliente registrado exitosamente!!', 7000, 'check2-circle', true);
           },
           error: (err) => {
-            this.toast.showToast('Error al registar al cliente!!', 7000, 'x-circle', false);
+            let errorMessage = JSON.stringify(err.error.error);
+            if (errorMessage.startsWith('"Error:')) {
+              errorMessage = errorMessage.slice(7, errorMessage.length - 1);
+            }
+            this.toast.showToast(errorMessage/*'Error al registar la categoria!!'*/, 7000, 'x-circle', false);
           },
           complete: () => {
             this.onCancel();
@@ -177,6 +181,7 @@ export class ClientComponent {
       },
       complete: () => {
         this.clientList = this.clientService.getAllClients();
+        this.getAllDataClients();
       }
     });
     this.getAllDataClients();
@@ -220,6 +225,10 @@ export class ClientComponent {
 
   onKeyUp(event: KeyboardEvent) {
       if (event.key === 'Enter') {
+        if(this.clientEntitiyToGet== undefined || this.clientEntitiyToGet.length==0)
+        {
+          return;
+        }
         const searchResults: ClientEntity[] = this.originalValues.filter(item => item.name.includes(this.clientEntitiyToGet)); 
   
         if (searchResults.length !== 0) {

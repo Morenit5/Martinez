@@ -34,10 +34,6 @@ export class ServiceCategory {
   async create(category: Partial<CreateCategoryDto>): Promise<CategoryDto | null> {
     // verificamos que la categoria no se encuentre duplicada
     const existingCategory = await this.categoryRepository.findOne({ where: { name: category.name } });
-   /* if (existingCategory) {
-      throw new ConflictException('La categoria ' + category.name + ' ya está registrada.'); // O usar un HttpExcepetion de NestJS
-    }*/
-
     // 2) Intentar guardar y capturar error único de BD
     try {
       const newCategory = this.categoryRepository.create(category);
@@ -48,25 +44,6 @@ export class ServiceCategory {
       if (e.code === '23505') throw new ConflictException('La categoría ya está registrada.');
       throw e;
     }
-
-   
-    const newCategory = this.categoryRepository.create(category);
-    return this.categoryRepository.save(newCategory);
-
-    /*const cat: EntityCategory = await this.categoryRepository.find({where: { name: category.name } }).then((result: any) => {
-       console.log('RESULT DE CATEGORY.SERVICES: '+JSON.stringify(result));
-      return result;
-    }).catch((error: any) => {
-      this.exceptions.sendException(error);
-    });
-
-    //verificamos el resultado de la consulta
-    if (cat != undefined || cat != null) {
-      //si tiene categoria duplicada
-      console.log('RESULT DE CATEGORY: '+JSON.stringify(cat));
-    }*/
-
-    return this.categoryRepository.save(category);
   }
 
   async update(categoryId: number, category: UpdateCategoryDto): Promise<CategoryDto | null> {

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EntityClient } from '../entities/Client.entity';
@@ -64,9 +64,21 @@ export class ServiceClient {
     return user;
   }
 
-  create(client: CreateClientDto): Promise<ClientDto> {
-    return this.clientRepository.save(client);
-  }
+  async create(client:Partial<CreateClientDto>): Promise<ClientDto | null> {
+
+      // verificamos que la categoria no se encuentre duplicada
+      const existingCategory = await this.clientRepository.findOne({ where: { name: client.name } });
+      // 2) Intentar guardar y capturar error único de BD
+      try {
+        const newCategory = this.clientRepository.create(client);
+        return await this.clientRepository.save(newCategory);
+      } catch (e: any) {
+        // Postgres
+        //console.log('EL ERROR ES: '+e);
+        if (e.code === '23505') throw new ConflictException('El cliente ya está registrado.');
+        throw e;
+      }
+    }
 
   async delete(id: number): Promise<void> {
     await this.clientRepository.delete(id);
