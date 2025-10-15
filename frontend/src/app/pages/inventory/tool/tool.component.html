@@ -6,24 +6,27 @@
       <h3 class="mb-4">Herramientas</h3>
       <div class="table-responsive">
         <input type="text" class="form-control" placeholder="Buscar por Herramienta" (keyup)="onKeyUp($event)" [(ngModel)]="toolEntitiyToGet"><!--[(ngModel)]="filterResults"-->
-        <table class="table table-bordered table-hover table-striped">
+        <table class="user-table table table-bordered table-hover table-striped">
           <thead class="table-bordered">
             <tr>
-              <th>Código</th>
-              <th>Nombre</th>
-              <!--<th>Imagen</th>-->
-              <th>Estatus</th>
-              <th>Precio</th>
-              <!--<th>Estado de Herramienta</th>
-              <th>Fecha Adquisición</th>
-              <th>Categoria</th>-->
-              <th>Acciones</th>
+              <th class="col-sm-2">Imagen</th>
+              <th class="col-sm-2"> Código</th>
+              <th class="col-sm-2">Nombre</th>
+              <th class="col-sm-2">Estatus</th>
+              <th class="col-sm-2">Precio</th>
+              <th class="col-sm-2">Acciones</th>
             </tr>
           </thead>
           <tbody>
             <ng-container>
               @for (tool of paginatedTools; track tool.toolId) {
               <tr>
+                <td style="text-align:center;">
+                  <input type="file" (change)="onFileSelected($event,tool)" #fileInput accept="image/png" name="thumbnail" >
+                  <button class="btn btn-sm " ngbTooltip="Actualizar Imagen" (click)="fileInput.click()">
+                    <img [src]="tool.imgBlob" (error)="onImgError($event)" />
+                  </button>
+                </td>                
                 <td>{{ tool.code}}</td>
                 <td>
                   <a role="button" class="btn btn-link p-0" (click)="toggleDetails(tool)" ngbTooltip="Ver más detalles">
@@ -96,10 +99,7 @@
                 Campo requerido
               </div>
             </div>
-            <div class="mb-3">
-              <label for="formFile">Seleccione imagen</label>
-              <input class="form-control col-form-label" type="file" id="formFile" (change)="onFileChange($event)" value="Seleccione imagen">
-            </div><!---->
+
             <div class="mb-3">
               <label>Estado de la Herramienta*</label>
               <select class="form-select" formControlName="toolState">

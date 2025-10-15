@@ -554,9 +554,9 @@ export class ServiceComponent {
       if (this.isRecurrentService) {
         this.serviceForm.get('status').setValue('Recurrente');
       }
+      
       this.totalPrice = 0; //reset to zero prior to do final calculation
-
-      this.serviceForm.get('isExtra').setValue(this.isExtraOption?this.isExtraOption:false);  //this is boolean therefore we change its value here to either true or false according to value in isExtraOption 
+      this.serviceForm.get('isExtra').setValue(this.isExtraOption);  //this is boolean therefore we change its value here to either true or false according to value in isExtraOption 
       this.serviceForm.value['serviceDetail'].forEach((item: any) => {
         this.calculateTotal(item.price);
         const mustRemove = item.serviceDetailsId == '' || item.serviceDetailsId == undefined;
@@ -565,13 +565,12 @@ export class ServiceComponent {
         }
       });
 
-      this.serviceForm.get('price').setValue(this.totalPrice); // totalPrice contiene la sumatoria del total de la factura
-      this.createDefaultPaymentItemFormGroup(this.serviceForm.get('serviceDate').value);
-
-
       if (action == 'Registrar') {
 
-        console.log(this.serviceForm);
+        
+        this.serviceForm.get('price').setValue(this.totalPrice); // totalPrice contiene la sumatoria del total de la factura
+        this.createDefaultPaymentItemFormGroup(this.serviceForm.get('serviceDate').value);
+
         this.serviceInstance.addService(this.serviceForm.value).subscribe({
           next: (response) => {
             this.toast.showToast('Servicio creado exitosamente!!', 7000, 'check2-circle', true);
@@ -741,6 +740,7 @@ export class ServiceComponent {
         //lastName: this.client.lastName
       }),
       serviceDetail: this.serviceFrm.array([]),
+      isExtra:this.isExtraOption
     });
 
     const sDetails: ServiceDetailEntity[] = JSON.parse(JSON.stringify(serviceDTO.serviceDetail))
