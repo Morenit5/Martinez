@@ -1,5 +1,6 @@
 import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { DomSanitizer } from '@angular/platform-browser';
 import { CategoryEntity } from '@app/@core/entities/Category.entity';
 import { ToolEntity } from '@app/@core/entities/Tool.entity';
 import { ToolService } from '@app/@core/services/Tool.service';
@@ -56,7 +57,7 @@ export class ToolComponent implements OnInit {
   //category: string= undefined;
   acquisitionDate: string = undefined;
 
-  constructor(private fbTool: FormBuilder, private toast: ToastUtility) {
+  constructor(private fbTool: FormBuilder, private toast: ToastUtility, private sanitizer: DomSanitizer) {
     this.getAllDataTools();
 
     this.toolForm = this.fbTool.group({
@@ -109,6 +110,9 @@ export class ToolComponent implements OnInit {
       error: (error) => {
         console.error(error);
       },
+      complete: () =>{
+         this.getCurrentPageAvatars();
+      }
     });
   }
 
@@ -171,17 +175,32 @@ export class ToolComponent implements OnInit {
     this.paginatedTools = this.tools.slice(startIndex, endIndex);
   }
 
-  selectedFile: File | null = null;
+  onFileSelected(event, toolInstance: any) {
 
-  onFileChange(event: any) {
-    if (event.target.files.length > 0) {
-      this.selectedFile = event.target.files[0];
-      this.toolForm.patchValue({
-        image: this.selectedFile
+    const file: File = event.target.files[0];
+    let avatarName;
+    if (file) {
+      
+      const formData = new FormData();
+      formData.append('thumbnail', file, toolInstance.toolId);
+
+      this.toolService.uploadToolImage(formData).subscribe({
+        next: (response) => {
+          avatarName = response;
+        },
+        error: (error) => {
+          console.error(error);
+        },
+        complete:() => {
+          this.getAllDataTools();
+        }
       });
     }
+  }
 
- 
+  onImgError(event) {
+    event.target.src = 'images/no-image.png'
+    
   }
 
   onPageChange(newPage: number): void {
@@ -195,27 +214,10 @@ export class ToolComponent implements OnInit {
 
     if (this.toolForm.valid) {
 
-      if (this.selectedFile) {
-        const formData = new FormData();
-        formData.append('body',this.toolForm.value);
-        formData.append('thumbnail', this.selectedFile, this.toolForm.get('code').value);
-
-        console.log(this.toolForm.value)
-        // Send formData to your backend service
-        this.toolService.uploadToolImage(formData).subscribe({
-          next: (response) => {
-            console.log(response.image);
-          },
-          error: (error) => {
-
-            console.error(error);
-          }
-        });
-      }
 
       if (accion == 'Registrar') {
 
-        /*
+        
         this.toolService.addTool(this.toolForm.value).subscribe({
           next: (response) => {
             this.toast.showToast('Herramienta registrada exitosamente!!', 7000, 'check2-circle', true);
@@ -233,10 +235,11 @@ export class ToolComponent implements OnInit {
           },
           complete: () => {
             this.onClear();
+            this.getAllDataTools();
           }
         });
 
-        */
+        
       } else if (accion == 'Actualizar') {
 
         this.toolService.updateTool(this.toolForm.value).subscribe({
@@ -283,6 +286,7 @@ export class ToolComponent implements OnInit {
 
   onKeyUp(event: KeyboardEvent) {
     if (event.key === 'Enter') {
+      if(this.toolEntitiyToGet == undefined || this.toolEntitiyToGet.length <=0 ){return;}
       const searchResults: ToolEntity[] = this.originalValues.filter(item => item.name.includes(this.toolEntitiyToGet));
 
       if (searchResults.length !== 0) {
@@ -345,4 +349,28 @@ export class ToolComponent implements OnInit {
       }
     });
   }
+
+    getCurrentPageAvatars() {
+
+    for (const tool of this.tools) {
+      let x = this.getUserAvatarImage(tool.image).subscribe({
+        next: (imageBlob) => {
+          tool.imgBlob = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(imageBlob));
+        },
+      });
+    }
+  }
+
+
+  getUserAvatarImage(avatarName: string) {
+    let result;
+    try {
+      result = this.toolService.getUserAvatar(avatarName);
+
+    } catch (error) {
+      console.log(error);
+    }
+    return result;
+  }
+
 }

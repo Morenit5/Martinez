@@ -51,3 +51,20 @@
   opacity: 0.8;
 }
 //FIN NAVS
+
+.user-table {
+  img {
+    //border-radius: 10%;
+    width: 100px;
+    height: 75px;
+  }
+
+  input[type="file"] {
+  color: transparent; /* Makes the text invisible */
+  //opacity: 0; /* Hides the entire input element, but keeps it clickable */
+  /* Or, you can try: */
+  font-size: 0; /* Shrinks the text to be unnoticeable */
+  width: 0px; /* Example width */
+  height: 0px; /* Example height */
+}
+}

@@ -35,10 +35,15 @@ export class ToolService {
     return regresa;
   }
 
-   uploadToolImage(data: any) {
-      let ret =  this.http.post<any>(this.apiUrlUpload, data) //.subscribe(resp => { console.log(JSON.stringify(resp)); });
-      return ret;
-    }
+  uploadToolImage(data: any) {
+    let ret = this.http.post<any>(this.apiUrlUpload, data) //.subscribe(resp => { console.log(JSON.stringify(resp)); });
+    return ret;
+  }
+
+  getUserAvatar(filename: string): Observable<Blob> {
+        return  this.http.get(this.apiUrl + '/images/' + filename, { responseType: 'blob' });
+  }
+
 
   updateDeleteTool(tool: ToolEntity): Observable<ToolEntity> {
 

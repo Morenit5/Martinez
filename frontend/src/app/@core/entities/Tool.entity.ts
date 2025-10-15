@@ -1,3 +1,4 @@
+import { SafeUrl } from "@angular/platform-browser";
 import { CategoryEntity } from "./Category.entity";
 
 export class ToolEntity {
@@ -12,6 +13,7 @@ export class ToolEntity {
   acquisitionDate: Date;
   enabled: boolean;
   price:number;
+  imgBlob: SafeUrl;
   showDetails: boolean = false;
 }
 
