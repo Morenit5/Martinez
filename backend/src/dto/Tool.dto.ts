@@ -58,6 +58,10 @@ export class ToolDto {
 
 export class CreateToolDto {
 
+
+    @IsNumber()
+   toolId: number;
+
     @IsNotEmpty({ message: 'El nombre es obligatorio.' })
     name: string;
 
@@ -92,7 +96,6 @@ export class CreateToolDto {
 
 export class UpdateToolDto  extends PartialType(CreateToolDto) {
 
-    @IsNumber()
-    toolId: number;
+
    
 }

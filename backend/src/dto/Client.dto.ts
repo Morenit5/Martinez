@@ -47,6 +47,9 @@ export class ClientDto {
 
 export class CreateClientDto {
       
+    @IsNumber()
+    clientId: number;
+
     @IsOptional()
     @IsString()
     @IsNotEmpty({ message: 'El nombre es obligatorio.' })
@@ -91,6 +94,5 @@ export class CreateClientDto {
 
 export class UpdateClientDto extends PartialType(CreateClientDto) {
    
-    @IsNumber()
-    clientId: number;
+
 }

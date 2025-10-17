@@ -66,15 +66,20 @@ export class ServiceClient {
 
   async create(client:Partial<CreateClientDto>): Promise<ClientDto | null> {
 
-      // verificamos que la categoria no se encuentre duplicada
-      const existingCategory = await this.clientRepository.findOne({ where: { name: client.name } });
+    // verificamos que la categoria no se encuentre duplicada
+    const existingClient = await this.clientRepository.findOne({ where: { name: client.name, lastName: client.lastName } });
+
+    if(JSON.stringify(existingClient).length >0 )
+    {
+      client.clientId =existingClient?.clientId;
+      client.enabled =true;
+    }
       // 2) Intentar guardar y capturar error único de BD
       try {
-        const newCategory = this.clientRepository.create(client);
-        return await this.clientRepository.save(newCategory);
+        const newClient = this.clientRepository.create(client);
+        return await this.clientRepository.save(newClient);
       } catch (e: any) {
         // Postgres
-        //console.log('EL ERROR ES: '+e);
         if (e.code === '23505') throw new ConflictException('El cliente ya está registrado.');
         throw e;
       }
