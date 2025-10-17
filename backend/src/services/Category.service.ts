@@ -9,6 +9,8 @@ import { UpdateToolDto } from 'src/dto/Tool.dto';
 @Injectable()
 export class ServiceCategory {
   exceptions: any;
+
+
   constructor(@InjectRepository(EntityCategory) private categoryRepository: Repository<EntityCategory>, @InjectRepository(EntityTool) private toolRepository: Repository<EntityTool>) { }
 
   findAll(): Promise<CategoryDto[]> {
@@ -34,13 +36,20 @@ export class ServiceCategory {
   async create(category: Partial<CreateCategoryDto>): Promise<CategoryDto | null> {
     // verificamos que la categoria no se encuentre duplicada
     const existingCategory = await this.categoryRepository.findOne({ where: { name: category.name } });
+
+    if(JSON.stringify(existingCategory).length >0 )
+    {
+      category.categoryId = existingCategory?.categoryId;
+      category.enabled= true; // lo habilitamos  
+    }
+
+     //de lo contrario no existe en la bd y es registro
     // 2) Intentar guardar y capturar error único de BD
     try {
       const newCategory = this.categoryRepository.create(category);
       return await this.categoryRepository.save(newCategory);
     } catch (e: any) {
       // Postgres
-      //console.log('EL ERROR ES: '+e);
       if (e.code === '23505') throw new ConflictException('La categoría ya está registrada.');
       throw e;
     }
@@ -51,11 +60,15 @@ export class ServiceCategory {
     return this.categoryRepository.findOneBy({ categoryId });
   }
 
+  async reactive(categoryId: number, category: CategoryDto ): Promise<CategoryDto | null> {
+    await this.categoryRepository.update(categoryId, category);
+    return this.categoryRepository.findOneBy({ categoryId });
+  }
+
   async patchCategory(categoryId: number, partialCategory: Partial<UpdateCategoryDto>): Promise<CategoryDto | null> {
 
     // verificamos si la categoria cuenta con herramientas relacionadas
     const tools: EntityTool[] = await this.toolRepository.find({ where: { category: { categoryId: categoryId, }, }, relations: ["category"], }).then((result: any) => {
-      // console.log(JSON.stringify(result));
       return result;
     }).catch((error: any) => {
       this.exceptions.sendException(error);
@@ -63,8 +76,7 @@ export class ServiceCategory {
 
     //Actualizar las herramientas relacionadas con esta categoria, las pasamos a categoria general
     if (tools != undefined || tools != null) {
-      //console.log(JSON.stringify(tools));
-
+      
       //realizamos un recorrido y actualizamos las herramientas a la categoria GENERAL (1)
       tools.forEach(async (tool) => {
 

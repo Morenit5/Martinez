@@ -61,7 +61,7 @@
           <!-- Columna Izquierda -->
           <div id="Tools-Left-Column" class="col-md-6">
             <div class="mb-3">
-              <label for="userName" class="form-label">&#160;Usuario</label>
+              <label for="userName" class="form-label">&#160;Nombre de Usuario*</label>
               <input type="text" id="username" class="form-control col-form-label" formControlName="username" />
               <div *ngIf="usersForm.get('username')?.invalid && usersForm.get('username')?.touched" class="text-danger">
                 Campo requerido
@@ -72,7 +72,7 @@
               <input type="text" class="form-control col-form-label" formControlName="firstname" id="firstname" />
             </div>
             <div class="mb-3">
-              <label for="email" class="form-label">&#160;Correo Electronico</label>
+              <label for="email" class="form-label">&#160;Correo Electronico*</label>
               <input type="email" class="form-control col-form-label" id="email" formControlName="email" aria-describedby="emailHelp" >
               <div *ngIf="usersForm.get('email')?.invalid && usersForm.get('email')?.touched" class="text-danger">
                 Campo requerido
@@ -92,7 +92,7 @@
           <!-- Columna Derecha -->
           <div id="Tools-Right-Column" class="col-md-6">
             <div class="mb-3">
-              <label for="password" class="form-label">&#160;Clave</label>
+              <label for="password" class="form-label">&#160;Clave*</label>
               <input type="password" class="form-control" id="password"  formControlName="password" placeholder="Password">
               <div *ngIf="usersButton=='Registrar' && usersForm.get('password')?.invalid && usersForm.get('password')?.touched" class="text-danger">
                  Campo requerido

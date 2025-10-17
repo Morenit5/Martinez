@@ -1,4 +1,4 @@
-import {ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EntityTool } from '../entities/Tool.entity';
@@ -10,49 +10,42 @@ import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 @Injectable()
 export class ServiceTool {
   constructor(@InjectRepository(EntityTool) private toolRepository: Repository<EntityTool>,
-              @InjectRepository(EntityCategory) private categoryRepository: Repository<EntityCategory>,
-             private readonly exceptions:TypeORMExceptions) {
-    }
+    @InjectRepository(EntityCategory) private categoryRepository: Repository<EntityCategory>,
+    private readonly exceptions: TypeORMExceptions) {
+  }
 
-  /*findAll({limit, offset}: PaginationQueryDto): Promise<ToolDto[]> {
-    return this.toolRepository.find({
-      where: [
-        { enabled: true } 
-      ], skip: offset, take: limit,
-    })
-  }*/
-
-     /*findAll(): Promise<ToolDto[]> {
-    return this.toolRepository.find({
-      where: [
-        { enabled: true },
-      ],
-    })
-  }*/
-
+  
   findAllWithCategories(): Promise<ToolDto[]> {
     return this.toolRepository.find({
       where: [{ enabled: true },],
-        relations: { category: true } }).then((result: any) => {
-          
-          return result;
-        }).catch((error: any) => {
-            this.exceptions.sendException(error);
-        });
+      relations: { category: true }
+    }).then((result: any) => {
+
+      return result;
+    }).catch((error: any) => {
+      this.exceptions.sendException(error);
+    });
   }
 
-  async findOne(toolId: number): Promise<ToolDto|null> {
-  const toolExist = await this.toolRepository.findOne({ where: { toolId: toolId } });
+  async findOne(toolId: number): Promise<ToolDto | null> {
+    const toolExist = await this.toolRepository.findOne({ where: { toolId: toolId } });
 
-    
     if (!toolExist) throw new NotFoundException('La herramienta no existe');
     return toolExist;
   }
 
-  async create(tool: CreateToolDto): Promise<ToolDto> {
-    
-    if(tool.category == null){
-      var cat:CategoryDto = await this.categoryRepository.findOne({ where:[ { name: 'General' },{ name: 'general' },{ name: 'GENERAL' }] }).then((result: any) => {
+  async create(tool: Partial<CreateToolDto>): Promise<ToolDto | null> {
+
+    // verificamos que la categoria no se encuentre duplicada
+    const existingTool = await this.toolRepository.findOne({ where: { name: tool.name } });
+
+    if (JSON.stringify(existingTool).length > 0) {
+      tool.toolId = existingTool?.toolId;
+       tool.enabled = true;
+    }
+
+    if (tool.category == null) {
+      var cat: CategoryDto = await this.categoryRepository.findOne({ where: [{ name: 'General' }, { name: 'general' }, { name: 'GENERAL' }] }).then((result: any) => {
         return result;
       }).catch((error: any) => {
         throw new NotFoundException('La categoria general no existe y niguna categoria fue proveida en el request');
@@ -60,31 +53,24 @@ export class ServiceTool {
 
       tool.category = cat;
     }
-    
 
+    // 2) Intentar guardar y capturar error único de BD
+    try {
+      const newTool = this.toolRepository.create(tool);
+      return await this.toolRepository.save(newTool);
+    } catch (e: any) {
 
-      // 2) Intentar guardar y capturar error único de BD
-         try {
-           const newTool = this.toolRepository.create(tool);
-           return await this.toolRepository.save(newTool);
-         } catch (e: any) {
-
-           if (e.code === '23505') throw new ConflictException('La Herramienta ya está registrada, por favor intente con otro código.');
-           throw e;
-         }
+      if (e.code === '23505') throw new ConflictException('La Herramienta ya está registrada, por favor intente con otro código.');
+      throw e;
+    }
 
   }
 
   async update(toolId: number, entity: UpdateToolDto): Promise<ToolDto | null> {
 
-     await this.toolRepository.update(toolId, entity);
-     return this.toolRepository.findOneBy({ toolId })
+    await this.toolRepository.update(toolId, entity);
+    return this.toolRepository.findOneBy({ toolId })
   }
-
-  /*findAllCat(categoryId: number) {
-   return this.toolRepository.find({ where: { categoryId: categoryId } });
-  }*/
-
 
 
 

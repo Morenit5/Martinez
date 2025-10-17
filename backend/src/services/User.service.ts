@@ -37,13 +37,24 @@ export class ServiceUser {
     }
 
     //este endpoint es para crear usuario completo con user . clave, permisos etc
-    createFullUser(user: CreateUserLoginDto): Promise<userDto> {
+    async createFullUser(user: CreateUserLoginDto): Promise<userDto> {
+
+    // verificamos que el usuario no se encuentre duplicado
+    const existingUser = await this.userRepository.findOne({ where: { email: user.email } });
+
+    if(JSON.stringify(existingUser).length >0 )
+    {
+      user.userId = existingUser?.userId;
+      user.enabled= true; // lo habilitamos  
+    }
+
         const newUser = this.userRepository.create(user);
         return this.userRepository.save(newUser);
     }
 
     //este endpoint es para crear usuario detalles como el nombre apellidos etc
     createUser(user: CreateUserDto): Promise<userDto> {
+
         const newUser = this.userRepository.create(user);
         return this.userRepository.save(newUser);
     }

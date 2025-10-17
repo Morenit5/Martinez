@@ -55,6 +55,10 @@ export class userDto {
 
 export class CreateUserDto  {
   
+  @IsNotEmpty()
+  @IsNumber()
+  userId: number;
+
   @IsOptional()
   firstname: string;
 
@@ -94,9 +98,6 @@ export class CreateUserLoginDto extends PartialType(CreateUserDto) {
 
 export class UpdateUserDto extends PartialType(CreateUserLoginDto) {
 
-  @IsNotEmpty()
-  @IsNumber()
-  userId: number;
 
 }
 
