@@ -57,6 +57,17 @@ export class ToolComponent implements OnInit {
   //category: string= undefined;
   acquisitionDate: string = undefined;
 
+  toolSt = [
+    { name: 'Bueno' },
+    { name: 'Malo' },
+    { name: 'Reparación' }
+  ];
+
+  toolStatus =[
+    {name:'Activo'},
+    {name:'Inactivo'}
+  ];
+  
   constructor(private fbTool: FormBuilder, private toast: ToastUtility, private sanitizer: DomSanitizer) {
     this.getAllDataTools();
 
@@ -64,8 +75,8 @@ export class ToolComponent implements OnInit {
       toolId: [],
       name: ['', Validators.required],
       code: ['', Validators.required],
-      status: ['', Validators.required],
-      toolState: ['', Validators.required],
+      status: ['Activo', Validators.required],
+      toolState: ['Bueno', Validators.required],
       category: ['', Validators.required],
       acquisitionDate: ['', Validators.required],
       price: ['', Validators.required],
@@ -90,11 +101,10 @@ export class ToolComponent implements OnInit {
     //cleanup UI for next service details
     this.name = undefined;
     this.code = undefined;
-    this.status = undefined;
-    this.toolState = undefined;
+    this.status = "ACTIVO";
+    this.toolState = "BUENO";
     this.category = undefined;
     this.acquisitionDate = undefined;
-
 
   }
 
@@ -148,6 +158,7 @@ export class ToolComponent implements OnInit {
     this.reqTabId = 1; // al cancelar le enviamos al padre que cambie al tabulador 0
     this.recivedTabIndex = this.reqTabId;
 
+    console.log('ON CLEAR FORM'+ JSON.stringify(this.initialToolFormValues));
     this.toolForm.reset(this.initialToolFormValues);
   }
 
@@ -210,14 +221,13 @@ export class ToolComponent implements OnInit {
   /*FIN METODOS DE PAGINACION*/
 
   onSubmit(accion: string) {
-    this.toolForm.updateValueAndValidity();
+   // this.toolForm.updateValueAndValidity();
 
     if (this.toolForm.valid) {
 
-
+     
       if (accion == 'Registrar') {
-
-        
+         console.log("ENTRA AL METODO ONSUBMIT REGISTRAR: "+ this.toolForm);
         this.toolService.addTool(this.toolForm.value).subscribe({
           next: (response) => {
             this.toast.showToast('Herramienta registrada exitosamente!!', 7000, 'check2-circle', true);
@@ -257,6 +267,7 @@ export class ToolComponent implements OnInit {
       }
     } else {
       
+       console.log("ENTRA AL ELSE: "+ JSON.stringify(this.toolForm.value));
       this.toolForm.markAllAsTouched();
       this.toast.showToast('Campos inválidos, por favor revise el formulario!!', 7000, 'x-circle', false);
     }
@@ -305,6 +316,8 @@ export class ToolComponent implements OnInit {
 
           this.tools = this.originalValues;
         }
+
+        this.updatePaginatedData();
       }
     }
   }

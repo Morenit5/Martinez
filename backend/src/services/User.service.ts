@@ -40,7 +40,7 @@ export class ServiceUser {
     async createFullUser(user: CreateUserLoginDto): Promise<userDto> {
 
     // verificamos que el usuario no se encuentre duplicado
-    const existingUser = await this.userRepository.findOne({ where: { email: user.email } });
+    const existingUser = await this.userRepository.findOne({ where: { email: user.email, enabled: false } });
 
     if(JSON.stringify(existingUser).length >0 )
     {

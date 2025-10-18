@@ -47,7 +47,7 @@ export class ClientComponent {
   clients: ClientEntity[] = [];// se crea un array vacio de la interfaz
   paginatedClients: ClientEntity[] = [];
   page = 1; // Página actual
-  pageSize = 1; // Elementos por página
+  pageSize = 7; // Elementos por página
   collectionSize = 0; // Total de registros
   totalPages = 0;
   currentPage = 1;
@@ -196,18 +196,7 @@ export class ClientComponent {
     this.recivedTabIndex = message;
   }
 
-    onCancel() {
 
-    this.resetFields();
-    this.clientLabel = 'Registro de Clientes';
-    this.clientButton = 'Registrar'
-
-    //this.isReadOnly = false; //enable de regreso el field cliente
-    //go back to consulta tab
-    this.recivedTabIndex = 0;
-    this.reqTabId = 0;
-
-  }
 
   /*METODOS PAGINACION*/
   private updatePaginatedData(): void {
@@ -247,7 +236,21 @@ export class ClientComponent {
   
             this.clients = this.originalValues;
           }
+         this.updatePaginatedData(); 
         }
       }
     }
+
+        onCancel() {
+
+    this.resetFields();
+    this.clientLabel = 'Registro de Clientes';
+    this.clientButton = 'Registrar'
+
+    //this.isReadOnly = false; //enable de regreso el field cliente
+    //go back to consulta tab
+     this.reqTabId = 0; // al cancelar le enviamos al padre que cambie al tabulador 0
+    this.recivedTabIndex = this.reqTabId;
+
+  }
 }
