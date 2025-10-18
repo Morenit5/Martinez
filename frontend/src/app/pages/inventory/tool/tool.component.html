@@ -78,6 +78,10 @@
       </div>
     </div><!--Fin container mt-4-->
   </div>
+  <!-------------------------------------------------F I N   D E   L A   C O N S U L T A ---------------------------------------------->
+  
+  
+  <!--------------------------------------I N I C I O   D E   F O R M U L A R I O   D E   R E G I S T R O---------------------------------------------->
   <div *ngIf="recivedTabIndex==1" class="containerTool">
     <div class="container mt-4">
       <h4 class="mb-4">{{toolLabel}}</h4>
@@ -120,10 +124,9 @@
               </select>
             </div>
             <div class="mb-3">
-              <label for="category">Seleccione una Categoría:</label>
-              <select class="form-select" id="category" formControlName="category"
-                (ngModelChange)="onSelectChange($event)">
-                <option *ngFor="let cat of categories" [ngValue]="cat.categoryId">
+              <label for="category">Seleccione una Categoría: </label>
+              <select class="form-select" id="category" formControlName="category" >
+                <option *ngFor="let cat of categories" [value]="cat.categoryId">
                   {{ cat.name }}
                 </option>
               </select>
