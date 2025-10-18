@@ -6,6 +6,11 @@ import { PDFDocument, rgb, StandardFonts, PDFPage } from 'pdf-lib';
 import { EntityService } from 'src/entities/Service.entity';
 import * as fs from 'fs';
 import { ServiceDetailDto } from 'src/dto/ServiceDetail.dto';
+import { CronJob } from 'cron';
+import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
+import { Between, Not, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ServiceDto } from 'src/dto/Service.dto';
 
 enum EmailOptions {
   subject = "Martinez Gardening Invoice",
@@ -13,12 +18,23 @@ enum EmailOptions {
   html = '<p>Please find attached the PDF document outlining the service provided. It includes all the relevant details regarding prices and details of each service.</p>'
 }
 
+enum EmailReminderOptions {
+  subject = 'Friendly Reminder: Upcoming Service Due ',
+  html1 = '<p>Hello<br></p>',
+  html2 = '<p>I hope you are doing well! This is just a friendly reminder that the service we are providing for you is due in 3 days.<br></p>',
+  html3 = '<p>If you have any questions or need anything from us before then, feel free to reach out. We are here to help.<br><br><br></p>',
+  html4 = '<p>Thanks again for choosing Martinez Gardening — we appreciate the opportunity to work with you!<br><br><br></p>',
+  html5 = 'Warm regards, <br> Omar Martinez' 
+}
+
 @Injectable()
 export class EmailService {
 
   private transporter;
+  cronJob: CronJob;
+  onDate:number;
 
-  constructor() {
+  constructor(@InjectRepository(EntityService) private serviceRepository: Repository<EntityService>, private readonly exceptions: TypeORMExceptions){
     this.transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',  // tu servidor SMTP
       port: 587,
@@ -31,11 +47,120 @@ export class EmailService {
     });
   }
 
+  enableNotifications(enable: string, enableOnDate: string): {} {
+    let resp:{active:boolean, message:any} = {active:false, message:''};
+    const finalValue: boolean = enable.toLocaleLowerCase() === 'true';
+    this.onDate = Number(enableOnDate);
+
+    let x:number = 10;
+    const schedule = `0 0 13 ${this.onDate} * *`;
+    const forTesting = `0 */${x} * * * *`;
+
+    try {
+      if (this.cronJob == null || this.cronJob == undefined) {
+        this.cronJob = new CronJob(forTesting, async () => {
+          try {
+            await this.checkUnpaidServices();
+            console.log('Correos aparentemente enviados correctamente')
+          } catch (e) {
+            console.error(e);
+          }
+        });
+      }
+
+      if (finalValue == true) {
+        if (!this.cronJob.isActive) {
+          this.cronJob.start();
+        }
+      }
+      if (finalValue == false) {
+        this.cronJob.stop();
+      }
+      return {active:true, message:'notificaciones habilitadas'};
+    }
+    catch (error) {
+      return {active:false, message:'error al tratar de habilitar las notificaciones'};
+    }
+  }
+
+  getNotificationStatus():{} {
+    let resp:{active:boolean, notifyOnDate:any} = {active:false, notifyOnDate:''};
+    if(this.cronJob == undefined || this.cronJob == null){return resp;}
+    
+    let isActive = this.cronJob.isActive;
+    if(isActive){
+       resp = {active:true, notifyOnDate:this.onDate};
+    }else{
+       resp = {active:false, notifyOnDate:''};
+    }
+    return resp;
+  }
+
+
+  async checkUnpaidServices(): Promise<void>{
+    //const today = new Date().toISOString().slice(0, 10);
+    let mails:string[] = [];
+    let serviceList = await this.findAllUnpaidServices();
+    
+    serviceList.forEach(entity => {
+      var serviceIstance: EntityService = plainToInstance(EntityService, entity);
+      mails.push(serviceIstance.client.email);
+    });
+
+    if(mails.length > 0){
+      this.sendReminderMail(mails);
+    }
+    
+  }
+
+  async findAllUnpaidServices(): Promise<ServiceDto[]> {
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth()+1;
+
+    const startDate = new Date(currentYear.toString() + '-' + currentMonth.toString() + '-01');
+    const endDate = new Date(currentYear.toString() + '-' + currentMonth.toString() + '-31');
+   
+
+    var services: ServiceDto[] = await this.serviceRepository.find({
+      relations: {
+        client: true,
+      },
+      where: [{
+        enabled: true,
+        status: 'Recurrente',
+        invoice: {
+          payment: {
+            isServicePaid: false,
+            paymentDate: Between(startDate, endDate),
+          }
+        }
+      }],
+    }).then((result: any) => {
+      return result; // tal vez debamos manipular estos datos antes de mandar al front
+    }).catch((error: any) => {
+      this.exceptions.sendException(error);
+    });
+
+    return services;
+  }
+
+  async sendReminderMail(emailList:string[] = [] ) {
+     const body = EmailReminderOptions.html1 + EmailReminderOptions.html2 + EmailReminderOptions.html3 + EmailReminderOptions.html4 + EmailReminderOptions.html5;
+      await this.transporter.sendMail({
+        from: 'francisco.usa.227@gmail.com',
+        to: emailList,
+        subject: EmailReminderOptions.subject,
+        html: body,
+      });
+      return;
+  }
+
   async sendMail(entity: EntityService) {
     var variable: EntityService = plainToInstance(EntityService, entity);
-    
+
     const filePath = path.resolve(process.cwd(), 'src', 'invoices'/*,'YeseniaRejon-20250824.pdf'*/);
-    //const filePath2 = path.resolve(process.cwd(), 'src', 'invoices', invoice); /*'YeseniaRejon-20250824.pdf');*/
+
+
     const info = await this.transporter.sendMail({
       from: 'francisco.usa.227@gmail.com',
       to: variable.client.email,//entity.client.email,
@@ -52,10 +177,7 @@ export class EmailService {
     });
 
     return { message: 'Factura enviada', info };
-  }
 
-  getHello(): string {
-    return 'Hello World!';
   }
 
   getClientInvoice(fileName: string) {
