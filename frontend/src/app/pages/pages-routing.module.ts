@@ -8,6 +8,7 @@ import { ClientComponent } from './client/client.component';
 import { PaymentComponent } from './payment/payment.component';
 import { ServiceComponent } from './services/service/service.component';
 import { InvoceComponent } from './services/invoce/invoce.component';
+import { ConfigsComponent } from './configs/configs.component';
 
 const routes: Routes = [
   Shell.childRoutes([
@@ -43,7 +44,11 @@ const routes: Routes = [
     {
       path: 'payment',
       component: PaymentComponent,
-    },   
+    },  
+    {
+      path: 'configs',
+      component: ConfigsComponent,
+    }, 
 
     // Fallback when no prior route is matched
     { path: '**', redirectTo: '', pathMatch: 'full' },

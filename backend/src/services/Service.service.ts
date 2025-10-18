@@ -115,8 +115,8 @@ export class ServiceService {
         })
       }
       else if(month && !first && !last){
-        const startDate = new Date(currentYear.toString() + '-' + months.indexOf(month).toString + '-01');
-        const endDate = new Date(currentYear.toString() + '-' + months.indexOf(month).toString + '-31');
+        const startDate = new Date(currentYear.toString() + '-' + months.indexOf(month)+1 + '-01');
+        const endDate = new Date(currentYear.toString() + '-' + months.indexOf(month)+1 + '-31');
         whereClause.push({
           enabled: true,
           invoice: {

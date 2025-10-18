@@ -67,4 +67,11 @@ export const webSidebarMenuItems: NavMenuItem[] = [
       },
     ],
   },
+  {
+    href: '/configs',
+    title: 'Configuración', //Sales
+    active: false,
+    icon: 'gear',
+    permissions: [PERMISSIONS.ACCESS_SALE],
+  },
 ];

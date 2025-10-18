@@ -11,6 +11,8 @@ export class EmailService {
   apiUrlSend = environment.apiUrl + '/mail/send';
   apiUrlDown = environment.apiUrl + '/mail/download';
   apiUrlInvoice = environment.apiUrl + '/mail/invoice';
+  apiUrlEnable = environment.apiUrl + '/mail/notify';
+  apiUrlEnableStatus = environment.apiUrl + '/mail/notify/status';
 
   constructor(private http: HttpClient) { }
 
@@ -39,6 +41,25 @@ export class EmailService {
         'Accept': 'application/pdf'
       }
     });
+    return variable;
+  }
+
+  enableReminders(enable:boolean, date:number): Observable<any> {
+    let myparams = new HttpParams();
+    myparams = myparams.append('enable', enable);
+    myparams = myparams.append('onDate', date);
+
+    const httpOptions = {
+      params: myparams
+    };
+    
+    return this.http.post(this.apiUrlEnable, null, httpOptions);
+  }
+
+  getReminderStatus(): Observable<any>{
+
+
+    let variable = this.http.get(this.apiUrlEnableStatus);
     return variable;
   }
 }

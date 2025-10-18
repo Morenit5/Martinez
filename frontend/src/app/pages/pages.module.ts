@@ -14,9 +14,10 @@ import { InvoceComponent } from './services/invoce/invoce.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { PdfviewerComponent } from './services/pdfviewer/pdfviewer.component';
 import { SafePipePipe } from '@app/@core/pipes/safe-pipe.pipe';
+import { ConfigsComponent } from './configs/configs.component';
 
 @NgModule({
-  declarations: [CategoryComponent, ToolComponent, ClientComponent, PaymentComponent, ServiceComponent, InvoceComponent, PdfviewerComponent,SafePipePipe],
+  declarations: [CategoryComponent, ToolComponent, ClientComponent, PaymentComponent, ServiceComponent, InvoceComponent, PdfviewerComponent,SafePipePipe, ConfigsComponent],
   imports: [
     CommonModule,
     PagesRoutingModule,
