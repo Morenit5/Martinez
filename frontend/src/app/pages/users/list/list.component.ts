@@ -335,21 +335,22 @@ export class ListComponent implements OnInit {
     if (file) {
       this.avatarFileName = file.name;
       const formData = new FormData();
-      console.log('desde el front' + userInstance.userId);
-      formData.append('thumbnail', file,userInstance.userId);
-      
+
+      formData.append('thumbnail', file, userInstance.userId);
+
       this.userInstances.uploadUserAvatar(formData).subscribe({
-      next: (response) => {
-        avatarName = response.avatar;
-      },
-      error: (error) => {
+        next: (response) => {
+          avatarName = response.avatar;
+        },
+        error: (error) => {
 
-        console.error(error);
-      }
+          console.error(error);
+        },
+        complete: () => {
+          this.getAllUserInstances();
+
+        }
       });
-
-      this.getAllUserInstances();
-
     }
 
 

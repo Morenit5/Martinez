@@ -16,26 +16,25 @@ import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
   providers: [{ provide: NgbDateAdapter, useClass: DateAdapterService }]
 })
 
-export class ToolComponent implements OnInit {
-  //@Output() guardado = new EventEmitter<void>();
+export class ToolComponent {
   
   toolEntitiyToGet: any;
   originalValues: ToolEntity[] = []; //para guardar temporalmente valores originales
   toolLabel: string = 'Registro de Herramientas';
   toolButton: string = 'Registrar';
   categories: CategoryEntity[] = [];
-  categoryId: number | null = null;
+  categoryId: number;
   recivedTabIndex: number = 0;
   checkoutForm;
   exceptions: any;
   toolForm: FormGroup;
   deleteToolForm: FormGroup;
-  //toolList: Observable<ToolEntity[]> | undefined;
+  
   toolService: ToolService = inject(ToolService);
   filteredToolList: ToolEntity[] = [];
   reqTabId: number;
   category: CategoryEntity;
-  initialToolFormValues: any;
+  
   initialDeleteToolFormValues:any;
 
   /*Paginacion*/
@@ -49,41 +48,25 @@ export class ToolComponent implements OnInit {
   /*Paginacion*/
 
   isLoading = true;
-  
-  name: string = undefined;
-  code: string = undefined;
-  status: string = undefined;
-  toolState: string = undefined;
-  //category: string= undefined;
-  acquisitionDate: string = undefined;
+ 
 
-  toolSt = [
+  toolSt: {name:string}[] = [
     { name: 'Bueno' },
     { name: 'Malo' },
     { name: 'Reparación' }
   ];
 
-  toolStatus =[
+  toolStatus: {name:string}[] = [
     {name:'Activo'},
     {name:'Inactivo'}
   ];
   
+ 
   constructor(private fbTool: FormBuilder, private toast: ToastUtility, private sanitizer: DomSanitizer) {
+    
     this.getAllDataTools();
 
-    this.toolForm = this.fbTool.group({
-      toolId: [],
-      name: ['', Validators.required],
-      code: ['', Validators.required],
-      status: ['Activo', Validators.required],
-      toolState: ['Bueno', Validators.required],
-      category: ['', Validators.required],
-      acquisitionDate: ['', Validators.required],
-      price: ['', Validators.required],
-      image:[],
-    });
-    this.initialToolFormValues = this.toolForm.value;
-
+    this.prepareToolFormFields();
 
     this.deleteToolForm = this.fbTool.group({
       toolId: [null,Validators.required],
@@ -95,17 +78,30 @@ export class ToolComponent implements OnInit {
   }
 
 
-  resetFields() {
-    this.toolForm.reset(this.initialToolFormValues);
+  prepareToolFormFields() {
 
-    //cleanup UI for next service details
-    this.name = undefined;
-    this.code = undefined;
-    this.status = "ACTIVO";
-    this.toolState = "BUENO";
-    this.category = undefined;
-    this.acquisitionDate = undefined;
+    this.toolService.getCategories().subscribe({
+      next: (data) => {
+        this.categories = data;
+      },
+      error: (err) => console.error('Error:', err),
+      complete: () => {
+        this.categoryId = this.categories.find(category => category.name === 'General').categoryId;
 
+        this.toolForm = this.fbTool.group({
+          toolId: [],
+          name: ['', Validators.required],
+          code: ['', Validators.required],
+          status: ['Activo', { nonNullable: true, validators: [Validators.required] }],
+          toolState: ['Bueno', { nonNullable: true, validators: [Validators.required] }],
+          category: [this.categoryId, { nonNullable: true, validators: [Validators.required] }],
+          acquisitionDate: ['', Validators.required],
+          price: ['', Validators.required],
+          image: [],
+        });
+
+      }
+    });
   }
 
   getAllDataTools() {
@@ -126,12 +122,6 @@ export class ToolComponent implements OnInit {
     });
   }
 
-  
-
-  onSelectChange($categoryId: any) {
-    this.category = new CategoryEntity();
-    this.category.categoryId = $categoryId;
-  }
 
   getMessage(message: number) {
 
@@ -142,29 +132,14 @@ export class ToolComponent implements OnInit {
     this.recivedTabIndex = message;
   }
 
-  ngOnInit(): void {
-    //carga de categorias
-    this.toolService.getCategories().subscribe(data => {
-      this.categories = data;
-    });
-  }
 
   onClearForm() {
-    if (this.reqTabId && this.reqTabId == 1) {
-      this.recivedTabIndex = 1;
-      this.toolLabel = 'Registro de Herramientas';
-      this.toolButton = 'Registrar'
-    }
-    this.reqTabId = 1; // al cancelar le enviamos al padre que cambie al tabulador 0
-    this.recivedTabIndex = this.reqTabId;
-
-    console.log('ON CLEAR FORM'+ JSON.stringify(this.initialToolFormValues));
-    this.toolForm.reset(this.initialToolFormValues);
+    this.prepareToolFormFields();
   }
 
   onCancel() {
 
-    this.resetFields();
+     this.prepareToolFormFields();
     this.toolLabel = 'Registro de Herramientas';
     this.toolButton = 'Registrar'
 
@@ -280,7 +255,7 @@ export class ToolComponent implements OnInit {
       this.toolLabel = 'Registro de Herramientas';
       this.toolButton = 'Registrar'
     }
-    this.toolForm.reset(this.initialToolFormValues);
+     this.prepareToolFormFields();
   }
 
   filterResults(text: string) {
