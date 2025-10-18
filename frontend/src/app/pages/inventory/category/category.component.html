@@ -9,8 +9,8 @@
         <table class="table table-bordered table-hover table-striped">
           <thead class="table-bordered">
             <tr>
-              <th>Tipo</th>
-              <th>Nombre</th>
+                <th>Nombre</th>
+                <th>Tipo</th>
               <!--<th>Activo</th>-->
               <th>Acciones</th>
             </tr>
@@ -18,8 +18,8 @@
           <tbody>
             @for (category of paginatedCategories; track category.categoryId) {
             <tr> <!--*ngFor="let category of categoryList | async "-->
-              <td style="width: 42%;">{{ category.categoryType }}</td>
               <td style="width: 42%;">{{ category.name }}</td>
+              <td style="width: 42%;">{{ category.categoryType }}</td>
               <!--<td>{{ category.enabled }}</td>-->
               <td><button *ngIf="category.name.toLowerCase() !== 'general' " class="btn btn-sm btn-outline-info" (click)="updateCategory(category)" ngbTooltip="Actualizar Categoría"><i
                     class="bi bi-pencil-fill"></i>

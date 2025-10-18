@@ -67,7 +67,7 @@ export class ServiceClient {
   async create(client:Partial<CreateClientDto>): Promise<ClientDto | null> {
 
     // verificamos que la categoria no se encuentre duplicada
-    const existingClient = await this.clientRepository.findOne({ where: { name: client.name, lastName: client.lastName } });
+    const existingClient = await this.clientRepository.findOne({ where: { name: client.name, lastName: client.lastName, enabled: false } });
 
     if(JSON.stringify(existingClient).length >0 )
     {

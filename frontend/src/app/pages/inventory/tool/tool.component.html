@@ -103,10 +103,9 @@
             <div class="mb-3">
               <label>Estado de la Herramienta*</label>
               <select class="form-select" formControlName="toolState">
-                <option value="" disabled>Seleccione un estado</option>
-                <option value="BUENO">BUENO</option>
-                <option value="MALO">MALO</option>
-                <option value="MALO">REPARACIÓN</option>
+                <option *ngFor="let tool of toolSt" [ngValue]="tool.name">
+                  {{ tool.name }}
+                </option>
               </select>
             </div>
           </div>
@@ -115,16 +114,15 @@
             <div class="mb-3">
               <label for="status" class="form-label">Estatus*</label>
               <select class="form-select" formControlName="status">
-                <option value="" disabled>Seleccione un estado</option>
-                <option value="ACTIVO">ACTIVO</option>
-                <option value="INACTIVO">INACTIVO</option>
+                <option *ngFor="let status of toolStatus" [ngValue]="status.name">
+                  {{ status.name }}
+                </option>
               </select>
             </div>
             <div class="mb-3">
               <label for="category">Seleccione una Categoría:</label>
-              <select class="form-control" id="category" formControlName="category"
+              <select class="form-select" id="category" formControlName="category"
                 (ngModelChange)="onSelectChange($event)">
-                <option [ngValue]="null">-- Select --</option>
                 <option *ngFor="let cat of categories" [ngValue]="cat.categoryId">
                   {{ cat.name }}
                 </option>

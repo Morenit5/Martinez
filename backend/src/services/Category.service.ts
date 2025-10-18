@@ -35,7 +35,7 @@ export class ServiceCategory {
 
   async create(category: Partial<CreateCategoryDto>): Promise<CategoryDto | null> {
     // verificamos que la categoria no se encuentre duplicada
-    const existingCategory = await this.categoryRepository.findOne({ where: { name: category.name } });
+    const existingCategory = await this.categoryRepository.findOne({ where: { name: category.name, enabled: false }  });
 
     if(JSON.stringify(existingCategory).length >0 )
     {

@@ -9,35 +9,8 @@ import * as path from 'path';
 
 @Injectable()
 export class ServiceService {
-  private transporter;
 
-  constructor(@InjectRepository(EntityService) private serviceRepository: Repository<EntityService>, private readonly exceptions: TypeORMExceptions) {
-    this.transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',  // tu servidor SMTP
-      port: 587,
-      encryption: 'TLS',
-      secure: false,
-      auth: {
-        user: '', // ⚠️ Poner correo válido
-        pass: '',     // ⚠️ Contraseña de aplicación
-      },
-    });
-
-    const mailOptions = {
-      from: '',
-      to: "",
-      subject: "Envío de Factura Martínez",
-      text: "Adjunto al correo encontrará en archivo PDF la Factura correspondiente a su servicio.",
-      html: '<p>Adjunto al correo encontrará en archivo PDF la Factura correspondiente a su servicio.</p>',
-      attachments: [
-        {
-          filename: 'FACTURA.pdf',
-          path: path.join(__dirname, '..', 'pdfs', 'FACTURA.pdf'), // Ruta absoluta
-          contentType: 'application/pdf',
-        },
-      ],
-    };
-  }
+  constructor(@InjectRepository(EntityService) private serviceRepository: Repository<EntityService>, private readonly exceptions: TypeORMExceptions) { }
 
 
   async findAll(): Promise<ServiceDto[]> {

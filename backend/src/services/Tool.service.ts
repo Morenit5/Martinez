@@ -37,7 +37,7 @@ export class ServiceTool {
   async create(tool: Partial<CreateToolDto>): Promise<ToolDto | null> {
 
     // verificamos que la categoria no se encuentre duplicada
-    const existingTool = await this.toolRepository.findOne({ where: { name: tool.name } });
+    const existingTool = await this.toolRepository.findOne({ where: { name: tool.name, enabled: false } });
 
     if (JSON.stringify(existingTool).length > 0) {
       tool.toolId = existingTool?.toolId;
