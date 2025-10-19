@@ -125,11 +125,14 @@
           <div id="Service-Left-Column" class="col-md-6">
             <div  class="mb-3">
               <div formGroupName="client">
-              <label for="clientSelect">&nbsp;Cliente</label>
+              <label for="clientSelect">&nbsp;Cliente*</label>
               <ng-select readonly="{{isReadOnly}}" [items]="clientList" bindLabel="fullName" formControlName="clientId" bindValue="clientId" placeholder="-- Seleccione --"   > </ng-select>
+               <div *ngIf="serviceForm.get('client')?.invalid && serviceForm.get('client')?.touched" class="text-danger">
+                Campo requerido
+              </div>
               </div>
             
-              &nbsp; Nombre del Servicio
+              &nbsp; Nombre del Servicio*
               <input type="text" class="form-control col-form-label" formControlName="serviceName" id="serviceName" />
               <div *ngIf="serviceForm.get('serviceName')?.invalid && serviceForm.get('serviceName')?.touched" class="text-danger">
                 Campo requerido
@@ -154,13 +157,10 @@
                <div *ngIf="extraValue == 'Extra' || extraValue == 'Eventual'" >
                   <input type="text" readonly  class="form-control col-form-label" formControlName="status" id="status" />
               </div>
-              <!--select class="form-select" formControlName="status">
-                <option value="En Proceso">En Proceso</option>
-                <option value="Terminado">Terminado</option>
-              </select-->
+             
               <div *ngIf="extraValue == 'Fijo'"  class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" [ngModelOptions]="{standalone: true}" id="flexSwitchCheckRecurrente" [(ngModel)]="isRecurrentService" (change)="onRecurrentSwitchChange()">
-                <label class="form-check-label" for="flexSwitchCheckRecurrente">Servicio Recurrente</label>
+                <input class="form-check-input" type="checkbox" [ngModelOptions]="{standalone: true}" id="flexSwitchCheckRecurrente" [(ngModel)]="isRecurrentService" (change)="onRecurrentSwitchChange()" ngbTooltip="Activar/Desactivar">
+                <label class="form-check-label" for="flexSwitchCheckRecurrente">Habilitar Servicio Recurrente</label>
                </div>
             </div>
           </div>
@@ -347,7 +347,7 @@
                     <div class="actions-container "> 
 
                       <button *ngIf="!parentItem.invoice?.payment[0].isServicePaid" class="btn btn-sm btn-outline-success" (click)="onPaymentSubmit(parentItem)" ngbTooltip="Confirmar Pago"><i class="bi bi-currency-dollar"></i></button>
-                      <button *ngIf="parentItem.invoice?.payment[0].isServicePaid && !parentItem.invoice?.isGenerated" class="btn btn-sm btn-outline-primary" (click)="generateInvoice(parentItem)" ngbTooltip="Generar Factura"><i class="bi bi-receipt-cutoff"></i></button>
+                    <button *ngIf="parentItem.invoice?.payment[0].isServicePaid" class="btn btn-sm btn-outline-primary" (click)="generateInvoice(parentItem)" ngbTooltip="Generar Factura"><i class="bi bi-receipt-cutoff"></i></button>
                       <button *ngIf="parentItem.invoice?.payment[0].isServicePaid && parentItem.invoice?.isGenerated" class="btn btn-sm btn-outline-info" (click)="updateSendMailAndCloseStatus(parentItem)" ngbTooltip="Enviar Correo y Cerrar Servicio"><i class="bi bi-envelope-at"></i></button>
 
                     </div>    

@@ -2,7 +2,6 @@ import { formatDate } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, Inject, LOCALE_ID, SimpleChanges } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { SafeResourceUrl } from '@angular/platform-browser';
 import { ClientEntity } from '@app/@core/entities/Client.entity';
 import { ServiceEntity, ServiceDetailEntity } from '@app/@core/entities/Service.entity';
 import { ClientInstances } from '@app/@core/services/Client.service';
@@ -11,7 +10,6 @@ import { InvoiceInstances } from '@app/@core/services/invoice.service';
 import { ServicesInstances } from '@app/@core/services/Services.service';
 import { ToastUtility } from '@app/@core/utils/toast.utility';
 import { DateAdapterService } from '@app/shared/services/date-adapter.service';
-import { environment } from '@env/environment';
 import { NgbDateAdapter, NgbDateStruct, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
 import { Subscription } from 'rxjs';
@@ -66,9 +64,6 @@ export class ServiceComponent {
   enviado = false;
   respuesta = '';
   emailService: EmailService;
-  user = environment.auth.user;
-  pass = environment.auth.pass;
-  subject = environment.subject;
   /*Email */
 
   serviceLabel: string = 'Registro de Servicios';
@@ -96,7 +91,6 @@ export class ServiceComponent {
   clientesEventuales:string = 'Eventual';
 
   //Variables para el tab de Pagos
-  //isServicePaid: boolean = false;
   paymentForm: FormGroup;
   PaymentMethod = [
     { value: 'Transferencia', label: 'Transferencia' },
@@ -269,8 +263,7 @@ export class ServiceComponent {
     let pdfBlob:any;
     (await this.emailService.generateInvoice(service)).subscribe({
       next: (resp) => {
-        //this.toast.showToast('Factura generada correctamente ', 5000, 'check2-square', true)
-        //this.generarPdf(resp);
+
         pdfBlob = resp;
       },
       error: (err) => {
@@ -346,7 +339,6 @@ export class ServiceComponent {
 
   async generarPdf(pdfBytes) {
   
-    //const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes as unknown as ArrayBuffer], { type: 'application/pdf' });
     this.pdfUrl = URL.createObjectURL(blob);
 
@@ -384,10 +376,7 @@ export class ServiceComponent {
 
 
   ngOnInit() {
-    /*this.valueSubscription = this.serviceForm.valueChanges.subscribe(newValue => {
-      console.log('Value changed:', newValue);
-      // Perform actions based on the new value
-    });*/
+
     this.getallClientsBy(this.clientesFijos);
     this.lastUsedValue = this.clientesFijos;
     this.getAllServicesIntancesBy(this.clientesFijos); // de entrada traemos clientes fijos solamente
@@ -491,7 +480,7 @@ export class ServiceComponent {
         this.services = this.serviceList;
         this.collectionSize = this.services.length;
         this.paginatedServices = this.services.slice(0, this.pageSize);
-        //console.log(JSON.stringify(this.serviceList))
+       
       },
       error: (error) => {
         console.error(error);
@@ -592,7 +581,7 @@ export class ServiceComponent {
             this.toast.showToast('Servicio actualizado exitosamente!!', 7000, 'check2-circle', true);
           },
           error: (err) => {
-            //console.log(err);
+            
             this.toast.showToast('Error al actualizar el servicio!!', 7000, 'x-circle', false);
           },
           complete: () => {
@@ -602,10 +591,9 @@ export class ServiceComponent {
       }
 
     } else {
-      //console.log(this.serviceForm.valid);
-      //console.log(this.serviceForm);
+    
       this.serviceForm.markAllAsTouched();
-      this.toast.showToast('Campos Invalidos, porfavor revise el formulario!!', 7000, 'x-circle', false);
+      this.toast.showToast('Campos Inválidos, porfavor revise el formulario!!', 7000, 'x-circle', false);
     }
   }
 
@@ -613,7 +601,7 @@ export class ServiceComponent {
 
     const succesful = this.createPaymentItemFormGroup(serviceEnt);
     if(!succesful){ 
-      //console.log('onPaymentSubmit2 - Fallo la creacion del payment object para este invoice')
+
       return;
     }
 
@@ -655,7 +643,7 @@ export class ServiceComponent {
 
     } else {
       this.paymentForm.markAllAsTouched();
-      this.toast.showToast('Campos Invalidos, porfavor revise el formulario de Pago!!', 7000, 'x-circle', false);
+      this.toast.showToast('Campos Inválidos, porfavor revise el formulario de Pago!!', 7000, 'x-circle', false);
     }
   }
 
@@ -736,8 +724,7 @@ export class ServiceComponent {
       price: serviceDTO.price,
       client: this.serviceFrm.group({
         clientId: this.client.clientId,
-        //name:this.client.name,
-        //lastName: this.client.lastName
+
       }),
       serviceDetail: this.serviceFrm.array([]),
       isExtra:this.isExtraOption
@@ -875,8 +862,6 @@ export class ServiceComponent {
       } else {
         // de lo contrario hacemos busqueda requerida
 
-        //console.log(this.originalValues)
-
         let listEntities: ServiceEntity[];
 
         listEntities = this.pagosFindByCientService();
@@ -888,7 +873,7 @@ export class ServiceComponent {
           this.paginatedServices = this.serviceList.slice(0, this.pageSize);
 
         } else {
-          this.toast.showToastWarning('No se econtraron Pagos para ese nombre o servicio', 5000, 'x-circle');
+          this.toast.showToastWarning('No se encontraron Pagos para ese nombre o servicio', 5000, 'x-circle');
         }
 
       }
@@ -914,10 +899,9 @@ export class ServiceComponent {
   }
 
   onSearchServiceKeyUp(event: KeyboardEvent) {
-    //console.log('entramos')
+
     if (event.key === 'Enter') {
       if (this.serviceEntitiyToGet == undefined || this.serviceEntitiyToGet.length <= 0) { return; }
-      //console.log(this.originalValues)
 
       let listEntities: ServiceEntity[];
 
@@ -930,7 +914,7 @@ export class ServiceComponent {
         this.paginatedServices = this.serviceList.slice(0, this.pageSize);
 
       } else {
-        this.toast.showToastWarning('No se econtraron servicios con ese nombre', 5000, 'x-circle');
+        this.toast.showToastWarning('No se encontraron servicios con ese nombre', 5000, 'x-circle');
       }
 
     } else if (event.key === 'Backspace' || event.key === 'Delete') {
@@ -970,7 +954,6 @@ export class ServiceComponent {
     }
     return searchResults;
   }
-
 
 }
 

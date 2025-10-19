@@ -1,19 +1,15 @@
 import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
 import { EmailService } from 'src/services/Email.service';
 import { Response } from 'express';
-import { EntityService } from 'src/entities/Service.entity';
-import { ServiceService } from 'src/services/Service.service';
-import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
+import { ServiceDto } from 'src/dto/Service.dto';
 
 @Controller({ version: '1', path: 'mail' })
 export class EmailController {
-  constructor(private readonly appService: EmailService,private readonly serviceService: ServiceService, private readonly exceptions: TypeORMExceptions) { }
-
-  
+  constructor(private readonly appService: EmailService) { }
 
   @Post('/send')
-  sendEmail(@Body() ServiceDto: EntityService) {
-    //console.log(JSON.stringify(ServiceDto));
+  sendEmail(@Body() ServiceDto: ServiceDto) {
+
     return this.appService.sendMail(ServiceDto);
   }
 
@@ -35,7 +31,7 @@ export class EmailController {
   }
 
   @Post('/download')
-  async generateInvoice(@Body() entity: EntityService, @Res() res: Response) {
+  async generateInvoice(@Body() entity: ServiceDto, @Res() res: Response) {
     const pdfBytes = await this.appService.generateInvoice(entity);
 
     res.setHeader('Content-Type', 'application/pdf');
