@@ -17,7 +17,8 @@ export class EmailService {
   constructor(private http: HttpClient) { }
 
   sendEmail(service: ServiceEntity): Observable<any> {
-     return this.http.post(this.apiUrlSend, JSON.stringify(service));
+     
+     return this.http.post(this.apiUrlSend, service);
   }
 
   async generateInvoice(service: ServiceEntity): Promise<Observable<any>> {

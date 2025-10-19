@@ -23,8 +23,8 @@ enum EmailReminderOptions {
   html1 = '<p>Hello<br></p>',
   html2 = '<p>I hope you are doing well! This is just a friendly reminder that the service we are providing for you is due in 3 days.<br></p>',
   html3 = '<p>If you have any questions or need anything from us before then, feel free to reach out. We are here to help.<br><br><br></p>',
-  html4 = '<p>Thanks again for choosing Martinez Gardening — we appreciate the opportunity to work with you!<br><br><br></p>',
-  html5 = 'Warm regards, <br> Omar Martinez' 
+  html4 = '<p>Thanks again for choosing Martínez Gardening. <br> We appreciate the opportunity to work with you!<br><br><br></p>',
+  html5 = 'Warm regards, <br> Omar Martínez.' 
 }
 
 @Injectable()
@@ -148,29 +148,33 @@ export class EmailService {
      const body = EmailReminderOptions.html1 + EmailReminderOptions.html2 + EmailReminderOptions.html3 + EmailReminderOptions.html4 + EmailReminderOptions.html5;
       await this.transporter.sendMail({
         from: 'francisco.usa.227@gmail.com',
-        to: emailList,
+        to: 'francisco.usa.227@gmail.com',
+        bcc: emailList,
         subject: EmailReminderOptions.subject,
         html: body,
       });
       return;
   }
 
-  async sendMail(entity: EntityService) {
-    var variable: EntityService = plainToInstance(EntityService, entity);
+  async sendMail(entity: ServiceDto) {
 
-    const filePath = path.resolve(process.cwd(), 'src', 'invoices'/*,'YeseniaRejon-20250824.pdf'*/);
+    
+    const filePath = path.join(__dirname, '..', 'invoices'); // Or any other desired directory
+    console.log('FilePath:  '+filePath);
 
+    const invoiceName: string=entity.invoice?.invoiceName || 'YeseniaRejon-20250824.pdf';
+console.log("ENTITY: "+ JSON.stringify(entity));
 
     const info = await this.transporter.sendMail({
       from: 'francisco.usa.227@gmail.com',
-      to: variable.client.email,//entity.client.email,
+      to: entity.client.email,
       subject: EmailOptions.subject,
       text: EmailOptions.text,
       html: EmailOptions.html,
       attachments: [
         {
           filename: entity.invoice?.invoiceName, //'YeseniaRejon-20250824.pdf',
-          path: filePath, // Ruta absoluta
+          path: path.join(__dirname, '..', 'invoices', invoiceName), // Ruta absoluta
           contentType: 'application/pdf',
         },
       ],
@@ -186,7 +190,7 @@ export class EmailService {
   }
 
 
-  async generateInvoice(service: EntityService) {
+  async generateInvoice(service: ServiceDto) {
 
     // Crear documento PDF
     const pdfDoc = await PDFDocument.create();
