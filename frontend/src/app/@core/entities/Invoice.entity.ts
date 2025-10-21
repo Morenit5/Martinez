@@ -10,8 +10,8 @@ export class InvoiceEntity {
     invoiceNumber: string;
     totalAmount: number;
     payment: PaymentEntity[];  //@OneToMany(() => EntityPayment, payment => payment.paymentId)
-    invoiceDetails: InvoiceDetailsEntity[];  // @OneToMany(() => EntityInvoiceDetails, invoiceDetail => invoiceDetail.invoiceDetailId)
-    service?: ServiceEntity; //@OneToOne(() => EntityService, service => service.serviceId)
+    //invoiceDetails: InvoiceDetailsEntity[];  // @OneToMany(() => EntityInvoiceDetails, invoiceDetail => invoiceDetail.invoiceDetailId)
+    service?: ServiceEntity; //@OneToMany(() => EntityService, service => service.serviceId)
     
     isGenerated: boolean;
    

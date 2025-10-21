@@ -34,10 +34,19 @@ export class EmailController {
   async generateInvoice(@Body() entity: ServiceDto, @Res() res: Response) {
     const pdfBytes = await this.appService.generateInvoice(entity);
 
-    res.setHeader('Content-Type', 'application/pdf');
-    //res.setHeader('Content-Disposition', 'attachment; filename='+ entity.invoice?.invoiceName);
-    res.send(Buffer.from(pdfBytes));
+    
+      res.setHeader('Content-Type', 'application/pdf');
+      //res.setHeader('Content-Disposition', 'attachment; filename='+ entity.invoice?.invoiceName);
+      res.send(Buffer.from(pdfBytes));
+    
+  }
 
+  private isNotPromise<T>(value: T | Promise<T>): value is T {
+    return !(
+      value !== null &&
+      typeof value === 'object' &&
+      typeof (value as any).then === 'function'
+    );
   }
 
   @Post('/notify')

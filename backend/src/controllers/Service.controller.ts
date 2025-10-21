@@ -21,7 +21,7 @@ export class  ControllerService {
     //console.log('llegamos en el contorller  con valores ' + itemName + ' isExtra => ' + isExtra );
     let val:string;
     if(isExtra == undefined){val = 'false' } else { val = isExtra == 'true'? 'true': 'false' }
-    //console.log(val);
+    console.log('legamos con ==> ' + val);
     return this.serviceService.findAllBy(itemName,val);
   }
 

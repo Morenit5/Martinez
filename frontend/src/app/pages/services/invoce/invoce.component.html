@@ -35,22 +35,22 @@
 
                                     <td> <!--Fecha de Servicio -->
 
-                                        {{parentItem.invoice.invoiceDate }}
+                                        {{parentItem.invoice[0].invoiceDate }}
                                     </td>
                                      <td> <!--Fecha de pago -->
 
-                                        {{parentItem.invoice.payment[0].paymentDate }}
+                                        {{parentItem.invoice[0].payment[0].paymentDate }}
                                     </td>
 
                                     <td> <!-- Estado del pago  -->
                                         <div class="form-check form-switch">
-                                            <label class="form-check-label" for="flexSwitchCheckRecurrente">{{parentItem.invoice.payment[0].paymentStatus.replaceAll('o','a')}}</label>
-                                            <input class="form-check-input" disabled type="checkbox" id="flexSwitchCheckPayStatus" [(ngModel)]="parentItem.invoice.payment[0].isServicePaid">
+                                            <label class="form-check-label" for="flexSwitchCheckRecurrente">{{parentItem.invoice[0].payment[0].paymentStatus.replaceAll('o','a')}}</label>
+                                            <input class="form-check-input" disabled type="checkbox" id="flexSwitchCheckPayStatus" [(ngModel)]="parentItem.invoice[0].payment[0].isServicePaid">
                                         </div>
                                     </td>
 
                                     <td> <!--Acciones  -->
-                                        <button *ngIf="parentItem.status == 'Cerrado'" class="btn btn-sm btn-outline-success" (click)="onViewPDF(parentItem.invoice.invoiceName)"
+                                        <button *ngIf="parentItem.status == 'Cerrado'" class="btn btn-sm btn-outline-success" (click)="onViewPDF(parentItem.invoice[0].invoiceName)"
                                             ngbTooltip="Ver Factura del Servicio"><i class="bi bi-filetype-pdf"></i></button>
                                    
                                         <button class="btn btn-sm btn-outline-info" (click)="sendEmail(parentItem)" ngbTooltip="Reenviar Factura"><i class="bi bi-envelope-at"></i></button>

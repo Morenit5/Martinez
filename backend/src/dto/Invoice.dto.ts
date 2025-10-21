@@ -1,7 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { IsBoolean, IsDate, IsNotEmpty, isNumber, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
 import { CreatePaymentDto, PaymentDto } from './Payment.dto';
-import { CreateInvoiceDetailsDto, InvoiceDetailsDto } from './InvoiceDetails.dto';
 import { CreateServiceDto, ServiceDto } from './Service.dto';
 import { Type } from 'class-transformer';
 
@@ -31,16 +30,11 @@ export class InvoiceDto {
     @IsObject()
     @Type(()=>PaymentDto)
     payment: PaymentDto[];  //@OneToMany(() => EntityPayment, payment => payment.paymentId)
-
-    @IsOptional()
-    @IsObject()
-    @Type(()=>InvoiceDetailsDto)
-    invoiceDetails: InvoiceDetailsDto[];  // @OneToMany(() => EntityInvoiceDetails, invoiceDetail => invoiceDetail.invoiceDetailId)
-
+  
     @IsOptional()
     @IsObject()
     @Type(()=> ServiceDto)
-    service?: ServiceDto; //@OneToOne(() => EntityService, service => service.serviceId)  
+    service?: ServiceDto; //@OneToMany(() => EntityService, service => service.serviceId)  
     
     @IsOptional()
     @IsNumber()
@@ -70,12 +64,7 @@ export class CreateInvoiceDto {
     @IsNotEmpty({ message: 'El campo pago es obligatorio.' })
     @IsObject()
     payment: CreatePaymentDto[];  //@OneToMany(() => EntityPayment, payment => payment.paymentId)
-
-    @IsNotEmpty({ message: 'El detalles de factura es obligatorio.' })
-    @IsObject()
-    invoiceDetails: CreateInvoiceDetailsDto[];  // @OneToMany(() => EntityInvoiceDetails, invoiceDetail => invoiceDetail.invoiceDetailId)
-
-
+   
     @IsOptional()
     @IsObject()
     service?: CreateServiceDto; //@OneToOne(() => EntityService, service => service.serviceId)

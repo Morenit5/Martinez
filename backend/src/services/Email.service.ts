@@ -11,6 +11,7 @@ import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 import { Between, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ServiceDto } from 'src/dto/Service.dto';
+import { InvoiceDto } from 'src/dto/Invoice.dto';
 
 enum EmailOptions {
   subject = "Martinez Gardening Invoice",
@@ -41,14 +42,14 @@ export class EmailService {
       encryption: 'TLS',
       secure: false,
       auth: {
-        user: '', // ⚠️ Poner correo válido
-        pass: '',     // ⚠️ Contraseña de aplicación
+        user: 'francisco.usa.227@gmail.com', // ⚠️ Poner correo válido
+        pass: 'xmwzwuxotnqpvmjp',     // ⚠️ Contraseña de aplicación
       },
     });
   }
 
   enableNotifications(enable: string, enableOnDate: string): {} {
-    let resp:{active:boolean, message:any} = {active:false, message:''};
+    
     const finalValue: boolean = enable.toLocaleLowerCase() === 'true';
     this.onDate = Number(enableOnDate);
 
@@ -162,8 +163,9 @@ export class EmailService {
     const filePath = path.join(__dirname, '..', 'invoices'); // Or any other desired directory
     console.log('FilePath:  '+filePath);
 
-    const invoiceName: string=entity.invoice?.invoiceName || 'YeseniaRejon-20250824.pdf';
-console.log("ENTITY: "+ JSON.stringify(entity));
+    
+    const invoiceName: string=  entity.invoice? entity.invoice[0].invoiceName: 'YeseniaRejon-20250824.pdf';
+    console.log("ENTITY: "+ JSON.stringify(entity));
 
     const info = await this.transporter.sendMail({
       from: 'francisco.usa.227@gmail.com',
@@ -173,7 +175,7 @@ console.log("ENTITY: "+ JSON.stringify(entity));
       html: EmailOptions.html,
       attachments: [
         {
-          filename: entity.invoice?.invoiceName, //'YeseniaRejon-20250824.pdf',
+          filename: invoiceName, //'YeseniaRejon-20250824.pdf',
           path: path.join(__dirname, '..', 'invoices', invoiceName), // Ruta absoluta
           contentType: 'application/pdf',
         },
@@ -191,6 +193,13 @@ console.log("ENTITY: "+ JSON.stringify(entity));
 
 
   async generateInvoice(service: ServiceDto) {
+
+    let resp:{status:string, message:any} = {status:'', message:''};
+    const inv =  service.invoice? service.invoice[0] : undefined;
+    /*if(inv == undefined){
+      resp = {status:'error', message:'El invoice no fue encontrado, para poder generar la factura'};
+      return  resp;
+    }*/
 
     // Crear documento PDF
     const pdfDoc = await PDFDocument.create();
@@ -272,7 +281,7 @@ console.log("ENTITY: "+ JSON.stringify(entity));
     page.drawText("Invoice Date: " + fechaActual, { x: 70, y, size: 10, font: timesRoman });
 
     // Assuming you have a UUID string
-    const invoiceNumber = service.invoice?.invoiceNumber.substring(service.invoice?.invoiceNumber.lastIndexOf('-') + 1, service.invoice?.invoiceNumber.length);
+    const invoiceNumber = inv?.invoiceNumber.substring(inv?.invoiceNumber.lastIndexOf('-') + 1, inv?.invoiceNumber.length);
 
     // === Datos de la empresa ===
     y -= -60;//40;
@@ -397,19 +406,19 @@ console.log("ENTITY: "+ JSON.stringify(entity));
     }); // termino del foreach de las filas
     firstTime = true; // se resetea la bandera para la siguiente tanda
 
-    let tax = service.invoice?.payment[0].taxAmount;
+    let tax = inv?.payment[0].taxAmount;
     if (tax == null) { tax = 0; }
 
     // === Totales ===
     y -= 50;
-    page.drawText("Subtotal: $" + service.invoice?.payment[0].paymentAmount.toFixed(2), { x: 440, y, size: 12, font: timesRoman });
+    page.drawText("Subtotal: $" + inv?.payment[0].paymentAmount.toFixed(2), { x: 440, y, size: 12, font: timesRoman });
     y -= 15;
     page.drawText("Tax:        $" + tax.toFixed(2), { x: 440, y, size: 12, font: timesRoman });
     y -= 15;
-    page.drawText("Total:     $" + service.invoice?.totalAmount.toFixed(2), { x: 440, y, size: 12, color: rgb(0, 0, 0), font: timesRomanBold });
+    page.drawText("Total:     $" + inv?.totalAmount.toFixed(2), { x: 440, y, size: 12, color: rgb(0, 0, 0), font: timesRomanBold });
 
-    let method;
-    method = service.invoice?.payment[0].paymentMethod;
+   
+    let method = inv? inv.payment[0].paymentMethod:'Transferencia';
     const traductions: Record<string, string> = {
       Efectivo: "Cash",
       Transferencia: "Transfer",
@@ -439,7 +448,7 @@ console.log("ENTITY: "+ JSON.stringify(entity));
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes as unknown as ArrayBuffer], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
-    const fileName = service.invoice ? service.invoice.invoiceName : 'example.pdf';
+    const fileName = inv? inv.invoiceName : 'example.pdf';
 
     const uploadDir: string = path.join(__dirname, '..', 'invoices'); // Or any other desired directory
 

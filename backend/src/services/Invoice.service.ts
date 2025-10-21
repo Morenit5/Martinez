@@ -20,7 +20,6 @@ export class ServiceInvoice {
           client:true
         },
         payment:true,
-        invoiceDetails:true
       }
     }).then((result: any) => {
       return result; // tal vez debamos manipular estos datos antes de mandar al front
@@ -39,8 +38,7 @@ export class ServiceInvoice {
           serviceDetail:true,
           client:true
         },
-        payment:true,
-        invoiceDetails:true
+        payment:true
       }
     }).then((result: any) => {
       return result; // tal vez debamos manipular estos datos antes de mandar al front

@@ -24,7 +24,7 @@ export class ServicePayment {
       where: { paymentId: paymentId },
       relations: {
         invoice: {
-          invoiceDetails: true,
+          
           service:true
         }
       }

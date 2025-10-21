@@ -149,7 +149,7 @@ export class InvoceComponent {
 
     var dateobj = new Date();
     const searchResults: ServiceEntity[] = this.originalValues.filter(item => {
-      const itemDate = item.invoice.invoiceDate instanceof Date ? item.invoice.invoiceDate : new Date(item.invoice.invoiceDate);
+      const itemDate = item.invoice[0].invoiceDate instanceof Date ? item.invoice[0].invoiceDate[0] : new Date(item.invoice[0].invoiceDate);
       const startDate: Date = new Date(dateobj.getFullYear() + '-' + this.mesToGet + '-01');
       const endDate: Date = new Date(dateobj.getFullYear() + '-' + this.mesToGet + '-31');
 
