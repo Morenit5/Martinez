@@ -14,6 +14,7 @@ import { NgbDateAdapter, NgbDateStruct, NgbNavChangeEvent } from '@ng-bootstrap/
 import { v4 as uuidv4 } from 'uuid';
 import { Subscription } from 'rxjs';
 
+
 @Component({
   selector: 'app-service',
   standalone: false,
@@ -135,15 +136,7 @@ export class ServiceComponent {
         clientId: ['', Validators.required],
       }),
       serviceDetail: this.serviceFrm.array([]),
-      invoice:  this.serviceFrm.group({
-        invoiceId: [],
-        invoiceDate: ['1980-12-18'],
-        invoiceNumber: [1],
-        totalAmount: [0],
-        invoiceName: [''],
-        subtotalAmount: [0],
-        payment: this.serviceFrm.array([]),
-      }),
+      invoice: this.serviceFrm.array([]),
       isExtra: [''] 
     });
     this.initialServiceFormValues = this.serviceForm.value;
@@ -167,28 +160,34 @@ export class ServiceComponent {
     this.invoiceUpdateform = this.serviceFrm.group({
       serviceId: [null,Validators.required],
       status: [''], //valor debe ser T e r m i n a d o
-      //invoice: este lo llamamos en  
+      invoice: this.serviceFrm.array([])
     });
     this.initialInvoiceUpdateValues = this.invoiceUpdateform.value;
   }
 
+  
   // add the invoice group
-  addInvoiceGroup() {
-    const serviceGroup = this.serviceFrm.group({
-        invoiceId: [null,Validators.required],
-        isGenerated:[true]
-    });
+  addInvoiceUpdateArray(id:number): boolean {
+    try {
+      const invoiceArrayFrm = this.serviceFrm.group({
+        invoiceId: [id, Validators.required],
+        isGenerated: [true]
+      });
 
-    this.invoiceUpdateform.setControl('invoice', serviceGroup);
+      this.InvoiceUpdateFormArray.clear();
+      this.InvoiceUpdateFormArray.push(invoiceArrayFrm);
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
-  //remove the invoice group
-  removeInvoiceGroup() {
-    this.invoiceUpdateform.removeControl('invoice');
+  get InvoiceUpdateFormArray() {
+    return this.invoiceUpdateform.get('invoice') as FormArray;
   }
 
   // Method to create a new FormGroup for an item
-  createItemFormGroup(servDetail: ServiceDetailEntity): FormGroup {
+  createServiceDetailsItemFormGroup(servDetail: ServiceDetailEntity): FormGroup {
     return this.serviceFrm.group({
       serviceDetailsId: [],
       serviceType: [servDetail.serviceType],
@@ -204,7 +203,7 @@ export class ServiceComponent {
   }
 
   createPaymentItemFormGroup(servEnt: ServiceEntity): boolean {
-    let metodoPago = servEnt.invoice.payment[0].paymentMethod; // paymentEnt.paymentMethod;
+    let metodoPago = servEnt.invoice[0].payment[0].paymentMethod; // paymentEnt.paymentMethod;
     if(this.esPagoCash){
       metodoPago = 'Cash';
     }
@@ -214,11 +213,11 @@ export class ServiceComponent {
     }
 
     let paymentItem = this.serviceFrm.group({
-      paymentId: [servEnt.invoice.payment[0].paymentId],
-      paymentDate: [servEnt.invoice.payment[0].paymentDate],
+      paymentId: [servEnt.invoice[0].payment[0].paymentId],
+      paymentDate: [servEnt.invoice[0].payment[0].paymentDate],
       paymentAmount: [servEnt.price],
       paymentMethod: [metodoPago],
-      taxAmount: [servEnt.invoice.payment[0].taxAmount],
+      taxAmount: [servEnt.invoice[0].payment[0].taxAmount],
       paymentStatus: ['Pagado'],
       isServicePaid: [true]
     });
@@ -234,7 +233,32 @@ export class ServiceComponent {
 
 
 
-  // Methodo para crear el item pago que pertence al invoice con valores por default
+  // ************* Inicia - Metodos para crear los valores por default de Invoice y Payment Cuando se genera un service *************
+
+  createDefaultInvoiceFormGroup(): boolean {
+    try {
+      let invoiceItem = this.serviceFrm.group({
+        invoiceId: [],
+        invoiceDate: ['1980-12-18'],
+        invoiceNumber: [1],
+        totalAmount: [0],
+        invoiceName: [''],
+        subtotalAmount: [0],
+        payment: this.serviceFrm.array([]),
+      });
+
+      this.defaultInvoiceFormArray.clear();
+      this.defaultInvoiceFormArray.push(invoiceItem);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  get defaultInvoiceFormArray() {
+    return this.serviceForm.get('invoice') as FormArray;
+  }
+
   createDefaultPaymentItemFormGroup(formatedDate:any) {
    let paymentItem = this.serviceFrm.group({
       paymentId: [],
@@ -251,45 +275,50 @@ export class ServiceComponent {
   }
 
   get defaultPaymentFormArray() {
-    return this.serviceForm.get('invoice').get('payment') as FormArray;
+    //this.serviceForm.get('invoice').get('payment') as FormArray;
+    return this.defaultInvoiceFormArray.at(0).get('payment') as FormArray;
   }
-
+  // ************* Termina - Metodos para crear los valores por default de Invoice y Payment Cuando se genera un service *************
  
+
   async generateInvoice(service: ServiceEntity) {
     //Al “Generar Factura” necesitamos actualizar ==> entity_service, entity_invoice con los siguientes valores:
     //entitiy_service >> Status = T e r m i n a d o
     //entity_invoice >> isGenerated = True
+console.log('entramos al generador')
 
     let pdfBlob:any;
     (await this.emailService.generateInvoice(service)).subscribe({
       next: (resp) => {
 
         pdfBlob = resp;
+        console.log('entramos aquiiiiiiiiiiii')
       },
       error: (err) => {
         console.error(err);
         this.toast.showToast('Factura no generada', 5000, 'check2-square', true);
       },
-      complete: () => this.onInvoiceGenerationComplete(service,pdfBlob),
+      complete: () => {
+        this.updateGenerateInvoiceStatus(service,pdfBlob)
+      }
     });
 
   }
 
-  onInvoiceGenerationComplete(service: ServiceEntity, pdfBlob:any): void {
-    this.updateGenerateInvoiceStatus(service, pdfBlob)
-  }
-
   private updateGenerateInvoiceStatus(service: ServiceEntity, pdfBlob:any) {
   
-    this.addInvoiceGroup();
-  
+    const invUpdated = this.addInvoiceUpdateArray(service.invoice[0].invoiceId);
+    
+    if(invUpdated == false){
+      this.toast.showToast('Error al generar la Factura!!', 7000, 'x-circle', false);
+      return;
+    }
+
+    console.log('Patching values')
     this.invoiceUpdateform.patchValue({ //puede ser patchValue(para llenado parcial de la forma) en lugar de setValue,
       serviceId: service.serviceId,
-      status:'Terminado',
-      invoice: {
-        invoiceId: service.invoice.invoiceId,
-        isGenerated: true
-      }
+      status:'Terminado'
+
     })
 
     if (this.invoiceUpdateform.valid) {
@@ -300,9 +329,9 @@ export class ServiceComponent {
           this.toast.showToast('Error al generar la Factura!!', 7000, 'x-circle', false);
         },
         complete: () => {
+          this.getAllServicesIntances(); //Traemos todas las intances  
           this.toast.showToast('Factura generada correctamente ', 5000, 'check2-square', true)
           this.invoiceUpdateform.reset(this.initialInvoiceUpdateValues);
-          this.getAllServicesIntances(); //Traemos todas las intances  
           this.generarPdf(pdfBlob);
         }
       });
@@ -311,6 +340,8 @@ export class ServiceComponent {
       this.invoiceUpdateform.markAllAsTouched();
       this.toast.showToast('Error al generar el fomulario de Factura !!', 7000, 'x-circle', false);
     }
+
+
   }
 
   updateSendMailAndCloseStatus(service: ServiceEntity) {
@@ -350,6 +381,8 @@ export class ServiceComponent {
     a.click();
     document.body.removeChild(a);
     window.URL.revokeObjectURL(this.pdfUrl);
+    this.isLoading = false;
+    this.getAllServicesIntances(); //Traemos todas las intances 
   }
 
   sendEmail(ServiceDto: ServiceEntity) {
@@ -509,6 +542,7 @@ export class ServiceComponent {
 
     this.serviceLabel = 'Registro de Servicios';
     this.serviceButton = 'Registrar'
+    
 
     this.isReadOnly = false; //enable de regreso el field cliente
     //go back to consulta tab
@@ -529,7 +563,8 @@ export class ServiceComponent {
     this.description = undefined;
     this.price = undefined;
     this.unitMeasurement = undefined;
-
+    
+    this.isRecurrentService = false; //reseteamos la bandera de servicio recurrente
     this.isExtraOption = false;
     this.extraValue = 'Fijo';
 
@@ -556,9 +591,17 @@ export class ServiceComponent {
 
       if (action == 'Registrar') {
 
+        console.log(JSON.stringify(this.serviceForm.value));
         
         this.serviceForm.get('price').setValue(this.totalPrice); // totalPrice contiene la sumatoria del total de la factura
-        this.createDefaultPaymentItemFormGroup(this.serviceForm.get('serviceDate').value);
+        const success = this.createDefaultInvoiceFormGroup();
+        if(success){
+          this.createDefaultPaymentItemFormGroup(this.serviceForm.get('serviceDate').value);
+        }else {
+          this.toast.showToast('no se pudo crear el invoice por default!', 5000, 'check2-circle', true);
+          return;
+        }
+        
 
         this.serviceInstance.addService(this.serviceForm.value).subscribe({
           next: (response) => {
@@ -607,17 +650,17 @@ export class ServiceComponent {
 
     this.totalPrice = 0; //reset to zero prior to do final calculation
     this.calculateTotal(serviceEnt.price? serviceEnt.price.toString(): '0');
-    this.calculateTotal(serviceEnt.invoice.payment[0].taxAmount? serviceEnt.invoice.payment[0].taxAmount.toString(): '0');
+    this.calculateTotal(serviceEnt.invoice[0].payment[0].taxAmount? serviceEnt.invoice[0].payment[0].taxAmount.toString(): '0');
     
 
     let invoiceNum = uuidv4();
     this.paymentForm.patchValue({ //puede ser patchValue(para llenado parcial de la forma) en lugar de setValue,
-      invoiceId: serviceEnt.invoice.invoiceId,
-      invoiceDate: serviceEnt.invoice.payment[0].paymentDate,
+      invoiceId: serviceEnt.invoice[0].invoiceId,
+      invoiceDate: serviceEnt.invoice[0].payment[0].paymentDate,
       invoiceNumber: invoiceNum,
       totalAmount: this.totalPrice,
       invoiceName: serviceEnt.client.name + '_' + serviceEnt.client.lastName + '_' + invoiceNum + '.pdf',
-      subtotalAmount: serviceEnt.invoice.payment[0].paymentAmount,
+      subtotalAmount: serviceEnt.invoice[0].payment[0].paymentAmount,
       service: {
         serviceId: serviceEnt.serviceId,
       }
@@ -674,8 +717,25 @@ export class ServiceComponent {
     }
   }
 
-  deleteServiceDetail(serviceDTO: ServiceEntity) {
-    this.toast.showToast('Hay que implementar este metodo', 7000, 'x-circle', false);
+deleteServiceDetail(serviceDTO: ServiceEntity) {
+    // verificamos el estatus del pago, si no hay pago- confirmacion de pago, preguntar si se desea eliminar
+    // caso de que el pago esta pagado, pero no se ha generado la factura, no se debera poder eliminar
+    // caso de que la factura ya se genero pero no se ha enviado al cliente, no se debera poder eliminar
+        const serviceObject = new ServiceEntity();
+        serviceObject.enabled = false; // deshabilitamos el objeto
+        serviceObject.serviceId = serviceDTO.serviceId;
+        this.serviceInstance.updateService(serviceObject).subscribe({
+          next: (response) => {
+            this.toast.showToast('Servicio eliminada exitosamente!!', 7000, 'check2-circle', true);
+          },
+          error: (err) => {
+            this.toast.showToast('Error al eliminar el Servicio!!', 7000, 'x-circle', false);
+          },
+          complete: () => {
+            this.getAllServicesIntances();
+          }
+        });
+    //this.toast.showToast('Hay que implementar este metodo', 7000, 'x-circle', false);
   }
 
   getFormatedDate(dateToformat:any): NgbDateStruct{
@@ -761,7 +821,7 @@ export class ServiceComponent {
     this.unitMeasurement = undefined;
 
     //agregamos los details a la form
-    let itemFormGroup = this.createItemFormGroup(servDetail);
+    let itemFormGroup = this.createServiceDetailsItemFormGroup(servDetail);
     if (this.serviceDetailsId != undefined && action == 'actualizar') {
       itemFormGroup.get('serviceDetailsId')?.setValue(servDetail.serviceDetailsId);
     }

@@ -189,6 +189,7 @@ export class ClientComponent {
 
   getMessage(message: number) {
 
+    
     if (message == undefined) {
       message = 0;
       this.recivedTabIndex = 0;
@@ -241,16 +242,18 @@ export class ClientComponent {
       }
     }
 
-        onCancel() {
+  onCancel() {
+
+    //this.isReadOnly = false; //enable de regreso el field cliente
+    //go back to consulta tab
+    this.reqTabId = 0; // al cancelar le enviamos al padre que cambie al tabulador 0
+    this.recivedTabIndex = this.reqTabId;
 
     this.resetFields();
     this.clientLabel = 'Registro de Clientes';
     this.clientButton = 'Registrar'
 
-    //this.isReadOnly = false; //enable de regreso el field cliente
-    //go back to consulta tab
-     this.reqTabId = 0; // al cancelar le enviamos al padre que cambie al tabulador 0
-    this.recivedTabIndex = this.reqTabId;
+   
 
   }
 }

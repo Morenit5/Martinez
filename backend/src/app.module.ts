@@ -6,7 +6,6 @@ import { ConfigModule } from '@nestjs/config';
 import { DbUtilService_Cls } from './db/db-util.service';
 import { CategoryModule } from './modules/Category.module';
 import { ClientModule } from './modules/Client.module';
-import { InvoiceDetailModule } from './modules/InvoiceDetail.module';
 import { ServiceDetailModule } from './modules/ServiceDetail.module';
 import { ColumnNumericTransformer } from './utils/ColumnNumericTransformer';
 import { InvoiceModule } from './modules/Invoice.module';
@@ -30,7 +29,6 @@ let importModules =[
   /*UsersModule,*/
   CategoryModule,
   ClientModule,
-  InvoiceDetailModule,
   ServiceDetailModule, 
   InvoiceModule,
   PaymentModule,

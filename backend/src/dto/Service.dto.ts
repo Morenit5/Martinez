@@ -23,7 +23,7 @@ export class ServiceDto {
     @IsOptional()
     @IsObject()
     @Type(()=>InvoiceDto)
-    invoice?: InvoiceDto; // @OneToOne(() => EntityInvoice, invoice => invoice.invoiceId)
+    invoice?: InvoiceDto[]; // @OneToMany
 
     @IsOptional()
     @IsString()
@@ -41,7 +41,7 @@ export class ServiceDto {
     @IsOptional()
     @IsObject() 
     @Type(()=>ServiceDetailDto)
-    serviceDetail: ServiceDetailDto[]; //@OneToMany(() => EntityServiceDetail, servicedetail => servicedetail.serviceDetailsId)
+    serviceDetail: ServiceDetailDto[]; //@OneToMany
   
 }
 
@@ -57,7 +57,7 @@ export class CreateServiceDto {
 
     @IsOptional()
     @IsObject()
-    invoice?: CreateInvoiceDto; // @OneToOne(() => EntityInvoice, invoice => invoice.invoiceId)
+    invoice?: CreateInvoiceDto[]; // @OneToMany(() => EntityInvoice, invoice => invoice.invoiceId)
 
     @IsString()
     status: string;

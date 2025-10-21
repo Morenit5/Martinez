@@ -1,6 +1,5 @@
 import { ColumnNumericTransformer } from 'src/utils/ColumnNumericTransformer';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn } from 'typeorm';
-import { EntityInvoiceDetails } from './InvoiceDetails.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany,  ManyToOne, JoinColumn } from 'typeorm';
 import { EntityPayment } from './Payment.entity';
 import { EntityService } from './Service.entity';
 
@@ -25,10 +24,8 @@ export class EntityInvoice {
     @OneToMany(() => EntityPayment, payment => payment.invoice,{ cascade: true })
     payment: EntityPayment[];
 
-    @OneToMany(() => EntityInvoiceDetails, (invoiceDetail) => invoiceDetail.invoice)
-    invoiceDetails: EntityInvoiceDetails[];
-
-    @OneToOne(() => EntityService, (service) => service.invoice)
+    @ManyToOne(() => EntityService, (service) => service.invoice, { onUpdate: "CASCADE" })
+    @JoinColumn({ name: "serviceId" }) // Nombre de la columna en la tabla donde se une
     service?: EntityService;
 
     @Column('numeric', { precision: 7, scale: 2, transformer: new ColumnNumericTransformer() })

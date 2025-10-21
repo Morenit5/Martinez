@@ -11,9 +11,11 @@ export class ServiceEntity {
     client: ClientEntity;
     showDetails: boolean = false;
     serviceDetail: ServiceDetailEntity[];
-    invoice:InvoiceEntity;
+    invoice:InvoiceEntity[];
     isExtra: boolean;
+    enabled: boolean;
 }
+
 
 
 export class ServiceDetailEntity {
