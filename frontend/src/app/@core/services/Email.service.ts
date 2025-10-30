@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ServiceEntity } from '../entities/Service.entity';
 import { environment } from '@env/environment';
+import { ConfigurationEntity } from '../entities/Configuration.entity';
 
 @Injectable({ providedIn: 'root' })
 export class EmailService {
@@ -13,6 +14,7 @@ export class EmailService {
   apiUrlInvoice = environment.apiUrl + '/mail/invoice';
   apiUrlEnable = environment.apiUrl + '/mail/notify';
   apiUrlEnableStatus = environment.apiUrl + '/mail/notify/status';
+  apiUrlConfig = environment.apiUrl + '/mail/config';
 
   constructor(private http: HttpClient) { }
 
@@ -59,8 +61,27 @@ export class EmailService {
 
   getReminderStatus(): Observable<any>{
 
-
     let variable = this.http.get(this.apiUrlEnableStatus);
     return variable;
+  }
+
+    addConfiguration(configuration: ConfigurationEntity): Observable<ConfigurationEntity> {
+      console.log('Email.service: '+JSON.stringify(configuration));
+      const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+      let regresa = this.http.post<ConfigurationEntity>(this.apiUrlConfig, JSON.stringify(configuration),{ headers });
+      console.log('Email.service front: '+regresa);
+      return regresa;
+    }
+
+      updateConfiguration(configuration: ConfigurationEntity): Observable<ConfigurationEntity> {
+        let params = new HttpParams();
+        params = params.set('id', configuration.configurationId);
+        let instance = this.http.put<ConfigurationEntity>(this.apiUrlConfig + '/up/' + configuration.configurationId, configuration, { params: params });
+        return instance;
+      }
+
+      getConfig(): Observable<ConfigurationEntity[]>{
+
+    return this.http.get<ConfigurationEntity[]>(this.apiUrlConfig);
   }
 }

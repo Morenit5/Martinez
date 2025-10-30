@@ -1,4 +1,4 @@
-import { ConsoleLogger, Injectable } from '@nestjs/common';
+import { ConflictException, ConsoleLogger, Injectable } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import * as nodemailer from 'nodemailer';
 import * as path from 'path';
@@ -12,6 +12,7 @@ import { Between, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ServiceDto } from 'src/dto/Service.dto';
 import { InvoiceDto } from 'src/dto/Invoice.dto';
+import { EntityConfiguration } from 'src/entities/Configuration.entity';
 
 enum EmailOptions {
   subject = "Martinez Gardening Invoice",
@@ -34,8 +35,9 @@ export class EmailService {
   private transporter;
   cronJob: CronJob;
   onDate:number;
-
-  constructor(@InjectRepository(EntityService) private serviceRepository: Repository<EntityService>, private readonly exceptions: TypeORMExceptions){
+  //configRepository: Repository<EntityConfiguration>;
+  
+  constructor(@InjectRepository(EntityService) private serviceRepository: Repository<EntityService>,@InjectRepository(EntityConfiguration) private configRepository: Repository<EntityConfiguration>, private readonly exceptions: TypeORMExceptions){
     this.transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',  // tu servidor SMTP
       port: 587,
@@ -467,4 +469,24 @@ export class EmailService {
     }
     return pdfBytes;
   }
+
+    async create(configuration: EntityConfiguration): Promise<EntityConfiguration | null> {
+
+      try {
+        const newConfiguration = this.configRepository.create(configuration);
+        return await this.configRepository.save(newConfiguration);
+      } catch (e: any) {
+        // Postgres
+        if (e.code === '23505') throw new ConflictException('El correo ya está registrado.');
+        throw e;
+      }
+    }
+
+      findAll(): Promise<EntityConfiguration[]> {
+        return this.configRepository.find(/*{
+          where: [
+            { enabled: true },
+          ],
+        }*/)
+      }
 }

@@ -213,4 +213,19 @@ export class ServiceService {
     return this.serviceRepository.findOneBy({ serviceId })
     
   }
+
+
+    async findAllEnabled(): Promise<ServiceDto[]> {
+    var services: ServiceDto[] = await this.serviceRepository.find({ 
+       where: [{ 
+        enabled: true
+      } ],
+    }).then((result: any) => {
+      return result; // tal vez debamos manipular estos datos antes de mandar al front
+    }).catch((error: any) => {
+      this.exceptions.sendException(error);
+    });
+
+    return services;
+  }
 }

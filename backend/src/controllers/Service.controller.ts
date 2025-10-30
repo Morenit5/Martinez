@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param,  HttpException, HttpStatus,  Put, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param,  HttpException, HttpStatus,  Put, Query, ConsoleLogger } from '@nestjs/common';
 import { ServiceService} from '../services/Service.service';
 import { TypeORMExceptions } from '../exceptions/TypeORMExceptions';
 import { CreateServiceDto, ServiceDto, UpdateServiceDto } from '../dto/Service.dto';
@@ -11,9 +11,16 @@ export class  ControllerService {
   updateService: UpdateServiceDto;
   constructor(private readonly serviceService: ServiceService, private readonly exceptions: TypeORMExceptions) {}
 
+
+
   @Get()
   findAll(): Promise<ServiceDto[]> {
     return this.serviceService.findAll();
+  }
+
+  @Get('/enabled')
+  findAllEnabled(): Promise<ServiceDto[]> {
+    return this.serviceService.findAllEnabled();
   }
 
   @Get('/type')

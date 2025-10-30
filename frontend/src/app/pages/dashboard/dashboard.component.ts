@@ -108,7 +108,7 @@ export class DashboardComponent implements OnInit {
           legend: { position: 'top' },
           title: {
             display: true,
-            text: 'Clientes Fijos y Eventuales por Mes'
+            text: 'Clientes Fijos y Eventuales'
           }
         },
         scales: {
@@ -122,9 +122,10 @@ export class DashboardComponent implements OnInit {
   }
 
   getAllServicesIntances() {
-    this.serviceInstance.getAllServices().subscribe({
+    this.serviceInstance.getAllEnabled().subscribe({
       next: (servList) => {
         this.serviceList = servList;
+        console.log('ServiceList: '+this.serviceList[0].serviceName);
       },
       error: (error) => {
         console.error(error);

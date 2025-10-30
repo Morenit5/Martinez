@@ -54,7 +54,7 @@ export class ServiceComponent {
   services: ServiceEntity[] = [];// se crea un array vacio de la interfaz
   paginatedServices: ServiceEntity[] = [];
   page = 1; // Página actual
-  pageSize = 7; // Elementos por página
+  pageSize = 1; // Elementos por página
   collectionSize = 0; // Total de registros
   totalPages = 0;
   currentPage = 1;
@@ -251,6 +251,7 @@ export class ServiceComponent {
       this.defaultInvoiceFormArray.push(invoiceItem);
       return true;
     } catch (error) {
+      console.log('ERROR:'+error);
       return false;
     }
   }
@@ -629,6 +630,7 @@ console.log('entramos al generador')
           },
           complete: () => {
             this.onCancel();
+            this.getAllServicesIntances();
           }
         });
       }
