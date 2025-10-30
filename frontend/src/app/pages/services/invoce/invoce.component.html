@@ -10,8 +10,8 @@
                         <thead>
                             <tr>
                                 <th>Cliente</th>
-                                <th>Servicio</th>
-                                <th><a role="button" (click)="sortDate('invoiceDate')" ngbTooltip="Por Fechas">Fecha de Servicio</a><i class="bi bi-{{arrow}}"></i></th>
+                                <th><a role="button" (click)="sortDate('serviceName')" ngbTooltip="Por Servicio">Servicio</a><i class="bi bi-{{arrow}}"></i></th>
+                                <th><a role="button" (click)="sortDate('serviceDate')" ngbTooltip="Por Fechas">Fecha de Servicio</a><i class="bi bi-{{arrow}}"></i></th>
                                 <th>Fecha de Pago</th>
                                 <th>Estado Factura</th>
                                 <th>Acciones</th>
@@ -35,11 +35,11 @@
 
                                     <td> <!--Fecha de Servicio -->
 
-                                        {{parentItem.invoice[0].invoiceDate }}
+                                        {{parentItem.invoice[0].invoiceDate | date:'yyyy-MM-dd'  }}
                                     </td>
                                      <td> <!--Fecha de pago -->
 
-                                        {{parentItem.invoice[0].payment[0].paymentDate }}
+                                        {{parentItem.invoice[0].payment[0].paymentDate | date:'yyyy-MM-dd' }}
                                     </td>
 
                                     <td> <!-- Estado del pago  -->
@@ -50,10 +50,10 @@
                                     </td>
 
                                     <td> <!--Acciones  -->
-                                        <button *ngIf="parentItem.status == 'Cerrado'" class="btn btn-sm btn-outline-success" (click)="onViewPDF(parentItem.invoice[0].invoiceName)"
+                                        <button *ngIf="parentItem.status == 'Cerrado' || parentItem.invoice[0].invoiceStatus == 'Cerrado' " class="btn btn-sm btn-outline-success" (click)="onViewPDF(parentItem.invoice[0].invoiceName)"
                                             ngbTooltip="Ver Factura del Servicio"><i class="bi bi-filetype-pdf"></i></button>
                                    
-                                        <button class="btn btn-sm btn-outline-info" (click)="sendEmail(parentItem)" ngbTooltip="Reenviar Factura"><i class="bi bi-envelope-at"></i></button>
+                                        <button class="btn btn-sm btn-outline-info" (click)="sendEmail(parentItem, i)" ngbTooltip="Reenviar Factura"><i class="bi bi-envelope-at"></i></button>
                                     </td>
                                 </tr>
                                 }

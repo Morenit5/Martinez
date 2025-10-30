@@ -43,7 +43,7 @@ export class ControllerCategory {
 
     return await this.serviceCategory.create(this.createCat)
       .then((result: any) => {
-        console.log("Result:", result);
+        //console.log("Result:", result);
         return result;
       }).catch((error: any) => {
         this.exceptions.sendException(error);
@@ -69,7 +69,7 @@ export class ControllerCategory {
 
     return await this.serviceCategory.update(Number(categoryId), this.updateCat)
       .then((result: any) => {
-        console.log("Result:", result);
+        //console.log("Result:", result);
         return result;
       }).catch((error: any) => {
         this.exceptions.sendException(error);
@@ -94,7 +94,7 @@ export class ControllerCategory {
 
     return await this.serviceCategory.patchCategory(Number(categoryId), this.updateCat)
       .then((result: any) => {
-        console.log("Result:", result);
+        //console.log("Result:", result);
         return result;
       }).catch((error: any) => {
         this.exceptions.sendException(error);

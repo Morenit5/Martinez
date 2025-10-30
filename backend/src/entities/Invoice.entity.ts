@@ -12,6 +12,9 @@ export class EntityInvoice {
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     invoiceDate: Date;
 
+    @Column({type: 'varchar', length: 10, nullable:true })
+    invoicedMonth: string;
+
     @Column({type: 'varchar', length: 40 })
     invoiceNumber: string;
 
@@ -24,7 +27,7 @@ export class EntityInvoice {
     @OneToMany(() => EntityPayment, payment => payment.invoice,{ cascade: true })
     payment: EntityPayment[];
 
-    @ManyToOne(() => EntityService, (service) => service.invoice, { onUpdate: "CASCADE" })
+    @ManyToOne(() => EntityService, (service) => service.invoice, { cascade: ['insert', 'update'] })
     @JoinColumn({ name: "serviceId" }) // Nombre de la columna en la tabla donde se une
     service?: EntityService;
 
@@ -33,6 +36,9 @@ export class EntityInvoice {
 
     @Column({ type: 'boolean', default: true })
     enabled: boolean;
+
+    @Column({ type: 'varchar', length: 60, nullable:true })
+    invoiceStatus: string;
 
     @Column({ type: 'boolean',nullable:true, default: false })
     isGenerated: boolean;

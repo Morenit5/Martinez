@@ -8,9 +8,9 @@ export class EmailController {
   constructor(private readonly appService: EmailService) { }
 
   @Post('/send')
-  sendEmail(@Body() ServiceDto: ServiceDto) {
+  sendEmail(@Body() ServiceDto: ServiceDto,@Query('invoiceIndex') invoiceIndex: number) {
 
-    return this.appService.sendMail(ServiceDto);
+    return this.appService.sendMail(ServiceDto,invoiceIndex);
   }
 
   @Get('/invoice')
@@ -31,8 +31,8 @@ export class EmailController {
   }
 
   @Post('/download')
-  async generateInvoice(@Body() entity: ServiceDto, @Res() res: Response) {
-    const pdfBytes = await this.appService.generateInvoice(entity);
+  async generateInvoice(@Body() entity: ServiceDto,@Query('invoiceIndex') invoiceIndex: number, @Res() res: Response) {
+    const pdfBytes = await this.appService.generateInvoice(entity,invoiceIndex);
 
     
       res.setHeader('Content-Type', 'application/pdf');

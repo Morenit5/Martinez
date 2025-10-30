@@ -23,7 +23,7 @@ export class InvoceComponent {
   paginatedServices: ServiceEntity[] = [];
   originalValues: ServiceEntity[] = []; //para detener valores originales cuando se hace una busqueda
   page = 1; // Página actual
-  pageSize = 2; // Elementos por página
+  pageSize = 7; // Elementos por página
   collectionSize = 0; // Total de registros
   totalPages = 0;
   currentPage = 1;
@@ -42,11 +42,13 @@ export class InvoceComponent {
   arrow = 'arrow-up-short'
 
 
-  constructor(private toast: ToastUtility, private readonly serviceInstance: ServicesInstances, private readonly emailService: EmailService) { }
+  constructor(private toast: ToastUtility, private readonly serviceInstance: ServicesInstances, private readonly emailService: EmailService) { 
+   
+  }
 
 
   ngOnInit() {
-    this.getAllClosedServicesIntances(); // de entrada traemos clientes fijos solament
+     this.getAllClosedServicesIntances(); // de entrada traemos clientes fijos solament
   }
 
   private async openPDFViewer() {
@@ -189,19 +191,19 @@ export class InvoceComponent {
     });
   }
 
-  sendEmail(ServiceDto: ServiceEntity) {
+  sendEmail(ServiceDto: ServiceEntity,invoiceIndex:number) {
 
-    this.emailService.sendEmail(ServiceDto).subscribe({
+    this.emailService.sendEmail(ServiceDto,invoiceIndex).subscribe({
       next: () => this.toast.showToast('Factura reenviada correctamente ', 5000, 'check2-square', true),
       error: (err) => {
         console.error(err);
-        this.toast.showToast('Error al reenviar la factura ', 5000, 'check2-square', true);
+        this.toast.showToast('Error al reenviar la factura ', 5000, 'check2-square', false);
       }
     });
   }
 
   private getAllClosedServicesIntances(clientFirst?: string, clientLast?: string, month?: string) {
-    this.serviceList = null;
+    this.serviceList.length = 0;
 
     if (!clientFirst && !clientLast && !month) {
       this.serviceInstance.getAllClosedServicesBy().subscribe({
@@ -254,7 +256,7 @@ export class InvoceComponent {
 
     }
 
-    this.sortTableByColumn(this.originalValues, 'serviceDate', this.lastVal);
+    this.sortTableByColumn(this.originalValues, colName == 'serviceDate'? 'serviceDate':'serviceName', this.lastVal);
     this.serviceList = this.originalValues;
     this.collectionSize = this.serviceList.length;
     this.paginatedServices = this.serviceList.slice(0, this.pageSize);

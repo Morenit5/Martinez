@@ -38,7 +38,7 @@ export class ControllerServiceDetail {
 
     await this.serviceDetailService.create(this.newServiceDetail)
       .then((result: any) => {
-        console.log("Result:", result);
+        //console.log("Result:", result);
         return result;
       }).catch((error: any) => {
         this.exceptions.sendException(error);
@@ -68,7 +68,7 @@ export class ControllerServiceDetail {
   
       await this.serviceDetailService.update(serviceDetailId, this.updateServiceDetail)
         .then((result: any) => {
-          console.log("Result:", result);
+          //console.log("Result:", result);
           return result;
         }).catch((error: any) => {
           this.exceptions.sendException(error);

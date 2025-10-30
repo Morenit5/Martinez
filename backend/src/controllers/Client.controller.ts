@@ -17,7 +17,7 @@ export class  ControllerClient {
 
   @Get('/type')
   findAllBy(@Query('typeName') cltType: string): Promise<ClientDto[]> {
-    console.log('llegamos en el contorller  con valores ' + cltType);
+    //console.log('llegamos en el contorller  con valores ' + cltType);
    
     return this.serviceClient.findAllBy(cltType);
   }
@@ -55,7 +55,7 @@ export class  ControllerClient {
 
     await this.serviceClient.create(this.newClient)
       .then((result: any) => {
-        console.log("Result:", result);
+        //console.log("Result:", result);
         return result;
       }).catch((error: any) => {
         this.exceptions.sendException(error);
@@ -105,7 +105,7 @@ export class  ControllerClient {
 
     await this.serviceClient.update(id, this.updateClient)
       .then((result: any) => {
-        console.log("Result:", result);
+        //console.log("Result:", result);
         return result;
       }).catch((error: any) => {
         this.exceptions.sendException(error);

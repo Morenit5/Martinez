@@ -26,7 +26,7 @@ function postgresFactory(dbUtil: DbUtilService_Cls): TypeOrmModuleOptions {
         entities: dbUtil.getEntities(),
         synchronize: false,
         autoLoadEntities: false,
-
+        //logging: true,
         poolErrorHandler: async (err) => {
             const reconnection = setInterval(async () => {
                 console.log('Retrying connection...');

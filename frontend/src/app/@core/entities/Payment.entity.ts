@@ -3,7 +3,7 @@ import { NgbDateStruct } from "@ng-bootstrap/ng-bootstrap/datepicker/ngb-date-st
 export class PaymentEntity {
 
   paymentId: number;
-  paymentDate: Date | NgbDateStruct;
+  paymentDate: Date;
   paymentAmount: number;
   paymentMethod: string;
   taxAmount: number;

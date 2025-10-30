@@ -38,7 +38,7 @@ export class  ControllerPayment {
   
       await this.servicePayment.create(this.newPayment)
         .then((result: any) => {
-          console.log("Result:", result);
+          //console.log("Result:", result);
           return result;
         }).catch((error: any) => {
           this.exceptions.sendException(error);
@@ -84,7 +84,7 @@ export class  ControllerPayment {
   
       await this.servicePayment.update(id, this.updatePayment)
         .then((result: any) => {
-          console.log("Result:", result);
+          //console.log("Result:", result);
           return result;
         }).catch((error: any) => {
           this.exceptions.sendException(error);

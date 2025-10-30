@@ -7,12 +7,13 @@ export class InvoiceEntity {
     invoiceId: number;
     invoiceDate: Date;
     invoiceName: string;
+    invoicedMonth: string;
     invoiceNumber: string;
     totalAmount: number;
     payment: PaymentEntity[];  //@OneToMany(() => EntityPayment, payment => payment.paymentId)
     //invoiceDetails: InvoiceDetailsEntity[];  // @OneToMany(() => EntityInvoiceDetails, invoiceDetail => invoiceDetail.invoiceDetailId)
     service?: ServiceEntity; //@OneToMany(() => EntityService, service => service.serviceId)
-    
+    invoiceStatus:string;
     isGenerated: boolean;
    
 }

@@ -16,6 +16,10 @@ export class InvoiceDto {
 
     @IsOptional()
     @IsString()
+    invoicedMonth: string;
+
+    @IsOptional()
+    @IsString()
     invoiceName: string;
 
     @IsOptional()
@@ -38,7 +42,11 @@ export class InvoiceDto {
     
     @IsOptional()
     @IsNumber()
-    subtotalAmount
+    subtotalAmount:number
+
+    @IsOptional()
+    @IsString()
+    invoiceStatus: string;
 
     @IsBoolean()
     isGenerated: boolean;
@@ -56,6 +64,9 @@ export class CreateInvoiceDto {
     /*@IsNotEmpty({ message: 'El campo nombre de factura es obligatorio.' })
     @IsString()
     invoiceName: string;*/
+    @IsOptional()
+    @IsString()
+    invoicedMonth: string;
 
     @IsNotEmpty({ message: 'El campo cantidad total es obligatorio.' })
     @IsNumber()
@@ -71,7 +82,11 @@ export class CreateInvoiceDto {
 
     @IsOptional()
     @IsNumber()
-    subtotalAmount
+    subtotalAmount:number;
+
+    @IsOptional()
+    @IsString()
+    invoiceStatus: string;
 
     @IsBoolean({ message: 'El campo "activo" debe ser verdadero o falso' })
     enabled: boolean;
