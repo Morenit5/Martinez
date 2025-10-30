@@ -52,6 +52,14 @@ export class ServicesInstances {
         );
     }
 
+    getAllEnabled() {
+        return this.servicesListService.getAllEnabled().pipe(
+            map((response) =>
+                response.map((service: any) => plainToInstance(ServiceEntity, service)),
+            ),
+        );
+    }
+
     getAllServicesBy(clientType:string,extra?:boolean) {
 
         return this.servicesListService.getAllServicesBy(clientType, extra ).pipe(
@@ -80,6 +88,11 @@ class servicesService {
 
     getAllServices() {
         return this.http.get<any>(serviceUrl);
+        //.subscribe(data => { console.log(data); });
+    }
+
+    getAllEnabled() {
+        return this.http.get<any>(serviceUrl + '/enabled');
         //.subscribe(data => { console.log(data); });
     }
 

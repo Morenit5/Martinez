@@ -1,10 +1,14 @@
-import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Res } from '@nestjs/common';
 import { EmailService } from 'src/services/Email.service';
 import { Response } from 'express';
 import { ServiceDto } from 'src/dto/Service.dto';
+import { EntityConfiguration } from 'src/entities/Configuration.entity';
 
 @Controller({ version: '1', path: 'mail' })
 export class EmailController {
+  exceptions: any;
+   createConfig: EntityConfiguration;
+   
   constructor(private readonly appService: EmailService) { }
 
   @Post('/send')
@@ -12,6 +16,11 @@ export class EmailController {
 
     return this.appService.sendMail(ServiceDto,invoiceIndex);
   }
+
+    @Get()
+    findAll(): Promise<EntityConfiguration[]> {
+      return this.appService.findAll();
+    }
 
   @Get('/invoice')
   async getClientInvoice(@Query('name') name: string, @Res() res: Response) {
@@ -57,4 +66,29 @@ export class EmailController {
      return resp;
   }
 
+    @Post('/config')
+    async create(@Body() configuration: EntityConfiguration) {
+  
+      console.log('Llega a Email.controller: '+ JSON.stringify(configuration));
+      try {
+        this.createConfig = configuration;
+      } catch (error) {
+        throw new HttpException({
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: "Internal error while creating"
+        },
+          HttpStatus.INTERNAL_SERVER_ERROR, {
+          cause: error
+        });
+      }
+  
+      return await this.appService.create(this.createConfig)
+        .then((result: any) => {
+          console.log("Result:", result);
+          return result;
+        }).catch((error: any) => {
+          console.log("entra al catch: ", error);
+          this.exceptions.sendException(error);
+        });
+    }
 }
