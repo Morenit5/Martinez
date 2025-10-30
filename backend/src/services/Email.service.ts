@@ -16,7 +16,9 @@ import { InvoiceDto } from 'src/dto/Invoice.dto';
 enum EmailOptions {
   subject = "Martinez Gardening Invoice",
   text = "Please find attached the PDF document outlining the service provided. It includes all the relevant details regarding prices and details of each service.",
-  html = '<p>Please find attached the PDF document outlining the service provided. It includes all the relevant details regarding prices and details of each service.</p>'
+  html = '<p>Please find attached the PDF document outlining the service provided. It includes all the relevant details regarding prices and details of each service.<br><br></p>',
+  greetings = '<p>Thank you for choosing Martínez Gardening. <br> We appreciate the opportunity to work with you!<br><br><br></p>',
+  signature = 'Warm regards, <br> Omar Martínez.'
 }
 
 enum EmailReminderOptions {
@@ -157,22 +159,20 @@ export class EmailService {
       return;
   }
 
-  async sendMail(entity: ServiceDto) {
-
+  async sendMail(entity: ServiceDto,invoiceIndex:number) {
+    //const filePath = path.join(__dirname, '..', 'invoices'); // Or any other desired directory
+    //console.log('FilePath:  '+filePath);
+    const inv =  entity.invoice? entity.invoice[invoiceIndex] : undefined;
     
-    const filePath = path.join(__dirname, '..', 'invoices'); // Or any other desired directory
-    console.log('FilePath:  '+filePath);
-
-    
-    const invoiceName: string=  entity.invoice? entity.invoice[0].invoiceName: 'YeseniaRejon-20250824.pdf';
-    console.log("ENTITY: "+ JSON.stringify(entity));
+    const invoiceName: string=  inv? inv.invoiceName : 'YeseniaRejon-20250824.pdf';
+    //console.log("ENTITY: "+ JSON.stringify(entity));
 
     const info = await this.transporter.sendMail({
       from: 'francisco.usa.227@gmail.com',
       to: entity.client.email,
       subject: EmailOptions.subject,
-      text: EmailOptions.text,
-      html: EmailOptions.html,
+      //text: EmailOptions.text,
+      html: EmailOptions.html + EmailOptions.greetings + EmailOptions.signature,
       attachments: [
         {
           filename: invoiceName, //'YeseniaRejon-20250824.pdf',
@@ -192,10 +192,12 @@ export class EmailService {
   }
 
 
-  async generateInvoice(service: ServiceDto) {
+  async generateInvoice(service: ServiceDto,invoiceIndex:number) {
 
     let resp:{status:string, message:any} = {status:'', message:''};
-    const inv =  service.invoice? service.invoice[0] : undefined;
+    const inv =  service.invoice? service.invoice[invoiceIndex] : undefined;
+
+    
     /*if(inv == undefined){
       resp = {status:'error', message:'El invoice no fue encontrado, para poder generar la factura'};
       return  resp;
@@ -461,9 +463,9 @@ export class EmailService {
 
     try {
       fs.writeFileSync(filePath, pdfBytes);
-      console.log(`PDF document "${fileName}" saved successfully to ${filePath}`);
+      //console.log(`PDF document "${fileName}" saved successfully to ${filePath}`);
     } catch (error) {
-      console.error(`Error saving PDF document: ${error}`);
+      //console.error(`Error saving PDF document: ${error}`);
     }
     return pdfBytes;
   }

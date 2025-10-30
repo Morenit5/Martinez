@@ -21,6 +21,7 @@ function postgresFactory(dbUtil: DbUtilService_Cls) {
         database: dbUtil.getDbName(),
         entities: dbUtil.getEntities(),
         migrations: dbUtil.getMigrations(),
+        //logging: true,
         cli: {
             migrationsDir: dbUtil.getMigrationsDir()
         },

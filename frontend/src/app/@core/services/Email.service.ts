@@ -16,17 +16,25 @@ export class EmailService {
 
   constructor(private http: HttpClient) { }
 
-  sendEmail(service: ServiceEntity): Observable<any> {
-     
-     return this.http.post(this.apiUrlSend, service);
+  sendEmail(service: ServiceEntity, invoiceIndex:number): Observable<any> {
+    let myparams = new HttpParams();
+    myparams = myparams.append('invoiceIndex', invoiceIndex);
+
+    return this.http.post(this.apiUrlSend, service, {params: myparams});
   }
 
-  async generateInvoice(service: ServiceEntity): Promise<Observable<any>> {
+  async generateInvoice(service: ServiceEntity,invoiceIndex:number): Promise<Observable<any>> {
+
+    let myparams = new HttpParams();
+    myparams = myparams.append('invoiceIndex', invoiceIndex);
+    
+
     let variable = this.http.post(this.apiUrlDown, service, {
       responseType: 'blob', // Important: Set responseType to 'blob'
       headers: {
         'Accept': 'application/pdf' // Optional: Indicate preference for PDF
-      }
+      },
+      params: myparams
     });
     return variable;
   }

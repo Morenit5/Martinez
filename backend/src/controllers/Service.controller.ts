@@ -21,16 +21,20 @@ export class  ControllerService {
     //console.log('llegamos en el contorller  con valores ' + itemName + ' isExtra => ' + isExtra );
     let val:string;
     if(isExtra == undefined){val = 'false' } else { val = isExtra == 'true'? 'true': 'false' }
-    console.log('legamos con ==> ' + val);
+    //console.log('legamos con ==> ' + val);
     return this.serviceService.findAllBy(itemName,val);
   }
 
   @Get('/closed')
   findAllClosedBy(@Query('name') name?: string,@Query('lastName') lastName?: string,@Query('date') date?: string): Promise<ServiceDto[]> {
-    console.log('llegamos en el contorller  con valores Name ' + name + " Last " + lastName + ' date ' + date );
-  
-    
-    return this.serviceService.findAllClosed(name,lastName,date);
+    //console.log('llegamos en el contorller  con valores Name ' + name + " Last " + lastName + ' date ' + date );
+   return this.serviceService.findAllClosed(name,lastName,date);
+  }
+
+  @Get('/cclosed') //cash closed
+  findAllCashClosedBy(@Query('date') date?: string): Promise<ServiceDto[]> {
+    //console.log('llegamos en el contorller  con valores date ' + date );
+   return this.serviceService.findAllCashClosed(date);
   }
 
   @Get(':id')
@@ -57,7 +61,7 @@ export class  ControllerService {
 
     await this.serviceService.create(this.newService)
       .then((result: any) => {
-        console.log("Result:", result);
+        //console.log("Result:", result);
         return result;
       }).catch((error: any) => {
         this.exceptions.sendException(error);

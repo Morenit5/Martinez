@@ -58,7 +58,7 @@ export class ControllerUser {
       destination: join(__dirname, '..', 'uploads'),
       filename: (req, file, cb) => {
         // Generate a unique filename
-        console.log(req.body);
+        //console.log(req.body);
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         const ext = '.png';
         const userid = file.originalname; //este tiene el valor de user Id
@@ -109,7 +109,7 @@ export class ControllerUser {
       });
       return resp;
     } catch (error) {
-      //console.error('An error occurred during async upload:', error);
+      console.error('An error occurred during async upload: ', error);
       throw error; // Re-throw to propagate the error
     }
   }

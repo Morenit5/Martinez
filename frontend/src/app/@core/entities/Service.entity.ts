@@ -6,10 +6,12 @@ export class ServiceEntity {
     serviceId: number;
     serviceName: string;
     serviceDate: Date;
+    invoicedMonth: string
     status: string;
     price: string;
     client: ClientEntity;
     showDetails: boolean = false;
+    showMonthlyInvoices:boolean = false;
     serviceDetail: ServiceDetailEntity[];
     invoice:InvoiceEntity[];
     isExtra: boolean;

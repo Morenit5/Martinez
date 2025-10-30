@@ -4,7 +4,7 @@
   <!-- **************** C O M I E N Z A   E L   T A B   D E   C O N S U L T A **************** -->
   <div *ngIf="recivedTabIndex==0" class="containerService ">
     <div class="container mt-4">
-      <h3 class="mb-4">Servicios</h3>
+      <h3 class="mb-4">Servicios Activos</h3>
       <div style="margin-bottom: 25px;"> <!--Navigation Menu-->
         <ul ngbNav #nav="ngbNav" [(activeId)]="activeService" (navChange)="onNavChange($event)"  class="nav-tabs">
           <li [ngbNavItem]="1"> <button ngbNavLink>Servicios Fijos</button></li>
@@ -37,7 +37,7 @@
               <!--@if (!isLoading) {-->
               
               <ng-container> <!--*ngFor="let parentItem of serviceList"   paginatedServices-->
-                @for (parentItem of paginatedServices; track parentItem.serviceId) {
+                @for (parentItem of paginatedServices; track parentItem.serviceId; let i = $index) {
                   
                 <tr>
                   
@@ -49,13 +49,20 @@
                   </td>
                   <td>{{ parentItem.serviceDate | date:'yyyy-MM-dd' }}</td>
                   <td
-                    [ngClass]="{'table-success': parentItem.status.toLowerCase() == 'terminado', 'table-progress': parentItem.status.toLowerCase() == 'en proceso', 'table-recurrent': parentItem.status.toLowerCase() == 'recurrente'}">
+                    [ngClass]="{'table-success': parentItem.status.toLowerCase() == 'terminado', 'table-progress': parentItem.status.toLowerCase() == 'en_proceso', 'table-recurrent': parentItem.status.toLowerCase() == 'recurrente'}">
                     {{ parentItem.status }}</td>
                   <td>
-
-                    <button *ngIf="(parentItem.status.toLowerCase() != 'terminado' && !parentItem.invoice[0]?.payment[0].isServicePaid) " class="btn btn-sm btn-outline-primary " (click)="updateServiceDetail(parentItem)" ngbTooltip="Actualizar Servicio"><i class="bi bi-pencil"></i></button>
-                    <button *ngIf="(parentItem.status.toLowerCase() != 'terminado' && !parentItem.invoice[0]?.payment[0].isServicePaid) " class="btn btn-sm btn-outline-danger " (click)="deleteServiceDetail(parentItem)" ngbTooltip="Eliminar Servicio"><i class="bi bi-trash"></i></button>
-                    <button *ngIf="parentItem.invoice[0]?.payment[0].isServicePaid && parentItem.invoice[0]?.isGenerated" class="btn btn-sm btn-outline-info" (click)="sendEmail(parentItem)" ngbTooltip="Enviar Correo y Cerrar Servicio"><i class="bi bi-envelope-at"></i></button>
+                    <ng-container *ngIf="parentItem.status.toLowerCase() !== 'recurrente'; else EsRecurrente">
+                      <button *ngIf="(parentItem.status.toLowerCase() != 'terminado' && !parentItem.invoice[0]?.payment[0].isServicePaid) " class="btn btn-sm btn-outline-primary " (click)="updateServiceDetail(parentItem)" ngbTooltip="Actualizar Servicio"><i class="bi bi-pencil"></i></button>
+                      <button *ngIf="(parentItem.status.toLowerCase() != 'terminado' && !parentItem.invoice[0]?.payment[0].isServicePaid) " class="btn btn-sm btn-outline-danger " (click)="deleteServiceDetail(parentItem)" ngbTooltip="Eliminar Servicio"><i class="bi bi-trash"></i></button>
+                      <button *ngIf="parentItem.invoice[0]?.payment[0].isServicePaid && parentItem.invoice[i]?.isGenerated" class="btn btn-sm btn-outline-info" (click)="updateSendMailAndCloseStatus(parentItem,i)" ngbTooltip="Enviar Correo y Cerrar Servicio"><i class="bi bi-envelope-at"></i></button>
+                    </ng-container>
+                    
+                    <ng-template #EsRecurrente>
+                      <button  class="btn btn-sm btn-outline-success" (click)="regenerarFacturaRecurrente(parentItem)" ngbTooltip="Renovar Servicio"><i class="bi bi-arrow-repeat"></i></button>
+                      <button class="btn btn-sm btn-outline-primary " (click)="updateServiceDetail(parentItem)" ngbTooltip="Actualizar Servicio"><i class="bi bi-pencil"></i></button>
+                      <button class="btn btn-sm btn-outline-danger " (click)="deleteServiceDetail(parentItem)" ngbTooltip="Eliminar Servicio"><i class="bi bi-trash"></i></button>
+                    </ng-template>
                   </td>
                 </tr>
                 <tr *ngIf="parentItem.showDetails">
@@ -106,7 +113,7 @@
   </div>
   <!-- **************** T E R M I N A   E L   T A B   D E   C O N S U L T A **************** -->
 
-  <!-- **************** E M P I E Z A   E L   T A B   D E   S E R V I C I O S **************** -->
+  <!-- **************** E M P I E Z A   E L   T A B   D E   C R E A R   S E R V I C I O S **************** -->
   <div *ngIf="recivedTabIndex==1" class="containerService">
     <div class="container mt-4">
       <h3 class="mb-4">{{serviceLabel}}</h3>
@@ -265,16 +272,14 @@
         <input type="text" class="form-control" placeholder="Buscar por Cliente" (keyup)="onKeyUp($event)" [(ngModel)]="clientEntitiyToGet" (ngModelChange)="onNameChange($event)">
         <div class="table-responsive">
           <table class="table table-bordered table-striped">
+
             <thead>
               <tr>
                 <th>Cliente</th>
+                <th>Correo </th>
                 <th>Servicio</th>
-                <th>Fecha Pago</th>
-                <th>Pago</th>
-                <th>Impuesto</th>
-                <th>Metodo</th>
+                <th>Inicio de Contrato </th>
                 <th>Estado</th>
-                <th>Acciones</th>
               </tr>
             </thead>
             
@@ -290,67 +295,125 @@
                     {{parentItem.client.name}} {{parentItem.client.lastName}}
                   </td>
 
+                   <td> <!-- Correo -->
+                    {{ parentItem.client.email }}
+                  </td>                  
+
                   <td> <!-- Servicio -->
-                    {{ parentItem.serviceName }}
+                    <a role="button" (click)="toggleInoviceDetails(parentItem)" ngbTooltip="Ver Facturas">
+                      {{ parentItem.serviceName }}
+                    </a>
                   </td>
 
-                  <td> <!--Fecha de pago -->
-                    <div class="input-group">
-                      <input class="form-control" [disabled]="parentItem.invoice[0].payment[0].isServicePaid" type="text" id="paymentDate" name="paymentDate{{i}}"  [(ngModel)]="parentItem.invoice[0].payment[0].paymentDate"  placeholder="yyyy-mm-dd" ngbDatepicker #d="ngbDatepicker"  />
-                      <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">📅</button>
-                    </div>
-                  </td>
+                   <td> <!-- Fecha Servicio -->
+                    {{ parentItem.serviceDate  | date:'yyyy-MM-dd'  }}
+                  </td> 
+
+                  <!-- Estado -->
+                   <td [ngClass]="{'table-success': parentItem.status.toLowerCase() == 'terminado', 'table-progress': parentItem.status.toLowerCase() == 'en_proceso', 'table-recurrent': parentItem.status.toLowerCase() == 'recurrente'}">
+                    {{ parentItem.status }}
+                  </td> 
+                </tr>
+                <tr *ngIf="parentItem.showMonthlyInvoices">
+                  <td colspan="8">
+                      <table class="table caption-top table-hover table-bordered">
+                      <caption>Factura(s) del Servicio </caption>
+                      <thead>
+                        <tr>
+                            <th>Mes Facturado </th>
+                            <th>Fecha Pago</th>
+                            <th>Pago</th>
+                            <th>Impuesto</th>
+                            <th>Metodo</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let childInvoice of parentItem.invoice; let i = index">
+                          <td> <!--Fecha de pago -->
+                            <div class="input-group">
+                              {{childInvoice.invoicedMonth}}
+                            </div>
+                          </td>
+                          <td> <!--Fecha de pago -->
+                            <div class="input-group">
+                              <input class="form-control" [disabled]="childInvoice.payment[0].isServicePaid" type="text" id="paymentDate"
+                                name="paymentDate{{i}}" [(ngModel)]="childInvoice.payment[0].paymentDate" placeholder="yyyy-mm-dd"
+                                ngbDatepicker #d="ngbDatepicker" />
+                              <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">📅</button>
+                            </div>
+                          </td>
                   
-                  <td> <!-- Pago  $$ -->
-                    <div class="mb-3">
-                      <input type="text" name="paymentAmount{{i}}" [disabled]="parentItem.invoice[0].payment[0].isServicePaid" (input)="onInput($event,'is-number')" [(ngModel)]="parentItem.price" class="form-control col-form-label" id="paymentAmount"  placeholder="Cantidad de Pago"  (blur)="onInputBlur('paymentAmount',parentItem.price)"/>
-                      <div *ngIf="!paymentAmountIsValid && !parentItem.price && typeof parentItem.price !== 'number'" class="text-danger">
-                        Campo requerido
-                      </div>
-                      <div *ngIf="!paymentAmountIsValid && parentItem.price && typeof parentItem.price !== 'number'" class="text-danger">
-                        '{{parentItem.price}}' no es numero
-                      </div>
-                    </div>
-                  </td>
+                          <td> <!-- Pago  $$ -->
+                            <div class="mb-3">
+                              <input type="text" name="paymentAmount{{i}}" [disabled]="childInvoice.payment[0].isServicePaid" (input)="onInput($event,'is-number')" [(ngModel)]="parentItem.price" class="form-control col-form-label"
+                                     id="paymentAmount" placeholder="Cantidad de Pago" (blur)="onInputBlur('paymentAmount',parentItem.price)" />
+                              <div *ngIf="!paymentAmountIsValid && !parentItem.price && typeof parentItem.price !== 'number'" class="text-danger">
+                                Campo requerido
+                              </div>
+                              <div *ngIf="!paymentAmountIsValid && parentItem.price && typeof parentItem.price !== 'number'" class="text-danger">
+                                '{{parentItem.price}}' no es numero
+                              </div>
+                            </div>
+                          </td>
+                  
+                          <td> <!-- Impuesto $$ -->
+                            <div class="mb-3">
+                              <input type="text" name="taxAmount{{i}}" [disabled]="childInvoice.payment[0].isServicePaid"
+                                (input)="onInput($event, 'is-number')" [(ngModel)]="childInvoice.payment[0].taxAmount"
+                                class="form-control col-form-label" id="taxAmount" placeholder="Cantidad de Impuesto"
+                                (blur)="onInputBlur('taxAmount',childInvoice.payment[0].taxAmount)" />
+                              <div
+                                *ngIf="!taxAmountIsValid && !childInvoice.payment[0].taxAmount && typeof childInvoice.payment[0].taxAmount !== 'number'"
+                                class="text-danger">
+                                Campo requerido
+                              </div>
+                              <div
+                                *ngIf="!taxAmountIsValid && childInvoice.payment[0].taxAmount && typeof childInvoice.payment[0].taxAmount !== 'number'"
+                                class="text-danger">
+                                '{{childInvoice.payment[0].taxAmount}}' no es numero
+                              </div>
+                            </div>
+                          </td>
+                  
+                          <td> <!-- Metodo -->
+                            <div class="mb-3">
+                              <select class="form-select" [disabled]="childInvoice.payment[0].isServicePaid" name="paymentMethod{{i}}"
+                                [(ngModel)]="childInvoice.payment[0].paymentMethod"
+                                (blur)="onInputBlur('paymentMethod', childInvoice.payment[0].paymentMethod)">
+                                <option [ngValue]="null" disabled selected>Seleccionar:</option>
+                                <option *ngFor="let method of PaymentMethod" [ngValue]="method.value">
+                                  {{method.label}}
+                                </option>
+                              </select>
+                            </div>
+                          </td>
+                  
+                          <td> <!-- Estado del pago  -->
+                            <div class="form-check form-switch">
+                              <label class="form-check-label"
+                                for="flexSwitchCheckRecurrente">{{childInvoice.payment[0].paymentStatus}}</label>
+                              <input class="form-check-input" disabled type="checkbox" id="flexSwitchCheckPayStatus"
+                                [(ngModel)]="childInvoice.payment[0].isServicePaid">
+                          
+                            </div>
+                          </td>
 
-                  <td> <!-- Impuesto $$ -->
-                    <div class="mb-3">
-                      <input type="text" name="taxAmount{{i}}" [disabled]="parentItem.invoice[0].payment[0].isServicePaid" (input)="onInput($event, 'is-number')"  [(ngModel)]="parentItem.invoice[0].payment[0].taxAmount"  class="form-control col-form-label" id="taxAmount" placeholder="Cantidad de Impuesto"  (blur)="onInputBlur('taxAmount',parentItem.invoice[0].payment[0].taxAmount)"/>
-                      <div *ngIf="!taxAmountIsValid && !parentItem.invoice[0].payment[0].taxAmount && typeof parentItem.invoice[0].payment[0].taxAmount !== 'number'" class="text-danger">
-                        Campo requerido
-                      </div>
-                      <div *ngIf="!taxAmountIsValid && parentItem.invoice[0].payment[0].taxAmount && typeof parentItem.invoice[0].payment[0].taxAmount !== 'number'" class="text-danger">
-                        '{{parentItem.invoice[0].payment[0].taxAmount}}' no es numero
-                      </div>
-                    </div>
-                  </td>
+                          <td> <!--Acciones  -->
+                            <div class="actions-container ">
+                          
+                              <button *ngIf="!childInvoice.payment[0].isServicePaid" class="btn btn-sm btn-outline-success" (click)="onPaymentSubmit(parentItem,i)" ngbTooltip="Confirmar Pago"><i class="bi bi-currency-dollar"></i></button>
+                              <button *ngIf="childInvoice.payment[0].isServicePaid" class="btn btn-sm btn-outline-primary" (click)="generateInvoice(parentItem, i)" ngbTooltip="Generar Factura"><i class="bi bi-receipt-cutoff"></i></button>
+                              <button *ngIf="childInvoice.payment[0].isServicePaid && childInvoice.isGenerated" class="btn btn-sm btn-outline-info" (click)="updateSendMailAndCloseStatus(parentItem,i)"
+                                ngbTooltip="Enviar Correo y Cerrar Servicio"><i class="bi bi-envelope-at"></i></button>
+                          
+                            </div>
+                          </td>
 
-                  <td> <!-- Metodo -->
-                    <div class="mb-3">
-                      <select class="form-select" [disabled]="parentItem.invoice[0].payment[0].isServicePaid" name="paymentMethod{{i}}"  [(ngModel)]="parentItem.invoice[0].payment[0].paymentMethod" (blur)="onInputBlur('paymentMethod',parentItem.invoice[0].payment[0].paymentMethod)" >
-                        <option [ngValue]="null" disabled selected>Seleccionar:</option>
-                        <option *ngFor="let method of PaymentMethod" [ngValue]="method.value">
-                          {{method.label}}
-                        </option>
-                      </select>
-                    </div>
-                  </td>
-
-                  <td> <!-- Estado del pago  -->
-                    <div  class="form-check form-switch">
-                      <label class="form-check-label" for="flexSwitchCheckRecurrente">{{parentItem.invoice[0].payment[0].paymentStatus}}</label>
-                      <input class="form-check-input"  disabled type="checkbox"  id="flexSwitchCheckPayStatus" [(ngModel)]="parentItem.invoice[0].payment[0].isServicePaid" >
-                      
-                    </div>
-                  </td>
-                  <td> <!--Acciones  -->
-                    <div class="actions-container "> 
-
-                      <button *ngIf="!parentItem.invoice[0]?.payment[0].isServicePaid" class="btn btn-sm btn-outline-success" (click)="onPaymentSubmit(parentItem)" ngbTooltip="Confirmar Pago"><i class="bi bi-currency-dollar"></i></button>
-                    <button *ngIf="parentItem.invoice[0]?.payment[0].isServicePaid" class="btn btn-sm btn-outline-primary" (click)="generateInvoice(parentItem)" ngbTooltip="Generar Factura"><i class="bi bi-receipt-cutoff"></i></button>
-                      <button *ngIf="parentItem.invoice[0]?.payment[0].isServicePaid && parentItem.invoice[0]?.isGenerated" class="btn btn-sm btn-outline-info" (click)="updateSendMailAndCloseStatus(parentItem)" ngbTooltip="Enviar Correo y Cerrar Servicio"><i class="bi bi-envelope-at"></i></button>
-
-                    </div>    
+                        </tr>
+                      </tbody>
+                    </table>
                   </td>
                 </tr>
               }
