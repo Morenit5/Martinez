@@ -58,7 +58,7 @@ export class ListComponent implements OnInit {
       lastname: [''],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
-      rol: [RolEntity, Validators.required],
+      rol: ['', Validators.required],
       phone: []
     });
     this.initialUsersFormValues = this.usersForm.value;
@@ -74,9 +74,10 @@ export class ListComponent implements OnInit {
 
   onKeyUp(event: KeyboardEvent) {
     if (event.key === 'Enter') {
-      if(this.userEntitiyToGet == undefined || this.userEntitiyToGet.length <= 0){return;}
 
-
+      if(this.userEntitiyToGet == undefined || this.userEntitiyToGet.trim().length === 0) {return; }
+      this.userEntitiyToGet.trim();
+      
       const searchResults: UserEntity[] = this.usersList.filter(item => item.firstname.includes(this.userEntitiyToGet)); // || item.email.includes(this.userEntitiyToGet));
 
       if (searchResults.length !== 0) {

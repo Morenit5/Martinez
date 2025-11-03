@@ -189,12 +189,13 @@ export class ClientComponent {
 
   getMessage(message: number) {
 
-    
     if (message == undefined) {
       message = 0;
       this.recivedTabIndex = 0;
+      this.reqTabId = 0;
     }
     this.recivedTabIndex = message;
+    this.reqTabId = message;
   }
 
 
@@ -215,7 +216,7 @@ export class ClientComponent {
 
   onKeyUp(event: KeyboardEvent) {
       if (event.key === 'Enter') {
-        if(this.clientEntitiyToGet== undefined || this.clientEntitiyToGet.length==0)
+        if(this.clientEntitiyToGet== undefined || this.clientEntitiyToGet.trim().length===0)
         {
           return;
         }

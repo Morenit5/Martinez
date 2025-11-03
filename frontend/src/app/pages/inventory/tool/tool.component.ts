@@ -128,8 +128,10 @@ export class ToolComponent {
     if (message == undefined) {
       message = 0;
       this.recivedTabIndex = 0;
+      this.reqTabId = 0;
     }
     this.recivedTabIndex = message;
+    this.reqTabId = message;
   }
 
 
@@ -272,7 +274,7 @@ export class ToolComponent {
 
   onKeyUp(event: KeyboardEvent) {
     if (event.key === 'Enter') {
-      if(this.toolEntitiyToGet == undefined || this.toolEntitiyToGet.length <=0 ){return;}
+      if(this.toolEntitiyToGet == undefined || this.toolEntitiyToGet.trim().length===0 ){return;}
       const searchResults: ToolEntity[] = this.originalValues.filter(item => item.name.includes(this.toolEntitiyToGet));
 
       if (searchResults.length !== 0) {

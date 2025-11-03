@@ -88,8 +88,8 @@ export class EmailService {
         return instance;
       }
 
-      getConfig(): Observable<ConfigurationEntity[]>{
+      getConfig(): Observable<ConfigurationEntity>{
 
-    return this.http.get<ConfigurationEntity[]>(this.apiUrlConfig);
+    return this.http.get<ConfigurationEntity>(this.apiUrlConfig);
   }
 }

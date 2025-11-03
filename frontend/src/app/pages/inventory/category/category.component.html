@@ -55,12 +55,8 @@
               </div>
             </div>
             <div class="mb-3">
-              <label>Tipo*</label>
+              <label>Tipo</label>
               <input type="text" class="form-control col-form-label" formControlName="categoryType" id="categoryType"/>
-              <div *ngIf="categoryForm.get('categoryType')?.invalid && categoryForm.get('categoryType')?.touched"
-                class="text-danger">
-                Campo requerido
-              </div>
             </div>
           </div>
 
