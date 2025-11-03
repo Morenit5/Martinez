@@ -485,10 +485,6 @@ export class EmailService {
     }
 
       findAll(): Promise<EntityConfiguration[]> {
-        return this.configRepository.find(/*{
-          where: [
-            { enabled: true },
-          ],
-        }*/)
+        return this.configRepository.find();
       }
 }

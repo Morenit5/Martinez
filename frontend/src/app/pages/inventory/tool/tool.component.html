@@ -47,7 +47,7 @@
                 </td>
               </tr>
               <tr *ngIf="tool.showDetails">
-                <td colspan="4">
+                <td colspan="6">
                   <table class="table caption-top table-striped-columns">
                     <caption>Detalles</caption>
                     <thead>
@@ -148,19 +148,13 @@
               <label for="price" class="form-label">Precio</label>
               <input type="text" id="price" class="form-control col-form-label" formControlName="price" />
             </div>
-
-            <!--<div class="mb-3">
-    <label for="precio" class="form-label">Precio</label>
-    <input type="number" id="precio" formControlName="precio" class="form-control" placeholder="Ingrese el precio" />
-  </div>-->
-
             <div class="mb-3 ">
               <label for="fecha" class=""></label>
               <div class="input-group-append">
                 <div class="text-end">
                   <button type="submit" class="btn btn-sm btn-outline-primary" >{{toolButton}}</button>
                   <button type="button" class="btn btn-sm btn-outline-danger" (click)="onCancel()" >Cancelar</button>
-                  <button type="reset" class="btn btn-sm btn-outline-warning" (click)="onClearForm()"><i class="bi bi-arrow-counterclockwise" ngbTooltip="Limpiar formulario"></i> 
+                  <button type="reset" *ngIf="toolForm.get('code').value!='' && toolForm.get('name').value!='' && toolForm.get('acquisitionDate').value!=''" class="btn btn-sm btn-outline-warning" (click)="onClearForm()"><i class="bi bi-arrow-counterclockwise" ngbTooltip="Limpiar formulario"></i> 
 </button>
                 </div>
               </div>

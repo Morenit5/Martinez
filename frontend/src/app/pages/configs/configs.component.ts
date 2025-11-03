@@ -40,15 +40,15 @@ export class ConfigsComponent {
   getEmailConfiguration() {
     this.mailService.getConfig().subscribe({
       next: (response) => {
-        console.log(response);
+        console.log('RESPONSE '+response);
 
-        /*this.emailConfigForm.patchValue({
+        this.emailConfigForm.patchValue({
           email: response.email,
           password: response.password
-        });*/
+        });
       },
       error: (error) => {
-        console.error(error);
+        console.error('ERROR '+error);
       },
     });
   }

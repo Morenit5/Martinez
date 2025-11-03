@@ -86,6 +86,9 @@
                   {{ rol.name }}
                 </option>
               </select>
+              <div *ngIf="usersForm.get('rol')?.invalid && usersForm.get('rol')?.touched" class="text-danger">
+                Campo requerido
+              </div>
             </div>
           </div>
 

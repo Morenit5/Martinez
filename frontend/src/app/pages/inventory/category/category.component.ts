@@ -19,7 +19,7 @@ export class CategoryComponent {
 
   onKeyUp(event: KeyboardEvent) {
     if (event.key === 'Enter') {
-              if(this.categoryEntitiyToGet== undefined || this.categoryEntitiyToGet.length==0)
+              if(this.categoryEntitiyToGet== undefined || this.categoryEntitiyToGet.trim().length===0)
         {
           return;
         }
@@ -91,7 +91,7 @@ export class CategoryComponent {
     this.categoryForm = this.fbCategory.group({
       categoryId: [],
       name: ['', Validators.required],
-      categoryType: ['', Validators.required],
+      categoryType: [''],
     });
     this.updatePaginatedData();
   }
@@ -205,12 +205,14 @@ export class CategoryComponent {
   }
 
   getMessage(message: number) {
-
+    
     if (message == undefined) {
       message = 0;
       this.recivedTabIndex = 0;
+      this.reqTabId = 0;
     }
     this.recivedTabIndex = message;
+    this.reqTabId = message;
   }
 
   updateCategory(categoryInstance: iCategory) {
