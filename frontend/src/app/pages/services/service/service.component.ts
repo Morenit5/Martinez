@@ -66,7 +66,7 @@ export class ServiceComponent {
   services: ServiceEntity[] = [];// se crea un array vacio de la interfaz
   paginatedServices: ServiceEntity[] = [];
   page = 1; // Página actual
-  pageSize = 1; // Elementos por página
+  pageSize = 7; // Elementos por página
   collectionSize = 0; // Total de registros
   totalPages = 0;
   currentPage = 1;
@@ -1039,7 +1039,8 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
    
   onKeyUp(event: KeyboardEvent) {
     if (event.key === 'Enter') {
-      if (this.clientEntitiyToGet == undefined || this.clientEntitiyToGet.length <= 0) { return; }
+     
+      if (this.clientEntitiyToGet == undefined || this.clientEntitiyToGet.trim().length===0) { return; }
 
       this.clientEntitiyToGet = this.clientEntitiyToGet.replace(/\s+/g, ' ').trim();
       if (this.clientEntitiyToGet.toLocaleLowerCase() == 'pago cash') { //este es para ocultar pagos en efectivo
@@ -1086,7 +1087,7 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
   onSearchServiceKeyUp(event: KeyboardEvent) {
 
     if (event.key === 'Enter') {
-      if (this.serviceEntitiyToGet == undefined || this.serviceEntitiyToGet.length <= 0) { return; }
+      if (this.serviceEntitiyToGet == undefined || this.serviceEntitiyToGet.trim().length === 0) { return; }
 
       let listEntities: ServiceEntity[];
 

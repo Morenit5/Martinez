@@ -80,7 +80,12 @@ export class InvoceComponent {
   //fecha
   onKeyUp(event: KeyboardEvent) {
     if (event.key === 'Enter') {
-      console.log(this.originalValues)
+     // console.log(this.originalValues)
+
+     if(this.entitiyToGet== undefined || this.entitiyToGet.trim().length===0)
+        {
+          return;
+        }
 
       let listEntities: ServiceEntity[];
 
