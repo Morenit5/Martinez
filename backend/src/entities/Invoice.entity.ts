@@ -37,7 +37,7 @@ export class EntityInvoice {
     @Column({ type: 'boolean', default: true })
     enabled: boolean;
 
-    @Column({ type: 'varchar', length: 60, nullable:true })
+    @Column({ type: 'varchar', length: 60, nullable:true, default:'En_Proceso' })
     invoiceStatus: string;
 
     @Column({ type: 'boolean',nullable:true, default: false })

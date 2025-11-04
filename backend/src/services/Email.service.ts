@@ -81,7 +81,7 @@ export class EmailService {
       if (finalValue == false) {
         this.cronJob.stop();
       }
-      return {active:true, message:'notificaciones habilitadas'};
+      return {active:true, message:'Configuración guardada.'};
     }
     catch (error) {
       return {active:false, message:'error al tratar de habilitar las notificaciones'};
