@@ -59,8 +59,8 @@
                     </ng-container>
                     
                     <ng-template #EsRecurrente>
-                      <button  class="btn btn-sm btn-outline-success" (click)="regenerarFacturaRecurrente(parentItem)" ngbTooltip="Renovar Servicio"><i class="bi bi-arrow-repeat"></i></button>
-                      <button class="btn btn-sm btn-outline-primary " (click)="updateServiceDetail(parentItem)" ngbTooltip="Actualizar Servicio"><i class="bi bi-pencil"></i></button>
+                      <button *ngIf="isRecurrencyEnabled==false"  class="btn btn-sm btn-outline-success" (click)="regenerarFacturaRecurrente(parentItem)" ngbTooltip="Renovar Servicio"><i class="bi bi-arrow-repeat"></i></button>
+                      <button class="btn btn-sm btn-outline-primary" (click)="updateServiceDetail(parentItem)" ngbTooltip="Actualizar Servicio"><i class="bi bi-pencil"></i></button>
                       <button class="btn btn-sm btn-outline-danger " (click)="deleteServiceDetail(parentItem)" ngbTooltip="Eliminar Servicio"><i class="bi bi-trash"></i></button>
                     </ng-template>
                   </td>

@@ -18,14 +18,14 @@ export class EmailService {
 
   constructor(private http: HttpClient) { }
 
-  sendEmail(service: ServiceEntity, invoiceIndex:number): Observable<any> {
+  sendEmail(service: ServiceEntity, invoiceIndex: number): Observable<any> {
     let myparams = new HttpParams();
     myparams = myparams.append('invoiceIndex', invoiceIndex);
 
-    return this.http.post(this.apiUrlSend, service, {params: myparams});
+    return this.http.post(this.apiUrlSend, service, { params: myparams });
   }
 
-  async generateInvoice(service: ServiceEntity,invoiceIndex:number): Promise<Observable<any>> {
+  async generateInvoice(service: ServiceEntity, invoiceIndex: number): Promise<Observable<any>> {
 
     let myparams = new HttpParams();
     myparams = myparams.append('invoiceIndex', invoiceIndex);
@@ -55,7 +55,7 @@ export class EmailService {
     return variable;
   }
 
-  enableReminders(enable:boolean, date:number): Observable<any> {
+  /*enableReminders(enable:boolean, date:number): Observable<any> {
     let myparams = new HttpParams();
     myparams = myparams.append('enable', enable);
     myparams = myparams.append('onDate', date);
@@ -65,30 +65,30 @@ export class EmailService {
     };
     
     return this.http.post(this.apiUrlEnable, null, httpOptions);
-  }
+  }*/
 
-  getReminderStatus(): Observable<any>{
+  getReminderStatus(): Observable<any> {
 
     let variable = this.http.get(this.apiUrlEnableStatus);
     return variable;
   }
 
-    addConfiguration(configuration: ConfigurationEntity): Observable<ConfigurationEntity> {
-      console.log('Email.service: '+JSON.stringify(configuration));
-      const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-      let regresa = this.http.post<ConfigurationEntity>(this.apiUrlConfig, JSON.stringify(configuration),{ headers });
-      console.log('Email.service front: '+regresa);
-      return regresa;
-    }
+  addConfiguration(configuration: ConfigurationEntity): Observable<ConfigurationEntity> {
+    console.log('Email.service: ' + JSON.stringify(configuration));
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let regresa = this.http.post<ConfigurationEntity>(this.apiUrlConfig, JSON.stringify(configuration), { headers });
+    console.log('Email.service front: ' + regresa);
+    return regresa;
+  }
 
-      updateConfiguration(configuration: ConfigurationEntity): Observable<ConfigurationEntity> {
-        let params = new HttpParams();
-        params = params.set('id', configuration.configurationId);
-        let instance = this.http.put<ConfigurationEntity>(this.apiUrlConfig + '/up/' + configuration.configurationId, configuration, { params: params });
-        return instance;
-      }
+  updateConfiguration(configuration: ConfigurationEntity): Observable<ConfigurationEntity> {
+    let params = new HttpParams();
+    params = params.set('id', configuration.configurationId);
+    let instance = this.http.put<ConfigurationEntity>(this.apiUrlConfig + '/up/' + configuration.configurationId, configuration, { params: params });
+    return instance;
+  }
 
-      getConfig(): Observable<ConfigurationEntity>{
+  getConfig(): Observable<ConfigurationEntity> {
 
     return this.http.get<ConfigurationEntity>(this.apiUrlConfig);
   }

@@ -20,6 +20,7 @@ import { AuthModule } from './auth/auth.module';
 import { PermissionModule } from './modules/Permission.module';
 import { RolModule } from './modules/Rol.module';
 import { MulterModule } from '@nestjs/platform-express';
+import { ConfigurationModule } from './modules/Configuration.module';
 
 let importModules =[
   ConfigModule.forRoot({
@@ -37,7 +38,8 @@ let importModules =[
   UserModule,
   PermissionModule,
   RolModule,
-  AuthModule
+  AuthModule,
+  ConfigurationModule
 ];
 
 @Module({
