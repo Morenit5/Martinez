@@ -61,6 +61,10 @@ export class CreateInvoiceDto {
     @IsString()
     invoiceNumber: string;
 
+    @IsOptional()
+    @IsString()
+    invoiceName: string;
+
     /*@IsNotEmpty({ message: 'El campo nombre de factura es obligatorio.' })
     @IsString()
     invoiceName: string;*/

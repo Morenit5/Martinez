@@ -39,7 +39,9 @@ export class EmailService {
   onDate:number;
   //configRepository: Repository<EntityConfiguration>;
   
-  constructor(@InjectRepository(EntityService) private serviceRepository: Repository<EntityService>,@InjectRepository(EntityConfiguration) private configRepository: Repository<EntityConfiguration>, private readonly exceptions: TypeORMExceptions){
+  constructor(@InjectRepository(EntityService) private serviceRepository: Repository<EntityService>,
+              @InjectRepository(EntityConfiguration) private configRepository: Repository<EntityConfiguration>, 
+              private readonly exceptions: TypeORMExceptions){
     this.transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',  // tu servidor SMTP
       port: 587,
@@ -50,9 +52,25 @@ export class EmailService {
         pass: 'xmwzwuxotnqpvmjp',     // ⚠️ Contraseña de aplicación
       },
     });
+
+    this.configRepository.find({ 
+      where: [{ 
+        enabled: true,
+      } ],
+    }).then((Configurations : any) => {
+      for(const config of Configurations ){
+        if(config.enableNotification == true || config.enableNotification == 'true' ){
+          this.enableNotifications('true',config.enableOnDate); 
+           //console.log('se inicializo la auto generacion de invoices')
+        }
+      }
+     }).catch((error: any) => {
+      this.exceptions.sendException(error);
+    });
+
   }
 
-  enableNotifications(enable: string, enableOnDate: string): {} {
+  async enableNotifications(enable: string, enableOnDate: string): Promise<{}> {
     
     const finalValue: boolean = enable.toLocaleLowerCase() === 'true';
     this.onDate = Number(enableOnDate);
@@ -76,6 +94,7 @@ export class EmailService {
       if (finalValue == true) {
         if (!this.cronJob.isActive) {
           this.cronJob.start();
+          console.log('ya fue activado el cron job para recordatorio de correos')
         }
       }
       if (finalValue == false) {
@@ -89,15 +108,19 @@ export class EmailService {
   }
 
   getNotificationStatus():{} {
+    console.log('llegamos al service job notification')
     let resp:{active:boolean, notifyOnDate:any} = {active:false, notifyOnDate:''};
     if(this.cronJob == undefined || this.cronJob == null){return resp;}
     
+   
     let isActive = this.cronJob.isActive;
     if(isActive){
        resp = {active:true, notifyOnDate:this.onDate};
     }else{
        resp = {active:false, notifyOnDate:''};
     }
+
+     console.log('el job del service esta activo')
     return resp;
   }
 
