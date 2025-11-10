@@ -42,14 +42,27 @@ export class EmailService {
    emailConfig: string | undefined;
    passConfig: string | undefined;
 
-  constructor(@InjectRepository(EntityService) private serviceRepository: Repository<EntityService>, @InjectRepository(EntityConfiguration) private configRepository: Repository<EntityConfiguration>, private readonly exceptions: TypeORMExceptions){
-    
-    this.configInit();
-    
+constructor(@InjectRepository(EntityService) private serviceRepository: Repository<EntityService>,
+              @InjectRepository(EntityConfiguration) private configRepository: Repository<EntityConfiguration>,
+              private readonly exceptions: TypeORMExceptions){
+   this.configInit();
+    this.configRepository.find({
+      where: [{
+        enabled: true,
+      } ],
+    }).then((Configurations : any) => {
+      for(const config of Configurations ){
+        if(config.enableNotification == true || config.enableNotification == 'true' ){
+          this.enableNotifications('true',config.enableOnDate);
+           //console.log('se inicializo la auto generacion de invoices')
+        }
+      }
+     }).catch((error: any) => {
+      this.exceptions.sendException(error);
+    });
   }
 
-  async configInit()
-  {
+  async configInit()  {
    await this.findConfigVariables();
     
    console.log(this.emailConfig + ' ' + this.passConfig);
@@ -63,12 +76,10 @@ export class EmailService {
         pass: this.passConfig,//'xmwzwuxotnqpvmjp',     //  Contraseña de aplicación
       },
     });
-
-
   }
 
 
-  enableNotifications(enable: string, enableOnDate: string): {} {
+  async enableNotifications(enable: string, enableOnDate: string): Promise<{}> {
     
     const finalValue: boolean = enable.toLocaleLowerCase() === 'true';
     this.onDate = Number(enableOnDate);
