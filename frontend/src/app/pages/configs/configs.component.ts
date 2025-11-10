@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { ConfigurationService } from '@app/@core/services/Configuration.service';
 import { EmailService } from '@app/@core/services/Email.service';
+import { ServicesInstances } from '@app/@core/services/Services.service';
 import { ToastUtility } from '@app/@core/utils/toast.utility';
+
 
 @Component({
   selector: 'app-configs',
@@ -9,101 +12,59 @@ import { ToastUtility } from '@app/@core/utils/toast.utility';
   templateUrl: './configs.component.html',
   styleUrl: './configs.component.scss'
 })
-export class ConfigsComponent {
+export class ConfigsComponent implements OnInit {
 
   configForm!: FormGroup;
-  emailConfigForm!:FormGroup;
+  showEmailSection: boolean = false; //vamos a esconder el correo por defecto
   recivedTabIndex: number = 0;
   initialConfigFormValues: any;
   configLabel: string = 'Registro de Correo de configuración';
   configButton: string = 'Registrar';
   reqTabId: number;
-  //emailService: EmailService = inject(CategoryService);
+  confId =  null;
+  
 
-  constructor(private fbTool: FormBuilder, private toast: ToastUtility, private readonly mailService: EmailService) {
-    this.getConfigStatus();
-    this.getEmailConfiguration();
+  constructor(private fbTool: FormBuilder, private toast: ToastUtility, 
+              private readonly mailService: EmailService, private readonly configService:ConfigurationService,private readonly serviceInstance: ServicesInstances) {
+   
 
     this.configForm = this.fbTool.group({
-      enableReminder: ['', Validators.required],
-      dayOfMonth: ['', Validators.required],
+      configurationId: [],
+      email: [''],
+      password: [''],
+      enableNotification: [''],
+      isInvoiceAutomatically: [''],
+      enableOnDate: [''],
 
     });
     this.initialConfigFormValues = this.configForm.value;
-
-    this.emailConfigForm = this.fbTool.group({
-      configurationId: [],
-      email: ['', Validators.required],
-      password: ['', Validators.required],
-    });
+  
   }
-  getEmailConfiguration() {
-    this.mailService.getConfig().subscribe({
-      next: (response) => {
-        console.log('RESPONSE '+response);
-
-        this.emailConfigForm.patchValue({
-          email: response.email,
-          password: response.password
-        });
-      },
-      error: (error) => {
-        console.error('ERROR '+error);
-      },
-    });
+  
+  
+  ngOnInit(): void {
+    this.getAllValues();
   }
 
+  
   onSubmit(orignForm: 'Configuration' | 'Email') {
     this.configForm.updateValueAndValidity();
 
-if (orignForm === 'Configuration') {
-    console.log('Formulario Configuracion enviado');
-    console.log(this.configForm.value);
-
-    if (this.configForm.valid) {
-
-      let enable = this.configForm.get('enableReminder').value;
-      let enableOnDate = this.configForm.get('dayOfMonth').value;
+    if (orignForm === 'Configuration') {
 
 
-      this.mailService.enableReminders(enable, enableOnDate).subscribe({
-        next: (response) => {
-          if (response.active == true) {
-            this.toast.showToast(response.message, 7000, 'check2-circle', true);
-          } else {
-            this.toast.showToast(response.message, 7000, 'check2-circle', false);
-          }
+      if (this.configForm.valid) {
 
-        },
-        error: (err) => {
-          this.toast.showToast('Error al tratar de registar recordatorios', 7000, 'x-circle', false);
-        },
-
-      });
-
-
-    } else {
-
-      this.configForm.markAllAsTouched();
-      this.toast.showToast('Campos inválidos, por favor revise el formulario!!', 7000, 'x-circle', false);
-    }
-  }
-
-  if (orignForm === 'Email') {
-    console.log('Formulario Email enviado');
-    console.log(this.emailConfigForm.value);
-
-    if (this.emailConfigForm.valid) {
-      
-     //
-      this.mailService.addConfiguration(this.emailConfigForm.value).subscribe({
+        if(this.confId != null){
+          this.configForm.get('configurationId').setValue(this.confId);
+        }
+       
+        this.configService.setConfigurations(this.configForm.value).subscribe({
           next: (response) => {
-            this.toast.showToast('Correo registrado exitosamente!!', 7000, 'check2-circle', true);
-            console.log(response);
+            this.toast.showToast('Configuraciones Actualizadas correctamente!!', 7000, 'check2-circle', true);
           },
           error: (err) => {
-            console.log('ENTRAMOS AL ERROR: ' + JSON.stringify(err.error.error));
-            let errorMessage = JSON.stringify(err.error.error);
+           let errorMessage = JSON.stringify(err.error.error);
             console.log(errorMessage);
             if (errorMessage.startsWith('"Error:')) {
               console.log(errorMessage);
@@ -112,33 +73,30 @@ if (orignForm === 'Configuration') {
             this.toast.showToast(errorMessage, 7000, 'x-circle', false);
           },
           complete: () => {
-            //this.onClear();
-            //this.getAllDataCategories();
+            console.log('Completamos la accion ahora vamos a traer datos')
+            this.getAllValues();
+            
           }
+
         });
-      //
 
-    } else {
-      console.log('Formulario Email inválido');
+
+      } else {
+
+        this.configForm.markAllAsTouched();
+        this.toast.showToast('Campos inválidos, por favor revise el formulario!!', 7000, 'x-circle', false);
+      }
     }
-  }   
-  }
 
-  onCancel() {
-/*
-    //this.isReadOnly = false; //enable de regreso el field cliente
-    //go back to consulta tab
-    this.reqTabId = 0; // al cancelar le enviamos al padre que cambie al tabulador 0
-    this.recivedTabIndex = this.reqTabId;
-
-    this.resetFields();
-    this.configLabel = 'Registro de Clientes';
-    this.configButton = 'Registrar'
-*/
+  
   }
 
 
-
+  getAllValues(){
+    this.getConfigStatus();
+    this.getAutoInvoiceStatus()
+    this.getEmailConfiguration();
+  } 
 
   getMessage(message: number) {
 
@@ -149,17 +107,52 @@ if (orignForm === 'Configuration') {
     this.recivedTabIndex = message;
   }
 
-  getConfigStatus() {
-    this.mailService.getReminderStatus().subscribe({
+  async getConfigStatus() {
+
+    //obtenemos el status desde el mail service que es dnd esta 
+    //el cronjob en lugar de la base de datos de configurations
+    //para saber el status en tiempo real
+     this.mailService.getReminderStatus().subscribe({
       next: (response) => {
-        console.log(response);
-        this.configForm.get('enableReminder').setValue(response.active);
-        this.configForm.get('dayOfMonth').setValue(response.notifyOnDate);
+        console.log('response de reminder ' + JSON.stringify(response));
+        this.configForm.get('enableNotification').setValue(response.active);
+        this.configForm.get('enableOnDate').setValue(response.notifyOnDate);
       },
       error: (error) => {
         console.error(error);
       },
 
+    });
+  }
+
+    getAutoInvoiceStatus() {
+
+    //obtenemos el status desde el Servicio  service que es dnd esta 
+    //el cronjob en lugar de la base de datos de configurations
+    //para saber el status en tiempo real
+    this.serviceInstance.getAutoInvoiceStatus().subscribe({
+      next: (response) => {
+        console.log('response de automatic service ' + JSON.stringify(response));
+        this.configForm.get('isInvoiceAutomatically').setValue(response.active);
+        
+      },
+      error: (error) => {
+        console.error(error);
+      },
+
+    });
+  }
+
+  getEmailConfiguration() {
+    this.configService.getConfig().subscribe({
+      next: (response) => {
+        this.configForm.get('configurationId').setValue(response[0].configurationId);
+        this.configForm.get('email').setValue(response[0].email);
+        this.configForm.get('password').setValue(response[0].password);
+      },
+      error: (error) => {
+        console.error(error);
+      },
     });
   }
 }

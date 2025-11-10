@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param,  HttpException, HttpStatus,  Put, Query, ConsoleLogger } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param,  HttpException, HttpStatus,  Put, Query, ConsoleLogger, Res } from '@nestjs/common';
 import { ServiceService} from '../services/Service.service';
 import { TypeORMExceptions } from '../exceptions/TypeORMExceptions';
 import { CreateServiceDto, ServiceDto, UpdateServiceDto } from '../dto/Service.dto';
@@ -44,6 +44,13 @@ export class  ControllerService {
    return this.serviceService.findAllCashClosed(date);
   }
 
+  @Get('/autoinvoice/status')
+  async getNotificationsStatus(@Res({ passthrough: true }) res: Response) {
+
+    let resp = this.serviceService.getAutoInvoiceStatus();
+    return resp;
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string): Promise<ServiceDto|null> {
     return this.serviceService.findOne(+id);
@@ -73,6 +80,14 @@ export class  ControllerService {
       }).catch((error: any) => {
         this.exceptions.sendException(error);
       });
+  }
+
+  @Post('/autocreate')
+  async enableNotification(@Query('enable') enableNotification: string,  @Res({ passthrough: true }) res: Response) {
+
+    let resp = this.serviceService.enableDisableInvoiceCreation(enableNotification );
+
+    return resp;
   }
 
 

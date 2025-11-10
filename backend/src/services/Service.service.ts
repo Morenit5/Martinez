@@ -4,12 +4,38 @@ import { Between, Equal, FindOperator, ILike, In, Not, Or, Repository } from 'ty
 import { EntityService } from '../entities/Service.entity';
 import { CreateServiceDto, ServiceDto, UpdateServiceDto } from '../dto/Service.dto';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
+import { CronJob } from 'cron';
+import { CreatePaymentDto } from 'src/dto/Payment.dto';
+import { CreateInvoiceDto } from 'src/dto/Invoice.dto';
+import { EntityConfiguration } from 'src/entities/Configuration.entity';
+import { ConfigurationDto, createConfigurationDto } from 'src/dto/Configuration.dto';
+import { config } from 'dotenv';
 
 
 @Injectable()
 export class ServiceService {
+  cronJob: CronJob;
+  months: string[] = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
-  constructor(@InjectRepository(EntityService) private serviceRepository: Repository<EntityService>, private readonly exceptions: TypeORMExceptions) { }
+  constructor(@InjectRepository(EntityService) private serviceRepository: Repository<EntityService>, 
+              @InjectRepository(EntityConfiguration) private configurationRepository: Repository<EntityConfiguration>, private readonly exceptions: TypeORMExceptions) { 
+   
+
+    this.configurationRepository.find({ 
+      where: [{ 
+        enabled: true,
+      } ],
+    }).then((Configurations : any) => {
+      for(const config of Configurations ){
+        if(config.isInvoiceAutomatically == true || config.isInvoiceAutomatically == 'true' ){
+          this.enableDisableInvoiceCreation('true'); 
+           //console.log('se inicializo la auto generacion de invoices')
+        }
+      }
+     }).catch((error: any) => {
+      this.exceptions.sendException(error);
+    });
+  }
 
 
   async findAll(): Promise<ServiceDto[]> {
@@ -302,6 +328,23 @@ export class ServiceService {
 
   }
 
+  async findAllRecurrentServices(): Promise<ServiceDto[]> {
+
+    var services: ServiceDto[] = await this.serviceRepository.find({
+      where: [{
+        enabled: true,
+        status: 'Recurrente',
+
+      }],
+    }).then((result: any) => {
+      return result; // tal vez debamos manipular estos datos antes de mandar al front
+    }).catch((error: any) => {
+      this.exceptions.sendException(error);
+    });
+
+    return services;
+  }
+
   create(service: CreateServiceDto): Promise<ServiceDto> {
     return this.serviceRepository.save(service);
   }
@@ -314,11 +357,11 @@ export class ServiceService {
   }
 
 
-    async findAllEnabled(): Promise<ServiceDto[]> {
-    var services: ServiceDto[] = await this.serviceRepository.find({ 
-       where: [{ 
+  async findAllEnabled(): Promise<ServiceDto[]> {
+    var services: ServiceDto[] = await this.serviceRepository.find({
+      where: [{
         enabled: true
-      } ],
+      }],
     }).then((result: any) => {
       return result; // tal vez debamos manipular estos datos antes de mandar al front
     }).catch((error: any) => {
@@ -326,5 +369,131 @@ export class ServiceService {
     });
 
     return services;
+  }
+
+
+  async enableDisableInvoiceCreation(enable: string): Promise<{}> {
+
+    const finalValue: boolean = enable.toLocaleLowerCase() === 'true';
+    let x: number = 5;
+    //const schedule = `0 0 6 1 * *`;  // el primero de cada mes a las 6 de la mañana
+    const forTesting = `0 */${x} * * * *`;  //cada 10 minutos
+
+    try {
+      if (this.cronJob == null || this.cronJob == undefined) {
+        this.cronJob = new CronJob(forTesting, async () => {
+          try {
+            await this.updateServiceInvoice();
+            //console.log('Factura creada correctamente')
+          } catch (e) {
+            console.error(e);
+          }
+        });
+      }
+
+      if (finalValue == true) {
+        if (!this.cronJob.isActive) {
+          this.cronJob.start();
+
+          console.log('ya fue activado el cron job para crear las nuevas facturas')
+        }
+      }
+      if (finalValue == false) {
+        this.cronJob.stop();
+      }
+
+      let configs: createConfigurationDto;// = new createConfigurationDto();
+      let currentCofig = await this.findCurrentConfigurations();
+
+      for (const conf of currentCofig) {
+        configs = new createConfigurationDto();
+        configs.configurationId = conf.configurationId;
+        configs.email = conf.email;
+        configs.enabled = true;
+        configs.isInvoiceAutomatically = finalValue;
+        configs.password = conf.password;
+
+        this.configurationRepository.save(configs);
+      }
+
+      return { active: true, message: 'invoice creado' };
+    }
+    catch (error) {
+      return { active: false, message: 'error al tratar de crear el invoice' };
+    }
+  }
+
+
+  async findCurrentConfigurations(): Promise<EntityConfiguration[]> {
+    var conf: ConfigurationDto[] = await this.configurationRepository.find({
+      where: [{
+        enabled: true,
+      }],
+    }).then((result: any) => {
+      //console.log(result);
+      return result; // tal vez debamos manipular estos datos antes de mandar al front
+
+    }).catch((error: any) => {
+      this.exceptions.sendException(error);
+    });
+
+    return conf;
+  }
+  
+  async updateServiceInvoice(): Promise<void> {
+ 
+    //let serviceIds: number[] = [];
+    let serviceList = await this.findAllRecurrentServices();
+
+    for(const serviceInst of serviceList ){
+      await this.createAutomaticNewInvoice(serviceInst);
+    }
+
+  }
+
+  private async createAutomaticNewInvoice(service: ServiceDto): Promise<ServiceDto>{
+    const currentDate = new Date();//.toISOString().slice(0, 10); //en teoria debe ser ==> año/mes/01 ya que se genera cada primero de mes
+    const currentMonthIndex: number = new Date().getMonth();
+    let chosenMonth =  this.months[currentMonthIndex]; 
+    
+    
+    let paymentItem: CreatePaymentDto = new CreatePaymentDto();
+    paymentItem.paymentDate = currentDate,
+    paymentItem.paymentAmount = 0;
+    paymentItem.paymentMethod = 'none';
+    paymentItem.taxAmount = 0;
+    paymentItem.paymentStatus = 'Por_Pagar';
+   
+
+    let invoiceItem: CreateInvoiceDto = new CreateInvoiceDto();
+    invoiceItem.invoiceDate = currentDate;
+    invoiceItem.invoiceNumber = '1';
+    invoiceItem.invoiceName = 'initial_invoice_name';
+    invoiceItem.totalAmount = 0;
+    invoiceItem.subtotalAmount = 0;
+    invoiceItem.invoicedMonth = chosenMonth;
+    invoiceItem.invoiceStatus = 'Por_Pagar';
+    invoiceItem.payment = [paymentItem];
+    
+
+    let serviceUp :UpdateServiceDto = new UpdateServiceDto();
+    serviceUp.serviceId = service.serviceId;
+    serviceUp.invoice = [invoiceItem];
+  
+
+    return this.serviceRepository.save(serviceUp);
+  }
+
+    getAutoInvoiceStatus():{} {
+    let resp:{active:boolean} = {active:false};
+    if(this.cronJob == undefined || this.cronJob == null){return resp;}
+    
+    let isActive = this.cronJob.isActive;
+    if(isActive){
+       resp = {active:true};
+    }else{
+       resp = {active:false};
+    }
+    return resp;
   }
 }

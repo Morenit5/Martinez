@@ -37,6 +37,7 @@ export class EmailService {
   private transporter;
   cronJob: CronJob;
   onDate:number;
+
   configRepo: Repository<EntityConfiguration>;
    existingConfig: EntityConfiguration;
    emailConfig: string | undefined;
@@ -62,7 +63,7 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
     });
   }
 
-  async configInit()  {
+ async configInit()  {
    await this.findConfigVariables();
     
    console.log(this.emailConfig + ' ' + this.passConfig);
@@ -77,7 +78,6 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
       },
     });
   }
-
 
   async enableNotifications(enable: string, enableOnDate: string): Promise<{}> {
     
@@ -103,6 +103,7 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
       if (finalValue == true) {
         if (!this.cronJob.isActive) {
           this.cronJob.start();
+          console.log('ya fue activado el cron job para recordatorio de correos')
         }
       }
       if (finalValue == false) {
@@ -116,15 +117,19 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
   }
 
   getNotificationStatus():{} {
+    console.log('llegamos al service job notification')
     let resp:{active:boolean, notifyOnDate:any} = {active:false, notifyOnDate:''};
     if(this.cronJob == undefined || this.cronJob == null){return resp;}
     
+   
     let isActive = this.cronJob.isActive;
     if(isActive){
        resp = {active:true, notifyOnDate:this.onDate};
     }else{
        resp = {active:false, notifyOnDate:''};
     }
+
+     console.log('el job del service esta activo')
     return resp;
   }
 

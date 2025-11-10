@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { map } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { environment } from '@env/environment';
 import { instanceToPlain, plainToInstance } from 'class-transformer';
 import { ServiceEntity } from '../entities/Service.entity';
@@ -83,10 +83,14 @@ export class ServicesInstances {
                 response.map((service: any) => plainToInstance(ServiceEntity, service)),
             ),
         );
-    }
-
 }
 
+
+    getAutoInvoiceStatus(): Observable<any>{
+        return this.servicesListService.getNewInvoiceStatus();
+
+    }
+}
 
 @Injectable({ providedIn: 'root', })
 class servicesService {
@@ -157,5 +161,10 @@ class servicesService {
         return instance;
     }
 
-
+    
+    getNewInvoiceStatus() {
+    
+        return this.http.get(serviceUrl + '/autoinvoice/status');
+       
+      }
 }

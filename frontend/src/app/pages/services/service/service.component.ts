@@ -1,7 +1,7 @@
 import { formatDate } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, Inject, LOCALE_ID, SimpleChanges } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, Inject, LOCALE_ID, OnInit } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ClientEntity } from '@app/@core/entities/Client.entity';
 import { ServiceEntity, ServiceDetailEntity } from '@app/@core/entities/Service.entity';
 import { ClientInstances } from '@app/@core/services/Client.service';
@@ -10,9 +10,9 @@ import { InvoiceInstances } from '@app/@core/services/invoice.service';
 import { ServicesInstances } from '@app/@core/services/Services.service';
 import { ToastUtility } from '@app/@core/utils/toast.utility';
 import { DateAdapterService } from '@app/shared/services/date-adapter.service';
-import { NgbDateAdapter, NgbDateStruct, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDateAdapter, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
-import { firstValueFrom, from, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 enum Status {
   EnProceso = "En_Proceso",
@@ -34,7 +34,7 @@ enum paymentStatus {
   styleUrl: './service.component.scss',
   providers: [{ provide: NgbDateAdapter, useClass: DateAdapterService}]
 })
-export class ServiceComponent {
+export class ServiceComponent implements OnInit{
 
   valueSubscription: Subscription;
 
@@ -133,6 +133,9 @@ export class ServiceComponent {
   serviceEntitiyToGet: any;
 
   months: string[] = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+  //recurrencia
+  isRecurrencyEnabled:boolean = false;
 
   constructor(private toast: ToastUtility, private readonly serviceInstance: ServicesInstances, private readonly invoiceInstance: InvoiceInstances,
     private readonly clientInstance: ClientInstances, http: HttpClient, private serviceFrm: FormBuilder, @Inject(LOCALE_ID) private locale: string) {
@@ -528,7 +531,7 @@ export class ServiceComponent {
     this.getallClientsBy(this.clientesFijos);
     this.lastUsedValue = this.clientesFijos;
     this.getAllServicesIntancesBy(this.clientesFijos); // de entrada traemos clientes fijos solamente
-
+    this.getRecurrentInvoiceStatus();
   }
 
 
@@ -650,6 +653,18 @@ export class ServiceComponent {
     });
   }
 
+  getRecurrentInvoiceStatus() {
+    this.serviceInstance.getAutoInvoiceStatus().subscribe({
+      next: (response) => {
+        this.isRecurrencyEnabled = response.active; //si la recurrencia es activa entonces escondemos el boton de lo contrario lo mostramos
+      },
+      error: (error) => {
+        console.error(error);
+      },
+
+    });
+  }
+
   toggleDetails(Item: any) {
     Item.showDetails = !Item.showDetails;
   }
@@ -676,7 +691,7 @@ export class ServiceComponent {
 
   resetFields(){
     this.serviceForm.reset(this.initialServiceFormValues);
-    this.itemsFormArray.clear();
+    if(this.itemsFormArray != null) { this.itemsFormArray.clear(); }
     this.serviceDetails.length = 0; //remove from UI
 
     //cleanup UI for next service details
@@ -721,7 +736,7 @@ export class ServiceComponent {
         if(success){
           this.createDefaultPaymentItemFormGroup(this.serviceForm.get('serviceDate').value);
         }else {
-          this.toast.showToast('no se pudo crear el invoice por default!', 5000, 'check2-circle', true);
+          this.toast.showToast('no se pudo crear el invoice por default!', 5000, 'check2-circle', false);
           return;
         }
         
@@ -846,6 +861,7 @@ export class ServiceComponent {
     //y no ir tantas veces a la backend
     if(message == 0){  //Tab Consulta
       this.getAllServicesIntancesBy(this.clientesFijos,false);
+      this.getRecurrentInvoiceStatus();
     }
 
     if(message == 1){  //Tab Crear Servicio
@@ -1149,7 +1165,49 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
   }
 
   regenerarFacturaRecurrente(entity: ServiceEntity) {
-    this.toast.showToastWarning('Aqui vamos a renovar el servico un mes mas', 5000, 'x-circle');
+
+    
+    const currentDate = new Date();
+    let currentDateFormatted = formatDate(currentDate, 'yyyy-MM-dd', this.locale);
+    this.serviceForm.get('serviceId').setValue(entity.serviceId);
+    this.serviceForm.get('serviceName').setValue(entity.serviceName);
+    this.serviceForm.get('client.clientId').setValue(entity.client.clientId);
+
+    if (this.serviceForm.valid) {
+
+      const success = this.createDefaultInvoiceFormGroup(currentDateFormatted); //agregamos el default invoice a la serviceForm
+      if (success) {
+        this.createDefaultPaymentItemFormGroup(currentDateFormatted); //agregamos el default payment al invoiceGroup q acabamos de agregar
+      } else {
+        this.toast.showToast('no se pudo crear el invoice!!', 5000, 'check2-circle', false);
+        return;
+      }
+
+      //console.log(JSON.stringify(this.serviceForm.value));
+
+      //remove unnecessary fields
+      this.serviceForm.removeControl('serviceDate');
+      this.serviceForm.removeControl('status');
+      this.serviceForm.removeControl('price');
+      this.serviceForm.removeControl('serviceDetail');
+      this.serviceForm.removeControl('isExtra');
+      this.serviceForm.removeControl('serviceName');
+      this.serviceForm.removeControl('client');
+
+      this.serviceInstance.updateService(this.serviceForm.value).subscribe({
+        next: (response) => {
+          this.toast.showToast('Servicio recurrente actualizado exitosamente!!', 7000, 'check2-circle', true);
+        },
+        error: (err) => {
+
+          this.toast.showToast('Error al actualizar el servicio recurrente!!', 7000, 'x-circle', false);
+        },
+        complete: () => {
+          this.onCancel();
+          this.getAllServicesIntances();
+        }
+      });
+    }
   }
 
 }
