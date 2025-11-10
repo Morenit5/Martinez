@@ -15,6 +15,7 @@ import { PdfviewerComponent } from '../pdfviewer/pdfviewer.component';
 })
 export class InvoceComponent {
 
+
   recivedTabIndex: number = 0;
   isLoading: boolean = true;
 
@@ -40,7 +41,9 @@ export class InvoceComponent {
 
   lastVal = 'asc'
   arrow = 'arrow-up-short'
+  esPagoCash:string;
 
+  displayBtnCash = false;
 
   constructor(private toast: ToastUtility, private readonly serviceInstance: ServicesInstances, private readonly emailService: EmailService) { 
    
@@ -49,13 +52,22 @@ export class InvoceComponent {
 
   ngOnInit() {
      this.getAllClosedServicesIntances(); // de entrada traemos clientes fijos solament
+     this.displayBtnCash= false;
   }
 
   private async openPDFViewer() {
     this.modalConfig = { closeButtonLabel: 'Cerrar', };
     this.pdfUrl = URL.createObjectURL(this.pdfData);
+        return await this.modalComponent.open();
+  }
 
-    return await this.modalComponent.open();
+  clearSearch() {
+    // Limpiamos los resultados de la tabla
+    this.serviceList.length = 0;
+    this.displayBtnCash = false;
+
+    //realizamos la consulta de las facturas
+    this.getAllClosedServicesIntances(); // de entrada traemos clientes fijos solamente
   }
 
   onNameChange(newValue: string) {
@@ -78,19 +90,26 @@ export class InvoceComponent {
   //apellido
   //nombre + apellido
   //fecha
+  //paymentMethod
   onKeyUp(event: KeyboardEvent) {
     if (event.key === 'Enter') {
      // console.log(this.originalValues)
 
-     if(this.entitiyToGet== undefined || this.entitiyToGet.trim().length===0)
-        {
-          return;
-        }
+     if(this.entitiyToGet== undefined || this.entitiyToGet.trim().length===0) { return; }
 
-      let listEntities: ServiceEntity[];
-
+     let listEntities: ServiceEntity[];
+         
       const numWords = this.entitiyToGet.trim().split(/\s+/).length;
+
+      if (this.entitiyToGet.toLocaleLowerCase() == 'pago cash') { //este es para buscar los pagos hechos en efectivo
+        this.esPagoCash = 'Cash'
+        listEntities = this.findAllCashClosedBy(this.esPagoCash);
+        this.entitiyToGet = ''; // limpiamos el campo de la busqueda
+        return;
+      }
+
       if (numWords == 1) {
+
         if (this.mesToGet != undefined) {
           listEntities = this.findByMonth();
         } else {
@@ -128,6 +147,32 @@ export class InvoceComponent {
 
       }
     }
+  }
+
+  findAllCashClosedBy(esPagoCash): ServiceEntity[] {
+     this.serviceList.length = 0;
+      
+      this.serviceInstance.getAllServicesByPaymentCash(this.esPagoCash).subscribe({
+        next: (servList) => {
+          this.originalValues = servList;
+          this.serviceList = servList;
+          this.collectionSize = this.serviceList.length;
+          this.paginatedServices = this.serviceList.slice(0, this.pageSize);
+          this.displayBtnCash = this.serviceList.length > 0;
+        },
+        error: (error) => {
+          console.error(error);
+          this.isLoading = false;
+        },
+        complete: () => {
+          this.isLoading = false;
+        }
+      });
+ 
+
+     let searchResults: ServiceEntity[] = this.originalValues.filter(item => item.invoice[0].payment[0].paymentMethod.includes(this.entitiyToGet));
+
+    return searchResults;
   }
 
   findByName(): ServiceEntity[] {
@@ -191,7 +236,8 @@ export class InvoceComponent {
       },
       complete: () => {
         this.isLoading = false;
-        this.openPDFViewer();
+       
+        window.open(this.pdfUrl, '_blank');
       }
     });
   }

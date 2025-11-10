@@ -7,20 +7,20 @@ import { EntityConfiguration } from 'src/entities/Configuration.entity';
 @Controller({ version: '1', path: 'mail' })
 export class EmailController {
   exceptions: any;
-   createConfig: EntityConfiguration;
-   
+  createConfig: EntityConfiguration;
+
   constructor(private readonly appService: EmailService) { }
 
-  @Post('/send')
-  sendEmail(@Body() ServiceDto: ServiceDto,@Query('invoiceIndex') invoiceIndex: number) {
-
-    return this.appService.sendMail(ServiceDto,invoiceIndex);
+  @Get()
+  findAll(): Promise<EntityConfiguration[]> {
+    return this.appService.findAll();
   }
 
-    @Get()
-    findAll(): Promise<EntityConfiguration[]> {
-      return this.appService.findAll();
-    }
+  @Post('/send')
+  sendEmail(@Body() ServiceDto: ServiceDto, @Query('invoiceIndex') invoiceIndex: number) {
+
+    return this.appService.sendMail(ServiceDto, invoiceIndex);
+  }
 
   @Get('/invoice')
   async getClientInvoice(@Query('name') name: string, @Res() res: Response) {
@@ -40,14 +40,14 @@ export class EmailController {
   }
 
   @Post('/download')
-  async generateInvoice(@Body() entity: ServiceDto,@Query('invoiceIndex') invoiceIndex: number, @Res() res: Response) {
-    const pdfBytes = await this.appService.generateInvoice(entity,invoiceIndex);
+  async generateInvoice(@Body() entity: ServiceDto, @Query('invoiceIndex') invoiceIndex: number, @Res() res: Response) {
+    const pdfBytes = await this.appService.generateInvoice(entity, invoiceIndex);
 
-    
-      res.setHeader('Content-Type', 'application/pdf');
-      //res.setHeader('Content-Disposition', 'attachment; filename='+ entity.invoice?.invoiceName);
-      res.send(Buffer.from(pdfBytes));
-    
+
+    res.setHeader('Content-Type', 'application/pdf');
+    //res.setHeader('Content-Disposition', 'attachment; filename='+ entity.invoice?.invoiceName);
+    res.send(Buffer.from(pdfBytes));
+
   }
 
   private isNotPromise<T>(value: T | Promise<T>): value is T {
@@ -59,36 +59,35 @@ export class EmailController {
   }
 
   @Post('/notify')
-  async enableNotification(@Query('enable') enableNotification: string,@Query('onDate') enableOnDate: string, @Res({ passthrough: true }) res: Response) {
+  async enableNotification(@Query('enable') enableNotification: string, @Query('onDate') enableOnDate: string, @Res({ passthrough: true }) res: Response) {
 
-    let resp = this.appService.enableNotifications(enableNotification,enableOnDate);
-    
-     return resp;
+    let resp = this.appService.enableNotifications(enableNotification, enableOnDate);
+
+    return resp;
   }
 
-    @Post('/config')
-    async create(@Body() configuration: EntityConfiguration) {
-  
-      console.log('Llega a Email.controller: '+ JSON.stringify(configuration));
-      try {
-        this.createConfig = configuration;
-      } catch (error) {
-        throw new HttpException({
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          error: "Internal error while creating"
-        },
-          HttpStatus.INTERNAL_SERVER_ERROR, {
-          cause: error
-        });
-      }
-  
-      return await this.appService.create(this.createConfig)
-        .then((result: any) => {
-          console.log("Result:", result);
-          return result;
-        }).catch((error: any) => {
-          console.log("entra al catch: ", error);
-          this.exceptions.sendException(error);
-        });
+  @Post('/config')
+  async create(@Body() configuration: EntityConfiguration) {
+
+    try {
+      this.createConfig = configuration;
+    } catch (error) {
+      throw new HttpException({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: "Internal error while creating"
+      },
+        HttpStatus.INTERNAL_SERVER_ERROR, {
+        cause: error
+      });
     }
+
+    return await this.appService.create(this.createConfig)
+      .then((result: any) => {
+        console.log("Result:", result);
+        return result;
+      }).catch((error: any) => {
+       
+        this.exceptions.sendException(error);
+      });
+  }
 }

@@ -37,20 +37,36 @@ export class EmailService {
   private transporter;
   cronJob: CronJob;
   onDate:number;
-  //configRepository: Repository<EntityConfiguration>;
-  
-  constructor(@InjectRepository(EntityService) private serviceRepository: Repository<EntityService>,@InjectRepository(EntityConfiguration) private configRepository: Repository<EntityConfiguration>, private readonly exceptions: TypeORMExceptions){
+  configRepo: Repository<EntityConfiguration>;
+   existingConfig: EntityConfiguration;
+   emailConfig: string | undefined;
+   passConfig: string | undefined;
+
+  constructor(@InjectRepository(EntityService) private serviceRepository: Repository<EntityService>, @InjectRepository(EntityConfiguration) private configRepository: Repository<EntityConfiguration>, private readonly exceptions: TypeORMExceptions){
+    
+    this.configInit();
+    
+  }
+
+  async configInit()
+  {
+   await this.findConfigVariables();
+    
+   console.log(this.emailConfig + ' ' + this.passConfig);
     this.transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',  // tu servidor SMTP
       port: 587,
       encryption: 'TLS',
       secure: false,
       auth: {
-        user: 'francisco.usa.227@gmail.com', // ⚠️ Poner correo válido
-        pass: 'xmwzwuxotnqpvmjp',     // ⚠️ Contraseña de aplicación
+        user: this.emailConfig,//'francisco.usa.227@gmail.com', //  Poner correo válido
+        pass: this.passConfig,//'xmwzwuxotnqpvmjp',     //  Contraseña de aplicación
       },
     });
+
+
   }
+
 
   enableNotifications(enable: string, enableOnDate: string): {} {
     
@@ -101,7 +117,6 @@ export class EmailService {
     return resp;
   }
 
-
   async checkUnpaidServices(): Promise<void>{
     //const today = new Date().toISOString().slice(0, 10);
     let mails:string[] = [];
@@ -125,7 +140,6 @@ export class EmailService {
     const startDate = new Date(currentYear.toString() + '-' + currentMonth.toString() + '-01');
     const endDate = new Date(currentYear.toString() + '-' + currentMonth.toString() + '-31');
    
-
     var services: ServiceDto[] = await this.serviceRepository.find({
       relations: {
         client: true,
@@ -196,6 +210,7 @@ export class EmailService {
 
   async generateInvoice(service: ServiceDto,invoiceIndex:number) {
 
+    configuration: EntityConfiguration;
     let resp:{status:string, message:any} = {status:'', message:''};
     const inv =  service.invoice? service.invoice[invoiceIndex] : undefined;
 
@@ -293,7 +308,7 @@ export class EmailService {
     y -= 15;
     page.drawText("MARTINEZ GARDENING", { x: 415, y, size: 10, font: timesRoman });
     y -= 15;
-    page.drawText("# de Cédula: ", { x: 415, y, size: 10, font: timesRoman });
+    page.drawText("License number: 68741"/*+ configuration.licenseNumber*/ , { x: 415, y, size: 10, font: timesRoman });
     y -= 15;
     page.drawText("Invoice Number: " + invoiceNumber, { x: 415, y, size: 10, font: timesRoman });
 
@@ -483,6 +498,16 @@ export class EmailService {
         throw e;
       }
     }
+
+
+
+     async findConfigVariables() {
+
+       let config =  await this.configRepository.find();
+       this.emailConfig = config[0].email;
+      this.passConfig = config[0].password;
+
+      }
 
       findAll(): Promise<EntityConfiguration[]> {
         return this.configRepository.find();

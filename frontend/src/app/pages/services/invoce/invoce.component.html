@@ -4,14 +4,23 @@
         <div class="container mt-4">
             <h3 class="mb-4">Facturas Cerradas</h3>
             <div class="table-responsive">
-                <input type="text" class="form-control" placeholder="Buscar Facturas por Cliente o Mes" (keyup)="onKeyUp($event)" [(ngModel)]="entitiyToGet" (ngModelChange)="onNameChange($event)">
+                <div class="input-group">               
+                    <button *ngIf="displayBtnCash" type="button" name="btnClearCash" class="btn btn-outline-secondary" (click)="clearSearch()">  <!--[disabled]="!consultaRealizada"-->
+                        <i class="bi bi-eraser" ngbTooltip="Limpiar búsqueda"></i>
+                    </button>
+                    <input type="text" class="form-control" placeholder="Buscar Facturas por Cliente o por Mes"
+                        (keyup)="onKeyUp($event)" [(ngModel)]="entitiyToGet" (ngModelChange)="onNameChange($event)">
+                </div>
+                
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped">
                         <thead>
                             <tr>
                                 <th>Cliente</th>
-                                <th><a role="button" (click)="sortDate('serviceName')" ngbTooltip="Por Servicio">Servicio</a><i class="bi bi-{{arrow}}"></i></th>
-                                <th><a role="button" (click)="sortDate('serviceDate')" ngbTooltip="Por Fechas">Fecha de Servicio</a><i class="bi bi-{{arrow}}"></i></th>
+                                <th><a role="button" (click)="sortDate('serviceName')"
+                                        ngbTooltip="Por Servicio">Servicio</a><i class="bi bi-{{arrow}}"></i></th>
+                                <th><a role="button" (click)="sortDate('serviceDate')" ngbTooltip="Por Fechas">Fecha de
+                                        Servicio</a><i class="bi bi-{{arrow}}"></i></th>
                                 <th>Fecha de Pago</th>
                                 <th>Estado Factura</th>
                                 <th>Acciones</th>
@@ -35,25 +44,33 @@
 
                                     <td> <!--Fecha de Servicio -->
 
-                                        {{parentItem.invoice[0].invoiceDate | date:'yyyy-MM-dd'  }}
+                                        {{parentItem.invoice[0].invoiceDate | date:'yyyy-MM-dd' }}
                                     </td>
-                                     <td> <!--Fecha de pago -->
+                                    <td> <!--Fecha de pago -->
 
                                         {{parentItem.invoice[0].payment[0].paymentDate | date:'yyyy-MM-dd' }}
                                     </td>
 
                                     <td> <!-- Estado del pago  -->
                                         <div class="form-check form-switch">
-                                            <label class="form-check-label" for="flexSwitchCheckRecurrente">{{parentItem.invoice[0].payment[0].paymentStatus.replaceAll('o','a')}}</label>
-                                            <input class="form-check-input" disabled type="checkbox" id="flexSwitchCheckPayStatus" [(ngModel)]="parentItem.invoice[0].payment[0].isServicePaid">
+                                            <label class="form-check-label"
+                                                for="flexSwitchCheckRecurrente">{{parentItem.invoice[0].payment[0].paymentStatus.replaceAll('o','a')}}</label>
+                                            <input class="form-check-input" disabled type="checkbox"
+                                                id="flexSwitchCheckPayStatus"
+                                                [(ngModel)]="parentItem.invoice[0].payment[0].isServicePaid">
                                         </div>
                                     </td>
 
                                     <td> <!--Acciones  -->
-                                        <button *ngIf="parentItem.status == 'Cerrado' || parentItem.invoice[0].invoiceStatus == 'Cerrado' " class="btn btn-sm btn-outline-success" (click)="onViewPDF(parentItem.invoice[0].invoiceName)"
-                                            ngbTooltip="Ver Factura del Servicio"><i class="bi bi-filetype-pdf"></i></button>
-                                   
-                                        <button class="btn btn-sm btn-outline-info" (click)="sendEmail(parentItem, i)" ngbTooltip="Reenviar Factura"><i class="bi bi-envelope-at"></i></button>
+                                        <button
+                                            *ngIf="parentItem.status == 'Cerrado' || parentItem.invoice[0].invoiceStatus == 'Cerrado' "
+                                            class="btn btn-sm btn-outline-success"
+                                            (click)="onViewPDF(parentItem.invoice[0].invoiceName)"
+                                            ngbTooltip="Ver Factura del Servicio"><i
+                                                class="bi bi-filetype-pdf"></i></button>
+
+                                        <button class="btn btn-sm btn-outline-info" (click)="sendEmail(parentItem, i)"
+                                            ngbTooltip="Reenviar Factura"><i class="bi bi-envelope-at"></i></button>
                                     </td>
                                 </tr>
                                 }
@@ -65,7 +82,7 @@
                             }
                         </tbody>
                     </table>
-   
+
                     <!-- Paginación -->
                     <ngb-pagination class="d-flex justify-content-center" [(page)]="page" [pageSize]="pageSize"
                         [collectionSize]="serviceList.length" (pageChange)="onPageChange($event)" [boundaryLinks]="true"
@@ -79,8 +96,8 @@
     </div>
 
     <app-pdfviewer #modal [modalConfig]="modalConfig">
-       <div class="pdf-viewer">
+        <div class="pdf-viewer">
             <object [data]="pdfUrl | safePipe" type="application/pdf"></object>
-      </div>
+        </div>
     </app-pdfviewer>
 </div>

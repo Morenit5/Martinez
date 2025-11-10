@@ -329,6 +329,7 @@ export class ServiceComponent {
     (await this.emailService.generateInvoice(service,invoiceIndex)).subscribe({
       next: (resp) => {
         pdfBlob = resp;
+
       },
       error: (err) => {
         console.error(err);
@@ -414,12 +415,12 @@ export class ServiceComponent {
         },
         complete: () => {
           if (closeServiceInvoice == false) {
-            //case de uso para cuando se genera la facutura
+            //case de uso para cuando se genera la factura
             this.getAllServicesIntances(); //Traemos todas las intances  
             this.toast.showToast('Factura generada correctamente ', 5000, 'check2-square', true)
             this.generarPdf(pdfBlob);
             
-          } else { //caso  de uso para cuando se envia la facutura
+          } else { //caso  de uso para cuando se envia la factura
             this.sendEmail(service,invoiceIndex);
             //this.getAllServicesIntances(); //Traemos todas las intances  
             //this.toast.showToast('Factura generada correctamente ', 5000, 'check2-square', true)
@@ -482,17 +483,21 @@ export class ServiceComponent {
   
     const blob = new Blob([pdfBytes as unknown as ArrayBuffer], { type: 'application/pdf' });
     this.pdfUrl = URL.createObjectURL(blob);
+    const nuevaVentana = window.open(this.pdfUrl, '_blank');
 
-    // Descargar automáticamente
-    const a = document.createElement('a');
-    a.href = this.pdfUrl;
-    a.download;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    // Si el navegador bloquea la ventana, ofrecer descarga
+  if (!nuevaVentana) {
+    const link = document.createElement('a');
+    link.href = this.pdfUrl;
+    link.download;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     window.URL.revokeObjectURL(this.pdfUrl);
-    this.isLoading = false;
-    this.getAllServicesIntances(); //Traemos todas las intances 
+     this.isLoading = false;
+    this.getAllServicesIntances(); //Traemos todas las intances
+  }
+    
   }
 
   sendEmail(ServiceDto: ServiceEntity,invoiceIndex:number) {
@@ -560,12 +565,15 @@ export class ServiceComponent {
     
     let cltType = this.extraValue == 'Fijo' || this.extraValue == 'Extra'? 'Fijo':'Eventual'; 
     
-    //esto evita tantas llamdas al backend en caso que haga click en los radio botones varias veces a  la vez
+    //esto evita tantas llamadas al backend en caso que haga click en los radio botones varias veces a  la vez
     if((this.lastUsedValue == 'Fijo' || this.lastUsedValue == 'Extra') &&  this.extraValue != 'Eventual') { return }
     if((this.lastUsedValue == 'Eventual') &&  (this.extraValue != 'Fijo' && this.extraValue != 'Extra') ) { return }
 
+
     this.getallClientsBy(cltType);
     this.lastUsedValue = cltType;
+    this.serviceForm.reset();
+    
   }
   
 
