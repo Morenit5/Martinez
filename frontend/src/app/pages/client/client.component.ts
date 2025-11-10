@@ -115,6 +115,7 @@ export class ClientComponent {
           }
         });
       } else if (accion == 'Actualizar') {
+
           this.clientService.updateClient(this.clientForm.value).subscribe({
           next: (response) => {
             this.toast.showToast('Cliente actualizado exitosamente!!', 7000, 'check2-circle', true);
@@ -146,6 +147,7 @@ export class ClientComponent {
     this.email = undefined;
     this.clientType = undefined;
     this.registryDate = undefined;
+    this.clientForm.get('clientType')?.enable();
   }
 
   updateClient(clientInstance: ClientEntity) {
@@ -154,7 +156,7 @@ export class ClientComponent {
     this.clientLabel = 'Actualizar Cliente';
     this.clientButton = 'Actualizar'
 
-  
+   this.clientForm.get('clientType')?.disable();
     this.clientForm.patchValue({
       clientId: clientInstance.clientId,
       name: clientInstance.name,
@@ -165,6 +167,8 @@ export class ClientComponent {
       registryDate: clientInstance.registryDate,
       clientType: clientInstance.clientType
     });
+
+    
   }
 
   async deleteClient(client: ClientEntity) {

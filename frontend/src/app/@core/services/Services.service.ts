@@ -77,16 +77,23 @@ export class ServicesInstances {
         );
     }
 
-    getAutoInvoiceStatus(): Observable<any>{
-        return this.servicesListService.getNewInvoiceStatus();
-    }
-
+    getAllServicesByPaymentCash(paymentMethod?:string) {
+        return this.servicesListService.getAllServicesByPaymentCash(paymentMethod).pipe(
+            map((response) =>
+                response.map((service: any) => plainToInstance(ServiceEntity, service)),
+            ),
+        );
 }
 
 
+    getAutoInvoiceStatus(): Observable<any>{
+        return this.servicesListService.getNewInvoiceStatus();
+
+    }
+}
+
 @Injectable({ providedIn: 'root', })
 class servicesService {
-
    
     constructor(private readonly http: HttpClient) { }
 
@@ -116,6 +123,16 @@ class servicesService {
 
         return this.http.get<any>(serviceUrl + '/closed',{ params: params });
         //.subscribe(data => { console.log(data); });
+    }
+
+    getAllServicesByPaymentCash(paymentMethod?: string) {
+       let params = new HttpParams();
+       
+        if(paymentMethod != undefined){
+            params = params.set('paymentMethod', paymentMethod);
+        }
+        return this.http.get<any>(serviceUrl + '/cclosed',{ params: params });
+        
     }
 
     getAllServicesBy(clientType:string,extra?:boolean) {
