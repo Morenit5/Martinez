@@ -36,6 +36,7 @@ enum paymentStatus {
 })
 export class ServiceComponent implements OnInit{
 
+
   valueSubscription: Subscription;
 
   isLoading = false;
@@ -45,6 +46,7 @@ export class ServiceComponent implements OnInit{
   
   //entities usados para crear un servicio nuevo
   service: ServiceEntity;
+  serviceDelete: ServiceEntity;
   serviceDetails: ServiceDetailEntity[] = [];
   client: ClientEntity;
   serviceDetailsId: number | undefined = undefined;
@@ -60,7 +62,7 @@ export class ServiceComponent implements OnInit{
   priceIsValid: boolean = true;
   unitMeasurementIsValid: boolean = true;
   isReadOnly: boolean = false; //inidicamos si el cliente esta activo, -Debe ser true para el actualizar, ya que no podra cambiar al cliente -
-
+  showToast = false;
 
   /*Paginacion*/
   services: ServiceEntity[] = [];// se crea un array vacio de la interfaz
@@ -137,6 +139,10 @@ export class ServiceComponent implements OnInit{
   //recurrencia
   isRecurrencyEnabled:boolean = false;
 
+  // VARIABLES
+  showToastWarning = false;
+  toastWarningMessage = '';
+
   constructor(private toast: ToastUtility, private readonly serviceInstance: ServicesInstances, private readonly invoiceInstance: InvoiceInstances,
     private readonly clientInstance: ClientInstances, http: HttpClient, private serviceFrm: FormBuilder, @Inject(LOCALE_ID) private locale: string) {
 
@@ -180,6 +186,30 @@ export class ServiceComponent implements OnInit{
     this.createInvoiceUpdateForm();
   }
 
+  // Mostrar mensaje en toast con botones Sí/No
+  showToastWarningMessage(message: string) {
+    this.toastWarningMessage = message;
+    this.showToastWarning = true;
+  }
+
+  siEliminar() {
+this.deleteServiceDetail(this.serviceDelete);
+this.showToastWarning = false;
+}
+
+    cancelarToast() {
+   // this.showToast = false;
+    this.showToastWarning = false;
+    this.serviceDelete = null;
+  }
+
+  preguntarEliminar(serviceDTO: ServiceEntity) {
+
+    this.serviceDelete=serviceDTO;
+    // this.showToast = true;
+    this.showToastWarningMessage('¿Desea eliminar este Servicio?');
+
+  }
   
   // add the invoice group
   addInvoiceUpdateArray(id:number,updateInvStatus:boolean=false): boolean {
@@ -575,8 +605,7 @@ export class ServiceComponent implements OnInit{
 
     this.getallClientsBy(cltType);
     this.lastUsedValue = cltType;
-    this.serviceForm.reset();
-    
+    this.serviceForm.get('client').reset();    
   }
   
 
@@ -875,6 +904,10 @@ export class ServiceComponent implements OnInit{
   }
 
 deleteServiceDetail(serviceDTO: ServiceEntity) {
+
+  //preguntar antes de eliminar
+ this.showToast = false;
+
     // verificamos el estatus del pago, si no hay pago- confirmacion de pago, preguntar si se desea eliminar
     // caso de que el pago esta pagado, pero no se ha generado la factura, no se debera poder eliminar
     // caso de que la factura ya se genero pero no se ha enviado al cliente, no se debera poder eliminar
@@ -883,7 +916,7 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
         serviceObject.serviceId = serviceDTO.serviceId;
         this.serviceInstance.updateService(serviceObject).subscribe({
           next: (response) => {
-            this.toast.showToast('Servicio eliminada exitosamente!!', 7000, 'check2-circle', true);
+            this.toast.showToast('Servicio eliminado exitosamente!!', 7000, 'check2-circle', true);
           },
           error: (err) => {
             this.toast.showToast('Error al eliminar el Servicio!!', 7000, 'x-circle', false);
@@ -1165,15 +1198,53 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
   }
 
   regenerarFacturaRecurrente(entity: ServiceEntity) {
-
     
     const currentDate = new Date();
     let currentDateFormatted = formatDate(currentDate, 'yyyy-MM-dd', this.locale);
     this.serviceForm.get('serviceId').setValue(entity.serviceId);
-    this.serviceForm.get('serviceName').setValue(entity.serviceName);
+    this.serviceForm.get('serviceName').setValue('Servicio');
     this.serviceForm.get('client.clientId').setValue(entity.client.clientId);
 
+    const months = [
+      'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+      'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
+    ];
+
+    const fullNameMonths = [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+
+    const currentMonth = months[currentDate.getMonth()];
+    const currentFullMonth = fullNameMonths[currentDate.getMonth()];
+
     if (this.serviceForm.valid) {
+
+       // verificamos si existe factura en el mes actual
+       //console.log('VEAMO QUE SE MANDA DEL ID '+entity.serviceId);
+       let servId : number = entity.serviceId;
+       const exists =  this.serviceInstance.getInvoicesXMonth(servId, currentMonth).subscribe({
+      next: (invoiceExists) => {
+        if(!invoiceExists)
+        {
+          return false;
+        }
+        return invoiceExists.active;
+      },
+      error: (error) => {
+        console.error(error);
+        this.toast.showToast(error, 7000, 'x-circle', false);
+      },
+    });
+       
+        if (exists) {
+     
+          // mando mensaje 
+          this.toast.showToastWarning('La factura del mes de "'+ currentFullMonth +'" ya existe!', 7000);
+          return;
+        } else {
+         
+       
 
       const success = this.createDefaultInvoiceFormGroup(currentDateFormatted); //agregamos el default invoice a la serviceForm
       if (success) {
@@ -1183,7 +1254,6 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
         return;
       }
 
-      //console.log(JSON.stringify(this.serviceForm.value));
 
       //remove unnecessary fields
       this.serviceForm.removeControl('serviceDate');
@@ -1191,8 +1261,8 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
       this.serviceForm.removeControl('price');
       this.serviceForm.removeControl('serviceDetail');
       this.serviceForm.removeControl('isExtra');
-      this.serviceForm.removeControl('serviceName');
-      this.serviceForm.removeControl('client');
+      //this.serviceForm.removeControl('serviceName');
+     // this.serviceForm.removeControl('client');
 
       this.serviceInstance.updateService(this.serviceForm.value).subscribe({
         next: (response) => {
@@ -1208,7 +1278,27 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
         }
       });
     }
+    } // termino else
+  }
+
+  existenceInvoice(serviceId: number, invoicedMonth: string)
+  {
+
+    this.serviceInstance.getInvoicesXMonth(serviceId, invoicedMonth).subscribe({
+      next: (servList) => {
+
+        console.log('servList: '+ JSON.stringify(servList));
+        this.originalValues = servList;
+        this.serviceList = servList;
+        
+      },
+      error: (error) => {
+        console.error(error);
+      },
+    });
+
   }
 
 }
+
 

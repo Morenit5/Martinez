@@ -58,6 +58,7 @@ export class ConfigsComponent implements OnInit {
         if(this.confId != null){
           this.configForm.get('configurationId').setValue(this.confId);
         }
+        this.configForm.get('enableOnDate').setValue(27);
        
         this.configService.setConfigurations(this.configForm.value).subscribe({
           next: (response) => {
@@ -73,7 +74,7 @@ export class ConfigsComponent implements OnInit {
             this.toast.showToast(errorMessage, 7000, 'x-circle', false);
           },
           complete: () => {
-            console.log('Completamos la accion ahora vamos a traer datos')
+            console.log('Completamos la acción, ahora vamos a traer datos')
             this.getAllValues();
             
           }

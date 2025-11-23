@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 import { environment } from '@env/environment';
 import { instanceToPlain, plainToInstance } from 'class-transformer';
 import { ServiceEntity } from '../entities/Service.entity';
@@ -85,11 +85,19 @@ export class ServicesInstances {
         );
 }
 
-
     getAutoInvoiceStatus(): Observable<any>{
         return this.servicesListService.getNewInvoiceStatus();
 
     }
+
+    getInvoicesXMonth(serviceId: number, invoicedMonth:string) {
+
+        return this.servicesListService.getInvoicesXMonth(serviceId, invoicedMonth).pipe(
+            tap(value => value),// console.log('Observable value:', value)),
+        );
+      }
+
+
 }
 
 @Injectable({ providedIn: 'root', })
@@ -167,4 +175,14 @@ class servicesService {
         return this.http.get(serviceUrl + '/autoinvoice/status');
        
       }
+
+
+      getInvoicesXMonth(serviceId: number, invoicedMonth: string)  {
+       let params = new HttpParams();
+       
+       params = params.set('serviceId', serviceId);
+        params = params.set('invoicedMonth', invoicedMonth);
+        return this.http.get<any>(serviceUrl + '/existsinvoice',{ params: params });
+    }
+
 }

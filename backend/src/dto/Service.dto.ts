@@ -46,6 +46,8 @@ export class ServiceDto {
 }
 
 export class CreateServiceDto {
+
+    serviceId: number;
  
     @IsNotEmpty({ message: 'El campo serviceName de Servico  es obligatorio.' })
     @IsString()
@@ -84,6 +86,6 @@ export class CreateServiceDto {
 
 export class UpdateServiceDto  extends PartialType(CreateServiceDto) {
  
-    serviceId: number;
+    //serviceId: number;
   
 }

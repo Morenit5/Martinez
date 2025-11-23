@@ -1,6 +1,26 @@
 <div>
   <tabs [tabItems]="['Consulta', 'Crear Servicio', 'Pagos']" [tabIcons]="['journal-check', 'plus-circle', 'cash-coin']" [requiredTabId]=reqTabId  (tabIndex)="getMessage($event)">
   </tabs>
+  <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3">
+<ngb-toast
+  *ngIf="showToastWarning"
+  [autohide]="false"
+  class="toastDelete"><!--text-dark border border-dark-->
+  <div class="d-flex flex-column">
+    <strong class="mb-2">{{ toastWarningMessage }}</strong>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-danger btn-sm me-2" (click)="siEliminar()" ><!---->
+        Sí
+      </button> &nbsp;&nbsp;&nbsp;
+      <button class="btn btn-secondary btn-sm" (click)="cancelarToast()">
+        No
+      </button>
+    </div>
+  </div>
+</ngb-toast>
+
+  </div>
   <!-- **************** C O M I E N Z A   E L   T A B   D E   C O N S U L T A **************** -->
   <div *ngIf="recivedTabIndex==0" class="containerService ">
     <div class="container mt-4">
@@ -54,14 +74,22 @@
                   <td>
                     <ng-container *ngIf="parentItem.status.toLowerCase() !== 'recurrente'; else EsRecurrente">
                       <button *ngIf="(parentItem.status.toLowerCase() != 'terminado' && !parentItem.invoice[0]?.payment[0].isServicePaid) " class="btn btn-sm btn-outline-primary " (click)="updateServiceDetail(parentItem)" ngbTooltip="Actualizar Servicio"><i class="bi bi-pencil"></i></button>
-                      <button *ngIf="(parentItem.status.toLowerCase() != 'terminado' && !parentItem.invoice[0]?.payment[0].isServicePaid) " class="btn btn-sm btn-outline-danger " (click)="deleteServiceDetail(parentItem)" ngbTooltip="Eliminar Servicio"><i class="bi bi-trash"></i></button>
+                      <button *ngIf="(parentItem.status.toLowerCase() != 'terminado' && !parentItem.invoice[0]?.payment[0].isServicePaid) " class="btn btn-sm btn-outline-danger " (click)="preguntarEliminar(parentItem)" ngbTooltip="¿Desea eliminar este Servicio?"><i class="bi bi-trash"></i></button>
                       <button *ngIf="parentItem.invoice[0]?.payment[0].isServicePaid && parentItem.invoice[i]?.isGenerated" class="btn btn-sm btn-outline-info" (click)="updateSendMailAndCloseStatus(parentItem,i)" ngbTooltip="Enviar Correo y Cerrar Servicio"><i class="bi bi-envelope-at"></i></button>
                     </ng-container>
                     
                     <ng-template #EsRecurrente>
                       <button *ngIf="isRecurrencyEnabled==false"  class="btn btn-sm btn-outline-success" (click)="regenerarFacturaRecurrente(parentItem)" ngbTooltip="Renovar Servicio"><i class="bi bi-arrow-repeat"></i></button>
                       <button class="btn btn-sm btn-outline-primary" (click)="updateServiceDetail(parentItem)" ngbTooltip="Actualizar Servicio"><i class="bi bi-pencil"></i></button>
-                      <button class="btn btn-sm btn-outline-danger " (click)="deleteServiceDetail(parentItem)" ngbTooltip="Eliminar Servicio"><i class="bi bi-trash"></i></button>
+                      <!--<button class="btn btn-sm btn-outline-danger " (click)="deleteServiceDetail(parentItem)" ngbTooltip="Eliminar Servicio"><i class="bi bi-trash"></i></button>-->
+                      <button class="btn btn-sm btn-outline-danger " (click)="preguntarEliminar(parentItem)" ngbTooltip="¿Desea eliminar este servicio?"><i class="bi bi-trash"></i></button>  
+                      <!--Logica del boton eliminar-->
+
+                      
+
+                    
+
+                      <!--Fin Logica del boton eliminar-->
                     </ng-template>
                   </td>
                 </tr>

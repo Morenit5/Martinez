@@ -43,6 +43,7 @@ export class InvoceComponent {
   arrow = 'arrow-up-short'
   esPagoCash:string;
 
+  showColumn= true;
   displayBtnCash = false;
 
   constructor(private toast: ToastUtility, private readonly serviceInstance: ServicesInstances, private readonly emailService: EmailService) { 
@@ -65,6 +66,7 @@ export class InvoceComponent {
     // Limpiamos los resultados de la tabla
     this.serviceList.length = 0;
     this.displayBtnCash = false;
+    this.showColumn = true;
 
     //realizamos la consulta de las facturas
     this.getAllClosedServicesIntances(); // de entrada traemos clientes fijos solamente
@@ -105,6 +107,7 @@ export class InvoceComponent {
         this.esPagoCash = 'Cash'
         listEntities = this.findAllCashClosedBy(this.esPagoCash);
         this.entitiyToGet = ''; // limpiamos el campo de la busqueda
+        this.showColumn= false;
         return;
       }
 

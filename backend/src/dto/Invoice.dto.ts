@@ -1,7 +1,7 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { IsBoolean, IsDate, IsNotEmpty, isNumber, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
 import { CreatePaymentDto, PaymentDto } from './Payment.dto';
-import { CreateServiceDto, ServiceDto } from './Service.dto';
+import { CreateServiceDto, ServiceDto, UpdateServiceDto } from './Service.dto';
 import { Type } from 'class-transformer';
 
 export class InvoiceDto {
@@ -54,6 +54,10 @@ export class InvoiceDto {
 
 export class CreateInvoiceDto {
 
+    @IsOptional()
+    @IsNumber()
+    invoiceId: number;
+
     @IsDate()
     invoiceDate: Date;
 
@@ -82,7 +86,7 @@ export class CreateInvoiceDto {
    
     @IsOptional()
     @IsObject()
-    service?: CreateServiceDto; //@OneToOne(() => EntityService, service => service.serviceId)
+    service?: CreateServiceDto | UpdateServiceDto; //@OneToOne(() => EntityService, service => service.serviceId)
 
     @IsOptional()
     @IsNumber()
@@ -102,7 +106,5 @@ export class CreateInvoiceDto {
 
 export class UpdateInvoiceDto  extends PartialType(CreateInvoiceDto) {
 
-    @IsOptional()
-    @IsNumber()
-    invoiceId: number;
+    
 }

@@ -43,10 +43,10 @@ export class ConfigurationController {
         let enableInvoiceRecurrent;
 
         let confUpdated = await this.confService.create(configuration).then((result: any) => {
-            //console.log("El chinche Resultado:", result);
+            
             return result;
         }).catch((error: any) => {
-            console.log("entra al catch: ", error);
+            
             this.exceptions.sendException(error);
         }); 
 

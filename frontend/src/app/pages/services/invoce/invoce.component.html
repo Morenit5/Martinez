@@ -23,7 +23,7 @@
                                         Servicio</a><i class="bi bi-{{arrow}}"></i></th>
                                 <th>Fecha de Pago</th>
                                 <th>Estado Factura</th>
-                                <th>Acciones</th>
+                                <th *ngIf="showColumn">Acciones</th>
                             </tr>
                         </thead>
 
@@ -61,9 +61,9 @@
                                         </div>
                                     </td>
 
-                                    <td> <!--Acciones  -->
-                                        <button
-                                            *ngIf="parentItem.status == 'Cerrado' || parentItem.invoice[0].invoiceStatus == 'Cerrado' "
+                                    <td *ngIf="showColumn"> <!--Acciones  -->
+                                        <button 
+                                            *ngIf="parentItem.status == 'Cerrado' || parentItem.invoice[0].invoiceStatus == 'Cerrado'"
                                             class="btn btn-sm btn-outline-success"
                                             (click)="onViewPDF(parentItem.invoice[0].invoiceName)"
                                             ngbTooltip="Ver Factura del Servicio"><i
