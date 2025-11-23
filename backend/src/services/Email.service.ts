@@ -55,7 +55,7 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
       for(const config of Configurations ){
         if(config.enableNotification == true || config.enableNotification == 'true' ){
           this.enableNotifications('true',config.enableOnDate);
-           //console.log('se inicializo la auto generacion de invoices')
+           console.log('se inicializo la auto generacion de invoices')
         }
       }
      }).catch((error: any) => {
@@ -90,7 +90,7 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
 
     try {
       if (this.cronJob == null || this.cronJob == undefined) {
-        this.cronJob = new CronJob(forTesting, async () => {
+        this.cronJob = new CronJob(/*schedule*/forTesting, async () => {
           try {
             await this.checkUnpaidServices();
             console.log('Correos aparentemente enviados correctamente')
@@ -520,8 +520,11 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
      async findConfigVariables() {
 
        let config =  await this.configRepository.find();
+       if(config)
+       {
        this.emailConfig = config[0].email;
       this.passConfig = config[0].password;
+       }
 
       }
 

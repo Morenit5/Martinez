@@ -6,10 +6,10 @@ import { CreateServiceDto, ServiceDto, UpdateServiceDto } from '../dto/Service.d
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 import { CronJob } from 'cron';
 import { CreatePaymentDto } from 'src/dto/Payment.dto';
-import { CreateInvoiceDto } from 'src/dto/Invoice.dto';
+import { CreateInvoiceDto, UpdateInvoiceDto } from 'src/dto/Invoice.dto';
 import { EntityConfiguration } from 'src/entities/Configuration.entity';
 import { ConfigurationDto, createConfigurationDto } from 'src/dto/Configuration.dto';
-import { config } from 'dotenv';
+import { EntityInvoice } from 'src/entities/Invoice.entity';
 
 
 @Injectable()
@@ -18,7 +18,9 @@ export class ServiceService {
   months: string[] = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
   constructor(@InjectRepository(EntityService) private serviceRepository: Repository<EntityService>, 
-              @InjectRepository(EntityConfiguration) private configurationRepository: Repository<EntityConfiguration>, private readonly exceptions: TypeORMExceptions) { 
+              @InjectRepository(EntityConfiguration) private configurationRepository: Repository<EntityConfiguration>,
+              @InjectRepository(EntityInvoice) private invoiceRepository: Repository<EntityInvoice>,
+               private readonly exceptions: TypeORMExceptions) { 
    
 
     this.configurationRepository.find({ 
@@ -351,7 +353,14 @@ export class ServiceService {
 
 
   async update(serviceId: number, entity: UpdateServiceDto): Promise<ServiceDto | null> {
-    await this.serviceRepository.save(entity);
+ 
+
+    let invoice= new UpdateInvoiceDto();
+    invoice = entity.invoice![0];
+    invoice.service =new UpdateServiceDto();
+    invoice.service.serviceId= serviceId;
+
+     await this.invoiceRepository.save(invoice);
     return this.serviceRepository.findOneBy({ serviceId })
     
   }
@@ -384,7 +393,7 @@ export class ServiceService {
         this.cronJob = new CronJob(forTesting, async () => {
           try {
             await this.updateServiceInvoice();
-            //console.log('Factura creada correctamente')
+            console.log('Factura creada correctamente')
           } catch (e) {
             console.error(e);
           }
@@ -495,5 +504,30 @@ export class ServiceService {
        resp = {active:false};
     }
     return resp;
+  }
+
+  
+    async findInvoiceByMonth(serviceId: number, invoiceMonth: string): Promise<{}> {
+      let serv : EntityService = new EntityService();
+      serv.serviceId = serviceId;
+    var invoices = await this.invoiceRepository.find({
+      where: [{
+        service : serv,
+        invoicedMonth: invoiceMonth,
+      }],
+    }).then((result: any) => {
+      return result; 
+    }).catch((error: any) => {
+      this.exceptions.sendException(error);
+    });
+
+    if(invoices!= undefined || invoices != null)
+    {
+      return { active: true };
+    }
+    else
+    {
+      return { active: false};
+    }    
   }
 }

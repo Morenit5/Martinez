@@ -64,7 +64,7 @@ export class CategoryComponent {
     return copiedObj as T;
   }
 
-  categoryLabel: string = 'Registro de Categorías';
+  categoryLabel: string = 'Registro de Categoría';
   categoryButton: string = 'Registrar';
   reqTabId: number;
   recivedTabIndex: number = 0;
@@ -153,7 +153,7 @@ export class CategoryComponent {
             console.log(response);
           },
           error: (err) => {
-            console.log('ENTRAMOS AL ERROR: ' + JSON.stringify(err.error.error));
+            
             let errorMessage = JSON.stringify(err.error.error);
             console.log(errorMessage);
             if (errorMessage.startsWith('"Error:')) {

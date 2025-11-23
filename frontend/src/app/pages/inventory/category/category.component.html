@@ -10,8 +10,8 @@
           <thead class="table-bordered">
             <tr>
                 <th>Nombre</th>
-                <th>Tipo</th>
-              <!--<th>Activo</th>-->
+               <!-- <th>Tipo</th>
+              <th>Activo</th>-->
               <th>Acciones</th>
             </tr>
           </thead>
@@ -19,9 +19,9 @@
             @for (category of paginatedCategories; track category.categoryId) {
             <tr> <!--*ngFor="let category of categoryList | async "-->
               <td style="width: 42%;">{{ category.name }}</td>
-              <td style="width: 42%;">{{ category.categoryType }}</td>
-              <!--<td>{{ category.enabled }}</td>-->
-              <td><button *ngIf="category.name.toLowerCase() !== 'general' " class="btn btn-sm btn-outline-info" (click)="updateCategory(category)" ngbTooltip="Actualizar Categoría"><i
+              <!--<td style="width: 42%;">{{ category.categoryType }}</td>
+              <td>{{ category.enabled }}</td>-->
+              <td style="width: 42%;"><button *ngIf="category.name.toLowerCase() !== 'general' " class="btn btn-sm btn-outline-info" (click)="updateCategory(category)" ngbTooltip="Actualizar Categoría"><i
                     class="bi bi-pencil-fill"></i>
                 </button>
                 <button *ngIf="category.name.toLowerCase() !== 'general' "  class="btn btn-sm btn-outline-danger" (click)="deleteCategory(category)"  ngbTooltip="Eliminar Categoría"><i
@@ -54,10 +54,10 @@
                 Campo requerido
               </div>
             </div>
-            <div class="mb-3">
+            <!--<div class="mb-3">  POR EL MOMENTO ESTA DESHABILITADA, NO BORRAR
               <label>Tipo</label>
               <input type="text" class="form-control col-form-label" formControlName="categoryType" id="categoryType"/>
-            </div>
+            </div>-->
           </div>
 
           <div id="Tools-Right-Column" class="col-md-6 ">

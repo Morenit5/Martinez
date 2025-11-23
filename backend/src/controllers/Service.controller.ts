@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param,  HttpException, HttpStatus,  Put, Q
 import { ServiceService} from '../services/Service.service';
 import { TypeORMExceptions } from '../exceptions/TypeORMExceptions';
 import { CreateServiceDto, ServiceDto, UpdateServiceDto } from '../dto/Service.dto';
-import { log } from 'console';
+
 
 //@Controller('service')
 @Controller({ version: '1', path: 'service' })
@@ -44,6 +44,12 @@ export class  ControllerService {
    return this.serviceService.findAllCashClosed(date);
   }
 
+  @Get('/existsinvoice')
+  findInvoiceByMonth(@Query('serviceId') serviceId: number, @Query('invoicedMonth') invoicedMonth: string): Promise<{}>{
+   
+   return this.serviceService.findInvoiceByMonth(serviceId, invoicedMonth);
+  }
+
   @Get('/autoinvoice/status')
   async getNotificationsStatus(@Res({ passthrough: true }) res: Response) {
 
@@ -55,8 +61,6 @@ export class  ControllerService {
   findOne(@Param('id') id: string): Promise<ServiceDto|null> {
     return this.serviceService.findOne(+id);
   }
-
-
 
   @Post()
   async create(@Body() service: CreateServiceDto) {

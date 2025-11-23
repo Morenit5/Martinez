@@ -96,8 +96,7 @@ export class ListComponent implements OnInit {
       if ((this.userEntitiyToGet && this.userEntitiyToGet.length == 0) || !this.userEntitiyToGet) {
         
         if (this.originalValues && this.originalValues.length !== 0) {
-          //this.usersList.length = 0; //limpiamos el array y ponemos los nuevos datos
-          console.log('Valores originales ' + this.originalValues);
+
           this.usersList = this.originalValues;
         }
 
@@ -131,7 +130,7 @@ export class ListComponent implements OnInit {
 
     this.usersForm.get('rol').valueChanges.subscribe({
       next: (rol) => {
-        console.log('entramos al cambio')
+       
         if(rol != null){
           this.rolEntity = rol;
         } else{
@@ -220,7 +219,7 @@ export class ListComponent implements OnInit {
          this.usersForm.get('password').updateValueAndValidity();
         if (!this.usersForm.valid) {
           this.usersForm.markAllAsTouched();
-          this.toast.showToast('Campos Invalidos, porfavor revise el formulario!!', 7000, 'x-circle', false);
+          this.toast.showToast('Campos Inválidos, por favor revise el formulario!!', 7000, 'x-circle', false);
           return
         }
 
@@ -233,7 +232,7 @@ export class ListComponent implements OnInit {
             let errorMessage = JSON.stringify(err.error.error); 
            
             if(errorMessage.includes('duplicate key value violates unique constraint')){
-              this.toast.showToast( 'El usuario ya existe, porfavor revisa usuario y correo electronico', 5000, 'x-circle', false);
+              this.toast.showToast( 'El usuario ya existe, por favor revisa el usuario y correo electrónico!', 5000, 'x-circle', false);
              
             } else {
               this.toast.showToast( errorMessage, 7000, 'x-circle', false);
@@ -268,7 +267,7 @@ export class ListComponent implements OnInit {
       //console.log(this.usersForm.valid);
       //console.log(this.usersForm);
       this.usersForm.markAllAsTouched();
-      this.toast.showToast('Campos Invalidos, porfavor revise el formulario!!', 7000, 'x-circle', false);
+      this.toast.showToast('Campos Inválidos, por favor revise el formulario!!', 7000, 'x-circle', false);
     }
   }
 

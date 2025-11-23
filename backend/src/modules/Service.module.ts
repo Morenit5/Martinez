@@ -7,9 +7,10 @@ import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 import { EmailService } from 'src/services/Email.service';
 import { EmailController } from 'src/controllers/Email.controller';
 import { EntityConfiguration } from 'src/entities/Configuration.entity';
+import { EntityInvoice } from 'src/entities/Invoice.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([EntityService,EntityConfiguration])],
+  imports: [TypeOrmModule.forFeature([EntityService,EntityConfiguration, EntityInvoice])],
   providers: [ServiceService, TypeORMExceptions, EmailService],
   exports: [ServiceService, EmailService],
   controllers: [ControllerService, EmailController],
