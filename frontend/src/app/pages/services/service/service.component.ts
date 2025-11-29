@@ -37,6 +37,8 @@ enum paymentStatus {
 export class ServiceComponent implements OnInit{
 
 
+ cliente;
+
   valueSubscription: Subscription;
 
   isLoading = false;
@@ -327,7 +329,7 @@ this.showToastWarning = false;
     }
   }
 
-  get defaultInvoiceFormArray() {
+  get defaultInvoiceFormArray(): FormArray {
     return this.serviceForm.get('invoice') as FormArray;
   }
 
@@ -366,7 +368,7 @@ this.showToastWarning = false;
       },
       error: (err) => {
         console.error(err);
-        this.toast.showToast('Factura no generada', 5000, 'check2-square', true);
+        this.toast.showToast('Factura no generada', 3000, 'check2-square', true);
       },
       complete: () => {
         if(service.status == Status.Recurrente){
@@ -385,7 +387,7 @@ this.showToastWarning = false;
     const invUpdated = this.addInvoiceUpdateArray(service.invoice[invoiceIndex].invoiceId);
     
     if(invUpdated == false){
-      this.toast.showToast('Error al generar la Factura!!', 7000, 'x-circle', false);
+      this.toast.showToast('Error al generar la Factura!!', 3000, 'x-circle', false);
       return;
     }
 
@@ -402,11 +404,11 @@ this.showToastWarning = false;
       this.serviceInstance.updateService(this.invoiceUpdateform.value).subscribe({  
         next: (response) => { },
         error: (err) => {
-          this.toast.showToast('Error al generar la Factura!!', 7000, 'x-circle', false);
+          this.toast.showToast('Error al generar la Factura!!', 3000, 'x-circle', false);
         },
         complete: () => {
           this.getAllServicesIntances(); //Traemos todas las intances  
-          this.toast.showToast('Factura generada correctamente ', 5000, 'check2-square', true)
+          this.toast.showToast('Factura generada correctamente ', 3000, 'check2-square', true)
           this.invoiceUpdateform.reset(this.initialInvoiceUpdateValues);
           this.generarPdf(pdfBlob);
         }
@@ -414,7 +416,7 @@ this.showToastWarning = false;
 
     } else {
       this.invoiceUpdateform.markAllAsTouched();
-      this.toast.showToast('Error al generar el fomulario de Factura !!', 7000, 'x-circle', false);
+      this.toast.showToast('Error al generar el fomulario de Factura !!', 3000, 'x-circle', false);
     }
 
   }
@@ -444,13 +446,13 @@ this.showToastWarning = false;
       this.invoiceInstance.addInvoice(invoiceArrayFrm.value).subscribe({  
         next: (response) => { },
         error: (err) => {
-          this.toast.showToast('Error al generar la Factura!!', 7000, 'x-circle', false);
+          this.toast.showToast('Error al generar la Factura!!', 3000, 'x-circle', false);
         },
         complete: () => {
           if (closeServiceInvoice == false) {
             //case de uso para cuando se genera la factura
             this.getAllServicesIntances(); //Traemos todas las intances  
-            this.toast.showToast('Factura generada correctamente ', 5000, 'check2-square', true)
+            this.toast.showToast('Factura generada correctamente ', 3000, 'check2-square', true)
             this.generarPdf(pdfBlob);
             
           } else { //caso  de uso para cuando se envia la factura
@@ -465,7 +467,7 @@ this.showToastWarning = false;
 
     } else {
       this.invoiceUpdateform.markAllAsTouched();
-      this.toast.showToast('Error al generar el fomulario de Factura !!', 7000, 'x-circle', false)
+      this.toast.showToast('Error al generar el fomulario de Factura !!', 3000, 'x-circle', false)
       
     }
 
@@ -483,7 +485,7 @@ this.showToastWarning = false;
     const invUpdated = this.addInvoiceUpdateArray(service.invoice[invoiceIndex].invoiceId, true);
     
     if(invUpdated == false){
-      this.toast.showToast('Error al generar la Factura!!', 7000, 'x-circle', false);
+      this.toast.showToast('Error al generar la Factura!!', 3000, 'x-circle', false);
       return;
     }
 
@@ -497,7 +499,7 @@ this.showToastWarning = false;
         next: (response) => { },
         error: (err) => {
           console.log(err);
-          this.toast.showToast('Error al enviar el correo!!', 7000, 'x-circle', false);
+          this.toast.showToast('Error al enviar el correo!!', 3000, 'x-circle', false);
         },
         complete: () => {
           this.sendEmail(service,invoiceIndex);
@@ -508,7 +510,7 @@ this.showToastWarning = false;
 
     } else {
       this.invoiceUpdateform.markAllAsTouched();
-      this.toast.showToast('Error al generar el fomulario para enviar el correo !!', 7000, 'x-circle', false);
+      this.toast.showToast('Error al generar el fomulario para enviar el correo !!', 3000, 'x-circle', false);
     }
   }
 
@@ -544,10 +546,10 @@ this.showToastWarning = false;
       next: () => {},
       error: (err) => {
         console.error(err);
-        this.toast.showToast('Error al enviar el correo ', 5000, 'check2-square', true);
+        this.toast.showToast('Error al enviar el correo ', 3000, 'check2-square', true);
       },
       complete: () => {
-          this.toast.showToast('Correo enviado con factura Adjunta  ', 5000, 'check2-square', true)
+          this.toast.showToast('Correo enviado con factura Adjunta  ', 3000, 'check2-square', true)
           //this.invoiceUpdateform.reset(this.initialInvoiceUpdateValues);
           this.getAllServicesIntances(); //Traemos todas las intances  
           
@@ -557,11 +559,12 @@ this.showToastWarning = false;
 
 
   ngOnInit() {
-
+    this.getMessage(0);
     this.getallClientsBy(this.clientesFijos);
     this.lastUsedValue = this.clientesFijos;
     this.getAllServicesIntancesBy(this.clientesFijos); // de entrada traemos clientes fijos solamente
     this.getRecurrentInvoiceStatus();
+    
   }
 
 
@@ -602,10 +605,10 @@ this.showToastWarning = false;
     if((this.lastUsedValue == 'Fijo' || this.lastUsedValue == 'Extra') &&  this.extraValue != 'Eventual') { return }
     if((this.lastUsedValue == 'Eventual') &&  (this.extraValue != 'Fijo' && this.extraValue != 'Extra') ) { return }
 
-
+    //this.serviceForm.get('client').reset(); 
     this.getallClientsBy(cltType);
     this.lastUsedValue = cltType;
-    this.serviceForm.get('client').reset();    
+       
   }
   
 
@@ -672,9 +675,17 @@ this.showToastWarning = false;
   }
 
   getallClientsBy(clientType: string) {
+   
+    this.clientList.length=0;
     this.clientInstance.getAllClientsBy(clientType).subscribe({
       next: (clientsList) => {
-        this.clientList = clientsList;
+
+        clientsList.forEach(element => {
+          this.clientList = [...this.clientList, element];
+        });
+
+        
+        //this.clientList = clientsList;
       },
       error: (error) => {
         console.error(error);
@@ -765,37 +776,42 @@ this.showToastWarning = false;
         if(success){
           this.createDefaultPaymentItemFormGroup(this.serviceForm.get('serviceDate').value);
         }else {
-          this.toast.showToast('no se pudo crear el invoice por default!', 5000, 'check2-circle', false);
+          this.toast.showToast('no se pudo crear el invoice por default!', 3000, 'check2-circle', false);
           return;
         }
         
         this.serviceInstance.addService(this.serviceForm.value).subscribe({
           next: (response) => {
-            this.toast.showToast('Servicio creado exitosamente!!', 7000, 'check2-circle', true);
+           
+            console.table(response);
+            this.toast.showToast('Servicio creado exitosamente!!', 3000, 'check2-circle', true);
           },
           error: (err) => {
             console.log(err);
-            this.toast.showToast('Error crear el servicio!!', 7000, 'x-circle', false);
+            this.toast.showToast('Error crear el servicio!!', 3000, 'x-circle', false);
           },
           complete: () => {
-            this.onCancel() // llamamos on cancel apra poder irnos al tab de consulta
+            
+            this.onCancel() // llamamos on cancel para poder irnos al tab de consulta
           }
         });
 
       } else if (action == 'Actualizar') {
 
-       
         this.serviceForm.get('price').setValue(this.totalPrice); // totalPrice contiene la sumatoria del total de la factura
+       //this.serviceForm.removeControl('invoice');
+    
+      
         this.serviceInstance.updateService(this.serviceForm.value).subscribe({
           next: (response) => {
-            this.toast.showToast('Servicio actualizado exitosamente!!', 7000, 'check2-circle', true);
+            this.toast.showToast('Servicio actualizado exitosamente!!', 3000, 'check2-circle', true);
           },
           error: (err) => {
             
-            this.toast.showToast('Error al actualizar el servicio!!', 7000, 'x-circle', false);
+            this.toast.showToast('Error al actualizar el servicio!!', 3000, 'x-circle', false);
           },
           complete: () => {
-            this.onCancel();
+            this.onCancel(); 
             this.getAllServicesIntances();
           }
         });
@@ -804,7 +820,7 @@ this.showToastWarning = false;
     } else {
     
       this.serviceForm.markAllAsTouched();
-      this.toast.showToast('Campos Inválidos, porfavor revise el formulario!!', 7000, 'x-circle', false);
+      this.toast.showToast('Campos Inválidos, por favor revise el formulario!!', 3000, 'x-circle', false);
     }
   }
 
@@ -848,11 +864,11 @@ this.showToastWarning = false;
       console.log(this.paymentForm);
       this.invoiceInstance.addInvoice(this.paymentForm.value).subscribe({  
         next: (response) => {
-          this.toast.showToast('Pago generado exitosamente!!', 7000, 'check2-circle', true);
+          this.toast.showToast('Pago generado exitosamente!!', 3000, 'check2-circle', true);
         },
         error: (err) => {
           console.log(err);
-          this.toast.showToast('Error al generar el Pago!!', 7000, 'x-circle', false);
+          this.toast.showToast('Error al generar el Pago!!', 3000, 'x-circle', false);
         },
         complete: () => {
           // aqui limpiamos el formulario
@@ -864,7 +880,7 @@ this.showToastWarning = false;
 
     } else {
       this.paymentForm.markAllAsTouched();
-      this.toast.showToast('Campos Inválidos, porfavor revise el formulario de Pago!!', 7000, 'x-circle', false);
+      this.toast.showToast('Campos Inválidos, porfavor revise el formulario de Pago!!', 3000, 'x-circle', false);
     }
   }
 
@@ -916,10 +932,10 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
         serviceObject.serviceId = serviceDTO.serviceId;
         this.serviceInstance.updateService(serviceObject).subscribe({
           next: (response) => {
-            this.toast.showToast('Servicio eliminado exitosamente!!', 7000, 'check2-circle', true);
+            this.toast.showToast('Servicio eliminado exitosamente!!', 3000, 'check2-circle', true);
           },
           error: (err) => {
-            this.toast.showToast('Error al eliminar el Servicio!!', 7000, 'x-circle', false);
+            this.toast.showToast('Error al eliminar el Servicio!!', 3000, 'x-circle', false);
           },
           complete: () => {
             this.getAllServicesIntances();
@@ -953,9 +969,11 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
     } else { //Eventual
       this.extraValue = this.radioOptions[2];
     }
+   
+    this.cliente = this.client.clientId;
     
     
-    this.getallClientsBy(this.extraValue);
+    //this.getallClientsBy(this.extraValue);
 
     this.isRecurrentService = serviceDTO.status == Status.Recurrente? true:false;
 
@@ -973,6 +991,7 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
       serviceDetail: this.serviceFrm.array([]),
       isExtra:this.isExtraOption
     });
+     
 
     const sDetails: ServiceDetailEntity[] = JSON.parse(JSON.stringify(serviceDTO.serviceDetail))
 
@@ -1233,14 +1252,14 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
       },
       error: (error) => {
         console.error(error);
-        this.toast.showToast(error, 7000, 'x-circle', false);
+        this.toast.showToast(error, 3000, 'x-circle', false);
       },
     });
        
         if (exists) {
      
           // mando mensaje 
-          this.toast.showToastWarning('La factura del mes de "'+ currentFullMonth +'" ya existe!', 7000);
+          this.toast.showToastWarning('La factura del mes de "'+ currentFullMonth +'" ya existe!', 3000);
           return;
         } else {
          
@@ -1250,7 +1269,7 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
       if (success) {
         this.createDefaultPaymentItemFormGroup(currentDateFormatted); //agregamos el default payment al invoiceGroup q acabamos de agregar
       } else {
-        this.toast.showToast('no se pudo crear el invoice!!', 5000, 'check2-circle', false);
+        this.toast.showToast('no se pudo crear el invoice!!', 3000, 'check2-circle', false);
         return;
       }
 
@@ -1266,11 +1285,11 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
 
       this.serviceInstance.updateService(this.serviceForm.value).subscribe({
         next: (response) => {
-          this.toast.showToast('Servicio recurrente actualizado exitosamente!!', 7000, 'check2-circle', true);
+          this.toast.showToast('Servicio recurrente actualizado exitosamente!!', 3000, 'check2-circle', true);
         },
         error: (err) => {
 
-          this.toast.showToast('Error al actualizar el servicio recurrente!!', 7000, 'x-circle', false);
+          this.toast.showToast('Error al actualizar el servicio recurrente!!', 3000, 'x-circle', false);
         },
         complete: () => {
           this.onCancel();

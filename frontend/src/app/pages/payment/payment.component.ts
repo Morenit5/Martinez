@@ -68,6 +68,7 @@ export class PaymentComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
+    this.getMessage(0);
     /*this.toolList =this.toolService.fetchData();*/
     //console.log('Cada vez que se llama metodo OnInit');
     //this.toolList = this.toolService.fetchData1();
@@ -92,11 +93,11 @@ export class PaymentComponent implements OnInit, OnChanges {
 
         this.paymentService.add(this.paymentForm.value).subscribe({
           next: (response) => {
-            this.toast.showToast('Pago registrado exitosamente!!', 7000, 'check2-circle', true);
+            this.toast.showToast('Pago registrado exitosamente!!', 3000, 'check2-circle', true);
             console.log(response);
           },
           error: (err) => {
-            this.toast.showToast('Error al registar el pago!!', 7000, 'x-circle', false);
+            this.toast.showToast('Error al registar el pago!!', 3000, 'x-circle', false);
           },
           complete: () => {
             this.onClear();

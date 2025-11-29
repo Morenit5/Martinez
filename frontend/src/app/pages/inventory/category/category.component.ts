@@ -138,6 +138,7 @@ export class CategoryComponent {
   /*FIN METODOS DE PAGINACION*/
 
   ngOnInit() {
+    this.getMessage(0);
   }
 
   onSubmit(accion: string) {
@@ -149,7 +150,7 @@ export class CategoryComponent {
       if (accion == 'Registrar') {
         this.categoryService.addCategory(this.categoryForm.value).subscribe({
           next: (response) => {
-            this.toast.showToast('Categoría registrada exitosamente!!', 7000, 'check2-circle', true);
+            this.toast.showToast('Categoría registrada exitosamente!!', 3000, 'check2-circle', true);
             console.log(response);
           },
           error: (err) => {
@@ -172,10 +173,10 @@ export class CategoryComponent {
 
         this.categoryService.updateCategory(this.categoryForm.value).subscribe({
           next: (response) => {
-            this.toast.showToast('Categoría actualizada exitosamente!!', 7000, 'check2-circle', true);
+            this.toast.showToast('Categoría actualizada exitosamente!!', 3000, 'check2-circle', true);
           },
           error: (err) => {
-            this.toast.showToast('Error al actualizar la categoría!!', 7000, 'x-circle', false);
+            this.toast.showToast('Error al actualizar la categoría!!', 3000, 'x-circle', false);
           },
           complete: () => {
             this.onClear();
@@ -187,7 +188,7 @@ export class CategoryComponent {
     } else {
       console.log(this.categoryForm.valid);
       this.categoryForm.markAllAsTouched();
-      this.toast.showToast('Campos inválidos, por favor revise el formulario!!', 7000, 'x-circle', false);
+      this.toast.showToast('Campos inválidos, por favor revise el formulario!!', 3000, 'x-circle', false);
     }
 
   }
@@ -238,10 +239,10 @@ export class CategoryComponent {
 
     this.categoryService.updateCategory(categoryObject).subscribe({
       next: (response) => {
-        this.toast.showToast('Categoría eliminada exitosamente!!', 7000, 'check2-circle', true);
+        this.toast.showToast('Categoría eliminada exitosamente!!', 3000, 'check2-circle', true);
       },
       error: (err) => {
-        this.toast.showToast('Error al eliminar la categoría!!', 7000, 'x-circle', false);
+        this.toast.showToast('Error al eliminar la categoría!!', 3000, 'x-circle', false);
       },
       complete: () => {
         this.getAllDataCategories();

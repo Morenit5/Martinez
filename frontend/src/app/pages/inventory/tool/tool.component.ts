@@ -16,7 +16,7 @@ import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
   providers: [{ provide: NgbDateAdapter, useClass: DateAdapterService }]
 })
 
-export class ToolComponent {
+export class ToolComponent implements OnInit {
   
   toolEntitiyToGet: any;
   originalValues: ToolEntity[] = []; //para guardar temporalmente valores originales
@@ -75,6 +75,9 @@ export class ToolComponent {
     this.initialDeleteToolFormValues = this.deleteToolForm.value;
 
     this.updatePaginatedData();
+  }
+  ngOnInit(): void {
+    this.getMessage(0);
   }
 
 
@@ -207,7 +210,7 @@ export class ToolComponent {
          console.log("ENTRA AL METODO ONSUBMIT REGISTRAR: "+ this.toolForm);
         this.toolService.addTool(this.toolForm.value).subscribe({
           next: (response) => {
-            this.toast.showToast('Herramienta registrada exitosamente!!', 7000, 'check2-circle', true);
+            this.toast.showToast('Herramienta registrada exitosamente!!', 3000, 'check2-circle', true);
             
           },
           error: (err) => {
@@ -218,7 +221,7 @@ export class ToolComponent {
               
               errorMessage = errorMessage.slice(7, errorMessage.length - 1);
             }
-            this.toast.showToast(errorMessage, 7000, 'x-circle', false);
+            this.toast.showToast(errorMessage, 3000, 'x-circle', false);
           },
           complete: () => {
             this.onClear();
@@ -231,10 +234,10 @@ export class ToolComponent {
 
         this.toolService.updateTool(this.toolForm.value).subscribe({
           next: (response) => {
-            this.toast.showToast('Herramienta actualizada exitosamente!!', 7000, 'check2-circle', true);
+            this.toast.showToast('Herramienta actualizada exitosamente!!', 3000, 'check2-circle', true);
           },
           error: (err) => {
-            this.toast.showToast('Error al actualizar la Herramienta!!', 7000, 'x-circle', false);
+            this.toast.showToast('Error al actualizar la Herramienta!!', 3000, 'x-circle', false);
           },
           complete: () => {
             this.onClear();
@@ -246,7 +249,7 @@ export class ToolComponent {
       
        console.log("ENTRA AL ELSE: "+ JSON.stringify(this.toolForm.value));
       this.toolForm.markAllAsTouched();
-      this.toast.showToast('Campos inválidos, por favor revise el formulario!!', 7000, 'x-circle', false);
+      this.toast.showToast('Campos inválidos, por favor revise el formulario!!', 3000, 'x-circle', false);
     }
   }
 
@@ -328,10 +331,10 @@ export class ToolComponent {
     
     this.toolService.updateDeleteTool(this.deleteToolForm.value).subscribe({
       next: (response) => {
-        this.toast.showToast('Herramienta Eliminada exitosamente!!', 7000, 'check2-circle', true);
+        this.toast.showToast('Herramienta Eliminada exitosamente!!', 3000, 'check2-circle', true);
       },
       error: (err) => {
-        this.toast.showToast('Error al Eliminar la Herramienta!!', 7000, 'x-circle', false);
+        this.toast.showToast('Error al Eliminar la Herramienta!!', 3000, 'x-circle', false);
       },
       complete: () => {
         this.deleteToolForm.reset(this.initialDeleteToolFormValues);

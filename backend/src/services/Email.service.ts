@@ -84,13 +84,13 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
     const finalValue: boolean = enable.toLocaleLowerCase() === 'true';
     this.onDate = Number(enableOnDate);
 
-    let x:number = 10;
+    let x:number = 60;
     const schedule = `0 0 13 ${this.onDate} * *`;
     const forTesting = `0 */${x} * * * *`;
 
     try {
       if (this.cronJob == null || this.cronJob == undefined) {
-        this.cronJob = new CronJob(/*schedule*/forTesting, async () => {
+        this.cronJob = new CronJob(schedule/*forTesting*/, async () => {
           try {
             await this.checkUnpaidServices();
             console.log('Correos aparentemente enviados correctamente')
