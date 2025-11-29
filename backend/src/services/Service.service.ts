@@ -514,27 +514,33 @@ export class ServiceService {
   }
 
   
-    async findInvoiceByMonth(serviceId: number, invoiceMonth: string): Promise<{}> {
+    async findInvoiceByMonth(serviceId: number, invoiceMonth: string): Promise<{}|void> {
+      
       let serv : EntityService = new EntityService();
       serv.serviceId = serviceId;
-    var invoices = await this.invoiceRepository.find({
+    return await this.invoiceRepository.find({
       where: [{
-        service : serv,
+        service :{
+          serviceId: serviceId
+        },
         invoicedMonth: invoiceMonth,
       }],
     }).then((result: any) => {
-      return result; 
+     
+      if(result.length>0)
+      {
+        //console.log('result tenemos algo');
+        return { active: true };
+      }
+      else
+      {
+        //console.log('No hay resultados');
+        return { active: false};
+      }
+      //return result; 
+    
     }).catch((error: any) => {
       this.exceptions.sendException(error);
     });
-
-    if(invoices!= undefined || invoices != null)
-    {
-      return { active: true };
-    }
-    else
-    {
-      return { active: false};
-    }    
   }
 }

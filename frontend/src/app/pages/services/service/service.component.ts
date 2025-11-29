@@ -813,6 +813,7 @@ this.showToastWarning = false;
           complete: () => {
             this.onCancel(); 
             this.getAllServicesIntances();
+            this.initialServiceForm(); // Se agrega este metodo para reinicializar los valores despues de actualizar
           }
         });
       }
@@ -986,9 +987,9 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
       price: serviceDTO.price,
       client: this.serviceFrm.group({
         clientId: this.client.clientId,
-
       }),
       serviceDetail: this.serviceFrm.array([]),
+      //invoice:this.serviceFrm.array([]),
       isExtra:this.isExtraOption
     });
      
@@ -1005,6 +1006,25 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
 
       this.onAddDetails('actualizar');
     }
+  }
+
+  initialServiceForm()
+  {
+    this.serviceForm = this.serviceFrm.group({
+      //campos del servicio
+       serviceId: [],
+      serviceName: ['', Validators.required],
+      serviceDate: [''],
+      status: [Status.EnProceso],
+      price: [], //tengo que hacer sumatoria aqui
+      client: this.serviceFrm.group({
+        clientId: ['', Validators.required],
+      }),
+      serviceDetail: this.serviceFrm.array([]),
+      invoice: this.serviceFrm.array([]),
+      isExtra: ['']
+    });
+
   }
 
   onAddDetails(action: string = 'registrar') {
@@ -1241,14 +1261,12 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
 
        // verificamos si existe factura en el mes actual
        //console.log('VEAMO QUE SE MANDA DEL ID '+entity.serviceId);
+       console.log('currentMonth: '+currentMonth);
        let servId : number = entity.serviceId;
-       const exists =  this.serviceInstance.getInvoicesXMonth(servId, currentMonth).subscribe({
+       let exists:any =  this.serviceInstance.getInvoicesXMonth(servId, currentMonth).subscribe({
       next: (invoiceExists) => {
-        if(!invoiceExists)
-        {
-          return false;
-        }
-        return invoiceExists.active;
+        console.log('INVOICES '+invoiceExists.active);
+                return invoiceExists;
       },
       error: (error) => {
         console.error(error);
@@ -1256,10 +1274,11 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
       },
     });
        
-        if (exists) {
+        if (exists.active ==true || exists.active == 'true')
+         {
      
           // mando mensaje 
-          this.toast.showToastWarning('La factura del mes de "'+ currentFullMonth +'" ya existe!', 3000);
+          this.toast.showToastWarning('La factura del mes de "'+ currentFullMonth +'" ya existe! <br><br> *Recordatorio: <br> Crear la factura cada inicio de mes.', 3000);
           return;
         } else {
          
