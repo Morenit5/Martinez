@@ -1,5 +1,5 @@
 
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ClientEntity } from '@app/@core/entities/Client.entity';
 import { ClientService } from '@app/@core/services/Client.service';
@@ -16,7 +16,7 @@ import { DateAdapterService } from '@app/shared/services/date-adapter.service';
   styleUrl: './client.component.scss',
   providers: [{ provide: NgbDateAdapter, useClass: DateAdapterService}]
 })
-export class ClientComponent {
+export class ClientComponent implements OnInit {
 
   onSelectChange($event: any) { throw new Error('Method not implemented.'); }
 
@@ -75,6 +75,9 @@ export class ClientComponent {
 
     this.updatePaginatedData();
   }
+  ngOnInit(): void {
+    this.getMessage(0);
+  }
 
   getAllDataClients() {
     this.clientService.fetchData1().subscribe({
@@ -100,14 +103,14 @@ export class ClientComponent {
 
         this.clientService.addClient(this.clientForm.value).subscribe({
           next: (response) => {
-            this.toast.showToast('Cliente registrado exitosamente!!', 7000, 'check2-circle', true);
+            this.toast.showToast('Cliente registrado exitosamente!!', 3000, 'check2-circle', true);
           },
           error: (err) => {
             let errorMessage = JSON.stringify(err.error.error);
             if (errorMessage.startsWith('"Error:')) {
               errorMessage = errorMessage.slice(7, errorMessage.length - 1);
             }
-            this.toast.showToast(errorMessage/*'Error al registar la categoria!!'*/, 7000, 'x-circle', false);
+            this.toast.showToast(errorMessage/*'Error al registar la categoria!!'*/, 3000, 'x-circle', false);
           },
           complete: () => {
             this.onCancel();
@@ -118,10 +121,10 @@ export class ClientComponent {
 
           this.clientService.updateClient(this.clientForm.value).subscribe({
           next: (response) => {
-            this.toast.showToast('Cliente actualizado exitosamente!!', 7000, 'check2-circle', true);
+            this.toast.showToast('Cliente actualizado exitosamente!!', 3000, 'check2-circle', true);
           },
           error: (err) => {
-            this.toast.showToast('Error al actualizar al cliente!!', 7000, 'x-circle', false);
+            this.toast.showToast('Error al actualizar al cliente!!', 3000, 'x-circle', false);
           },
           complete: () => {
             this.onCancel();
@@ -132,7 +135,7 @@ export class ClientComponent {
     }else {
       
       this.clientForm.markAllAsTouched();
-      this.toast.showToast('Campos inválidos, por favor revise el formulario!!', 7000, 'x-circle', false);
+      this.toast.showToast('Campos inválidos, por favor revise el formulario!!', 3000, 'x-circle', false);
     } 
   }
 
@@ -178,10 +181,10 @@ export class ClientComponent {
     delete clientObject.showDetails;
     this.clientService.updateClient(clientObject).subscribe({
       next: (response) => {
-        this.toast.showToast('Cliente eliminado exitosamente!!', 7000, 'check2-circle', true);
+        this.toast.showToast('Cliente eliminado exitosamente!!', 3000, 'check2-circle', true);
       },
       error: (err) => {
-        this.toast.showToast('Error al eliminar al cliente!!', 7000, 'x-circle', false);
+        this.toast.showToast('Error al eliminar al cliente!!', 3000, 'x-circle', false);
       },
       complete: () => {
         this.clientList = this.clientService.getAllClients();

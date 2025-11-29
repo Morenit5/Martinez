@@ -353,8 +353,15 @@ export class ServiceService {
 
 
   async update(serviceId: number, entity: UpdateServiceDto): Promise<ServiceDto | null> {
- 
+    
 
+     await this.serviceRepository.save(entity);
+    return this.serviceRepository.findOneBy({ serviceId })
+    
+  }
+
+   async updateInvoice(serviceId: number, entity: UpdateServiceDto): Promise<ServiceDto | null> {
+    
     let invoice= new UpdateInvoiceDto();
     invoice = entity.invoice![0];
     invoice.service =new UpdateServiceDto();

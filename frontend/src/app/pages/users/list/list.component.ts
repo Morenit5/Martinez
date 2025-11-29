@@ -106,6 +106,7 @@ export class ListComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.getMessage(0);
     this._useRandomUser.getAllUsers().subscribe({
       next: (users) => {
         this.users = users;
@@ -187,10 +188,10 @@ export class ListComponent implements OnInit {
     this.userInstances.updateUser(usrInstance).subscribe({
       next: (response) => {
         //el response contiene el usuario actualizado 
-        this.toast.showToast('Usuario eliminado exitosamente!!', 7000, 'check2-circle', true);
+        this.toast.showToast('Usuario eliminado exitosamente!!', 3000, 'check2-circle', true);
       },
       error: (err) => {
-        this.toast.showToast('Error al eliminar el usuario!!', 7000, 'x-circle', false);
+        this.toast.showToast('Error al eliminar el usuario!!', 3000, 'x-circle', false);
       },
       complete: () => {
         this.getAllUserInstances();
@@ -219,23 +220,23 @@ export class ListComponent implements OnInit {
          this.usersForm.get('password').updateValueAndValidity();
         if (!this.usersForm.valid) {
           this.usersForm.markAllAsTouched();
-          this.toast.showToast('Campos Inválidos, por favor revise el formulario!!', 7000, 'x-circle', false);
+          this.toast.showToast('Campos Inválidos, por favor revise el formulario!!', 3000, 'x-circle', false);
           return
         }
 
         this.userInstances.addUser(this.usersForm.value).subscribe({
           next: (response) => {
-            this.toast.showToast('Usuario registrado exitosamente!!', 7000, 'check2-circle', true);
+            this.toast.showToast('Usuario registrado exitosamente!!', 3000, 'check2-circle', true);
           },
           error: (err) => {
            
             let errorMessage = JSON.stringify(err.error.error); 
            
             if(errorMessage.includes('duplicate key value violates unique constraint')){
-              this.toast.showToast( 'El usuario ya existe, por favor revisa el usuario y correo electrónico!', 5000, 'x-circle', false);
+              this.toast.showToast( 'El usuario ya existe, por favor revisa el usuario y correo electrónico!', 3000, 'x-circle', false);
              
             } else {
-              this.toast.showToast( errorMessage, 7000, 'x-circle', false);
+              this.toast.showToast( errorMessage, 3000, 'x-circle', false);
             }
            
 
@@ -250,11 +251,11 @@ export class ListComponent implements OnInit {
 
         this.userInstances.updateUser(this.usersForm.value).subscribe({
           next: (response) => {
-            this.toast.showToast('Usuario actualizado exitosamente!!', 7000, 'check2-circle', true);
+            this.toast.showToast('Usuario actualizado exitosamente!!', 3000, 'check2-circle', true);
           },
           error: (err) => {
             //console.log(err);
-            this.toast.showToast('Error al actualizar al Usuario!!', 7000, 'x-circle', false);
+            this.toast.showToast('Error al actualizar al Usuario!!', 3000, 'x-circle', false);
           },
           complete: () => {
             this.onCancel();
@@ -267,7 +268,7 @@ export class ListComponent implements OnInit {
       //console.log(this.usersForm.valid);
       //console.log(this.usersForm);
       this.usersForm.markAllAsTouched();
-      this.toast.showToast('Campos Inválidos, por favor revise el formulario!!', 7000, 'x-circle', false);
+      this.toast.showToast('Campos Inválidos, por favor revise el formulario!!', 3000, 'x-circle', false);
     }
   }
 
