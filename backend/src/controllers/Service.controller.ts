@@ -45,7 +45,7 @@ export class  ControllerService {
   }
 
   @Get('/existsinvoice')
-  findInvoiceByMonth(@Query('serviceId') serviceId: number, @Query('invoicedMonth') invoicedMonth: string): Promise<{}>{
+  findInvoiceByMonth(@Query('serviceId') serviceId: number, @Query('invoicedMonth') invoicedMonth: string): Promise<{}|void>{
    
    return this.serviceService.findInvoiceByMonth(serviceId, invoicedMonth);
   }
