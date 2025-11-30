@@ -21,6 +21,7 @@ import { PermissionModule } from './modules/Permission.module';
 import { RolModule } from './modules/Rol.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { ConfigurationModule } from './modules/Configuration.module';
+import { JwtService } from '@nestjs/jwt';
 
 let importModules =[
   ConfigModule.forRoot({
@@ -50,7 +51,7 @@ let importModules =[
         }),
   ],
   controllers: [AppController],
-  providers: [AppService, DbUtilService_Cls,ColumnNumericTransformer,TypeORMExceptions], /*Para que otras clases los puedan encontrar */
+  providers: [AppService, DbUtilService_Cls,ColumnNumericTransformer,TypeORMExceptions,JwtService], /*Para que otras clases los puedan encontrar */
 })
 
 export class AppModule {

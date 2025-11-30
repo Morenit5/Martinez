@@ -4,17 +4,18 @@ import { InitializableEntity } from '@core/entities/_extra/intializable.entity';
 export class Credentials extends InitializableEntity {
   id = '';
   username = '';
+  password? = '';
   firstName? = '';
   lastName? = '';
   email? = '';
 
-  @Expose({ name: 'access_token' })
+  @Expose({ /*name: 'access_token'*/ })
   token = '';
 
-  @Expose({ name: 'expires_in' })
+  @Expose({ /*name: 'expires_in'*/ })
   expiresIn = 0;
 
-  @Expose({ name: 'refresh_token' })
+  @Expose({ /*name: 'refresh_token'*/ })
   refreshToken = '';
 
   roles: string[] = [];

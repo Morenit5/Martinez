@@ -1,9 +1,10 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { TypeORMExceptions } from '../exceptions/TypeORMExceptions';
 import { PermissionDto } from 'src/dto/Permission.dto';
 import { ServicePermission } from 'src/services/Permission.service';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
-
+@UseGuards(JwtAuthGuard)
 @Controller({ version: '1', path: 'perms' })
 export class ControllerPermission {
   

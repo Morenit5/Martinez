@@ -33,6 +33,9 @@ export class EntityUser {
 
   @Column({ type: 'boolean', default: true })
   enabled: boolean;
+
+   @Column({ type: 'varchar', nullable:true,})
+  refreshToken:string;
   
 }
  

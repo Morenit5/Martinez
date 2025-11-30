@@ -21,10 +21,25 @@ export class ServiceUser {
         return users;
     }
 
-    async findOne(userId: number): Promise<userDto | null> {
+    async findOne(uname:string): Promise<userDto | null> {
 
         var user: userDto = await this.userRepository.findOne({
-            where: { userId: userId },
+            where: { username: uname },
+            relations: { rol: true }
+
+        }).then((result: any) => {
+            return result;
+        }).catch((error: any) => {
+            this.exceptions.sendException(error);
+        });
+        return user;
+        
+    }
+
+    async findOneBy(userId: number,uname?:string): Promise<userDto | null> {
+
+        var user: userDto = await this.userRepository.findOne({
+            where: { userId: userId,  username:uname },
             relations: { rol: true }
 
         }).then((result: any) => {

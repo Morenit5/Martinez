@@ -41,15 +41,6 @@ export const appSetting = {
         sale: true,
       },
     },
-    [ROLE.GUEST]: {
-      create: {
-        user: false,
-        sale: false,
-      },
-      access: {
-        user: false,
-        sale: false,
-      },
-    },
+
   },
 };

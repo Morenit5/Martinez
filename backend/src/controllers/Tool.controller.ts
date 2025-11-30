@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, Put, Query, UseInterceptors, ParseFilePipe, UploadedFile, FileTypeValidator, MaxFileSizeValidator, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, Put, Query, UseInterceptors, ParseFilePipe, UploadedFile, FileTypeValidator, MaxFileSizeValidator, Res, UseGuards } from '@nestjs/common';
 import { ServiceTool } from 'src/services/Tool.service';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 import { CreateToolDto, ToolDto, UpdateToolDto } from 'src/dto/Tool.dto';
@@ -8,8 +8,10 @@ import { diskStorage } from 'multer';
 import { join } from 'path';
 import { createReadStream } from 'fs';
 import { Response } from 'express';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 //@Controller('tool')
+@UseGuards(JwtAuthGuard)
 @Serializer(ToolDto)
 @Controller({ version: '1', path: 'tool' })
 export class ControllerTool {

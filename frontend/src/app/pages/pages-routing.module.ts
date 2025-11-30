@@ -9,6 +9,7 @@ import { PaymentComponent } from './payment/payment.component';
 import { ServiceComponent } from './services/service/service.component';
 import { InvoceComponent } from './services/invoce/invoce.component';
 import { ConfigsComponent } from './configs/configs.component';
+import { AuthenticationGuard } from '@app/auth/guard/authentication.guard';
 
 const routes: Routes = [
   Shell.childRoutes([
@@ -40,6 +41,7 @@ const routes: Routes = [
     {
       path: 'client',
       component: ClientComponent,
+      //canActivate: [AuthenticationGuard],
     },
     {
       path: 'payment',

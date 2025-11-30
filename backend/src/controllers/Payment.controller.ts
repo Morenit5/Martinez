@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Param, Delete, HttpStatus, HttpException, ParseIntPipe, NotFoundException, InternalServerErrorException, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, HttpStatus, HttpException, ParseIntPipe, NotFoundException, InternalServerErrorException, Put, UseGuards } from '@nestjs/common';
 import { ServicePayment} from 'src/services/Payment.service';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 import { CreatePaymentDto, PaymentDto, UpdatePaymentDto } from 'src/dto/Payment.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 //@Controller('payment')
+@UseGuards(JwtAuthGuard)
 @Controller({ version: '1', path: 'payment' })
 export class  ControllerPayment {
   newPayment: CreatePaymentDto;
