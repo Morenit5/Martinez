@@ -1,29 +1,34 @@
 import { Controller, Get, Post, UseGuards, Request } from '@nestjs/common';
 import { AppService } from './app.service';
-import { LocalAuthGuard } from './auth/local-auth.guard';
+import { LocalAuthGuard } from './auth/guards/local-auth.guard';
 import { AuthService } from './auth/auth.service';
-import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { Serializer } from 'src/interceptors/UserTransform.interceptor';
+import { userDto } from './dto/User.dto';
 
-@Controller()
+
+@Serializer(userDto)
+@Controller({ version: '1', path: 'ddd' })
 export class AppController {
   constructor(private readonly appService: AppService,private authService: AuthService) {}
 
-  @UseGuards(LocalAuthGuard)
-  @Post('auth/login')
+ 
+  @Post('/login')
   async login(@Request() req) {
-    return this.authService.login(req.user);
+    console.log('llega en el AppController')
+    return this.authService.signIn(req.user);
   }
 
 
   @UseGuards(LocalAuthGuard)
-  @Post('auth/logout')
+  @Post('/logout')
   async logout(@Request() req) {
     return req.logout();
   }
 
 
   @UseGuards(JwtAuthGuard)
-  @Get('profile')
+  @Get('/profile')
   getProfile(@Request() req) {
     return req.user;
   }

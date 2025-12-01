@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-
+import { BehaviorSubject, catchError, lastValueFrom, map, Observable, of, tap, throwError } from 'rxjs';
+import { environment } from '@env/environment';
 import { CredentialsService } from '@app/auth';
 import { Credentials } from '@core/entities';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { instanceToPlain } from 'class-transformer';
 
 export interface LoginContext {
   username: string;
@@ -11,24 +13,29 @@ export interface LoginContext {
   isMobile?: boolean;
 }
 
+const baseUrl = environment.apiUrl;
+const loginUrl = baseUrl + '/auth/login';
+const refreshTokenUrl = baseUrl + '/auth/refresh';
+
+
 /**
  * Provides a base for authentication workflow.
  * The login/logout methods should be replaced with proper implementation.
  */
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root', })
 export class AuthenticationService {
-  constructor(private readonly _credentialsService: CredentialsService) {}
+constructor(private readonly _credentialsService: CredentialsService,private readonly http: HttpClient) {}
 
   /**
    * Authenticates the user.
    * @param context The login parameters.
    * @return The user credentials.
    */
-  login(context: LoginContext): Observable<Credentials> {
+  async login(context: LoginContext): Promise<Observable<Credentials>> {
+
     const credentials: Credentials = new Credentials({
-      username: 'johndoe',
+      username: context.username,
+      password: context.password,
       id: '',
       token: '123456',
       refreshToken: '123456',
@@ -38,16 +45,82 @@ export class AuthenticationService {
       firstName: 'John',
       lastName: 'Doe',
     });
-    this._credentialsService.setCredentials(credentials, context.remember);
+    
+    
+    return this.http.post<any>(loginUrl, instanceToPlain(credentials)).pipe(
+      map(res => {
+        if (res) {
+          console.log('Login successful');
+          //console.log(JSON.stringify(res))
 
-    return of(credentials);
+          credentials.id = res.userId;
+          credentials.token = res.token;
+          credentials.refreshToken = res.refreshToken;
+          credentials.expiresIn = res.expiresIn;
+          credentials.roles.push(res.name);
+
+          this._credentialsService.setCredentials(credentials, context.remember);
+        }
+        return credentials;
+      }
+    ));
+     
+  
   }
+
+
+
+refreshToken(): Observable<any> {
+
+    const newCredentials = this._credentialsService.credentials;
+    const { refreshToken } = this._credentialsService.credentials || {};
+    if (!newCredentials.refreshToken) {
+      this.logout();
+    }
+    console.log('tratando de refrescar el token' );
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + refreshToken
+    });
+
+    return this.http.post(refreshTokenUrl, instanceToPlain(newCredentials),{ headers }).pipe(catchError((error: HttpErrorResponse) => {
+        if (error.status === 401) {
+          // Handle unauthorized error, e.g., redirect to login
+          console.error('Unauthorized access. Redirecting to login.');
+          // this.router.navigate(['/login']);
+        } else {
+          // Handle other errors
+          console.error('An error occurred:', error.message);
+        }
+        return throwError(() => new Error('Something bad happened; please try again later.'));
+      }),
+
+      tap((response: any) => {
+        console.log('llego al front authentication esto == > ' + response)
+        newCredentials.token = response.accessToken;
+        newCredentials.refreshToken = response.refreshToken;
+
+        this._credentialsService.setCredentials(newCredentials);
+       
+        return response;
+
+      }),
+      catchError((error) => {
+       
+        return throwError(() => error);
+      })
+    );
+  }
+
 
   /**
    * Logs out the user and clear credentials.
    * @return True if the user was logged out successfully.
    */
   logout(): Observable<any> {
+    this._credentialsService.setCredentials();
+    window.location.href = '/login';
     return of(true);
   }
 }

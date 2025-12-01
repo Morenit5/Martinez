@@ -1,9 +1,11 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Res, UseGuards } from '@nestjs/common';
 import { EmailService } from 'src/services/Email.service';
 import { Response } from 'express';
 import { ServiceDto } from 'src/dto/Service.dto';
 import { EntityConfiguration } from 'src/entities/Configuration.entity';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller({ version: '1', path: 'mail' })
 export class EmailController {
   exceptions: any;

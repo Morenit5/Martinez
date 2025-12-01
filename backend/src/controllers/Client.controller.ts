@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, Put, Query} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, Put, Query, UseGuards} from '@nestjs/common';
 import { ServiceClient } from 'src/services/Client.service';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 import { ClientDto, CreateClientDto, UpdateClientDto } from 'src/dto/Client.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 //@Controller('client')
+@UseGuards(JwtAuthGuard)
 @Controller({ version: '1', path: 'client' })
 export class  ControllerClient {
   newClient: CreateClientDto;

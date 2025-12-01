@@ -51,6 +51,11 @@ export class userDto {
   @IsString()  
   avatar?:string;
 
+  @Expose()
+  @IsNotEmpty()
+  @IsString()
+  refreshToken:string;  
+
 }
 
 export class CreateUserDto  {
@@ -88,12 +93,15 @@ export class CreateUserLoginDto extends PartialType(CreateUserDto) {
  
   @IsNotEmpty()
   @IsString()
-  password?: string;
+  password: string;
 
   @IsNotEmpty()
   @IsEmail()
   email: string;
-
+ 
+  @IsNotEmpty()
+  @IsString()
+  refreshToken:string;
 }
 
 export class UpdateUserDto extends PartialType(CreateUserLoginDto) {

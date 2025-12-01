@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Param, Put, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { ServiceInvoice } from 'src/services/Invoice.service';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 import { CreateInvoiceDto, InvoiceDto, UpdateInvoiceDto } from 'src/dto/Invoice.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 //@Controller('invoice')
+@UseGuards(JwtAuthGuard)
 @Controller({ version: '1', path: 'inv' })
 export class  ControllerInvoice {
   newInvoice: CreateInvoiceDto;

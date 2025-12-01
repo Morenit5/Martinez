@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, HttpException, HttpStatus, Put, UploadedFile, UseInterceptors, ParseFilePipeBuilder, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, HttpException, HttpStatus, Put, UploadedFile, UseInterceptors, ParseFilePipeBuilder, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Res, UseGuards } from '@nestjs/common';
 import { CreateUserDto, CreateUserLoginDto, UpdateUserDto, userDto } from '../dto/User.dto';
 import { TypeORMExceptions } from '../exceptions/TypeORMExceptions';
 import { ServiceUser } from '../services/User.service';
@@ -8,8 +8,10 @@ import { diskStorage } from 'multer';
 import { createReadStream } from 'fs';
 import { Response } from 'express';
 import { join } from 'path';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 //@Controller('user')
+@UseGuards(JwtAuthGuard)
 @Serializer(userDto)
 @Controller({ version: '1', path: 'user' })
 export class ControllerUser {
@@ -25,8 +27,8 @@ export class ControllerUser {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<userDto | null> {
-    return this.serviceUser.findOne(+id);
+  findOne(@Param('uname') uname: string): Promise<userDto | null> {
+    return this.serviceUser.findOne(uname);
   }
 
   @Post()
@@ -169,7 +171,7 @@ export class ControllerUser {
         }).catch((error: any) => {
           this.exceptions.sendException(error);
         });
-    }
+  }
 
   /*@Delete(':id')
   remove(@Param('id') id: string): Promise<void> {
