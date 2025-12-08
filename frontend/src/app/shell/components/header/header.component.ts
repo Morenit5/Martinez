@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { UntilDestroy } from '@ngneat/until-destroy';
+import { AuthenticationService, CredentialsService } from '@auth';
+import { Router } from '@angular/router';
 
 @UntilDestroy()
 @Component({
@@ -9,26 +11,32 @@ import { UntilDestroy } from '@ngneat/until-destroy';
   standalone: false,
 })
 export class HeaderComponent {
-  menuHidden = true;
-  
 
-  constructor(){
-        const colMenuElement = document.getElementById('sidebarcolumn') as HTMLInputElement | null;
-const colContentElement = document.getElementById('contentcolumn') as HTMLInputElement | null;
-    
-if (colMenuElement) {
-        const value = colMenuElement.value;
-        console.log(value);
+  menuHidden = true;
+  currentUser :string = 'User';
+
+  constructor(private readonly _credentialsService: CredentialsService,private readonly _authService: AuthenticationService, private readonly _router: Router,) {
+    const colMenuElement = document.getElementById('sidebarcolumn') as HTMLInputElement | null;
+    const colContentElement = document.getElementById('contentcolumn') as HTMLInputElement | null;
+
+    if (colMenuElement) {
+      const value = colMenuElement.value;
+      console.log(value);
     } else {
-        //console.error('Element with ID "myInputElementId" not found.');
+      //console.error('Element with ID "myInputElementId" not found.');
     }
 
     if (colContentElement) {
-        const value = colContentElement.value;
-        console.log(value);
+      const value = colContentElement.value;
+      console.log(value);
     } else {
-       // console.error('Element with ID "myInputElementId" not found.');
+      // console.error('Element with ID "myInputElementId" not found.');
     }
+
+     if (this._credentialsService.isAuthenticated()) {
+      const newCredentials = this._credentialsService.credentials;
+      this.currentUser = newCredentials.firstName;
+     }
 
   }
 
@@ -54,5 +62,26 @@ if (colMenuElement) {
     }
   }
 
-  hide() {}
+  signOut() {
+    if (!this._credentialsService.isAuthenticated()) {
+      this._credentialsService.setCredentials();
+      this._router.navigate(['/login']).then(() => {
+        window.location.reload();
+      });
+    } else {
+      this._authService.logout().subscribe({
+        next: () => {
+         this._credentialsService.setCredentials();
+          this._router.navigate(['/login']).then(() => {
+            window.location.reload();
+          });
+        },
+        error: () => {
+          console.error('Error logging out');
+        },
+      });
+    }
+  }
+
+  hide() { }
 }

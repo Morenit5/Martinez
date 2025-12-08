@@ -6,16 +6,16 @@ export class EntityUser {
   @PrimaryGeneratedColumn()
   userId: number;
 
-  @Column({ type: 'varchar', length: 100, unique:true })
+  @Column({ type: 'varchar', length: 250, unique:true })
   username: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 250 })
   password: string;
 
-  @Column({ type: 'varchar', nullable:true, length: 100 })
+  @Column({ type: 'varchar', nullable:true, length: 250 })
   firstname?: string;
 
-  @Column({ type: 'varchar', nullable:true, length: 100 })
+  @Column({ type: 'varchar', nullable:true, length: 250 })
   lastname?: string;
 
   @ManyToOne(() => EntityRol, (rol) => rol.user, { onUpdate: "CASCADE" })

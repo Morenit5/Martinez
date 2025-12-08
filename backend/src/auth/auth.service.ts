@@ -2,16 +2,15 @@ import { BadRequestException, ForbiddenException, Injectable, UnauthorizedExcept
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserLoginDto, userDto } from 'src/dto/User.dto';
-import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { ServiceUser } from 'src/services/User.service';
-import { log } from 'console';
-import { RolDto } from 'src/dto/Rol.dto';
+import {  UpdateRolDto } from 'src/dto/Rol.dto';
+import { ServiceRol } from 'src/services/Rol.service';
 
 @Injectable()
 export class AuthService {
 
-  constructor(private usersService: ServiceUser, private jwtService: JwtService,private configService: ConfigService,) { }
+  constructor(private usersService: ServiceUser, private jwtService: JwtService,private configService: ConfigService, private rolService: ServiceRol) { }
 
   async validateUser(username: string, pass: string): Promise<any> {
     const user = await this.usersService.findOne(username);
@@ -22,28 +21,8 @@ export class AuthService {
     return null;
   }
 
-  /*async login(user: any) {
-    const payload = { username: user.username, sub: user.userId };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
-  }
-
-  async signIn(username: string, pass: string): Promise<{ access_token: string }> {
-    const user = await this.usersService.findOne(username);
-    if (user?.password !== pass) {
-      throw new UnauthorizedException();
-    }
-
-    const payload = { sub: user.userId, username: user.username };
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
-
-  }*/
-
   //Funcion usada para crear un nuevo usuario y regresar  JWT token (access y refresh)
-  async signUp(createUserDto: CreateUserLoginDto): Promise<any> {
+  async signUp(createUserDto: CreateUserLoginDto,isFirstUser: boolean = false): Promise<any> {
     // Check if user exists
     const userExists = await this.usersService.findOne(createUserDto.username);
     if (userExists) {
@@ -51,10 +30,32 @@ export class AuthService {
     }
 
     // Hash password
-    const hash = await this.hashData(createUserDto.password);
+    //const hash = await this.hashData(createUserDto.password);
    
     //create the new user
-    const newUser = await this.usersService.createFullUser({...createUserDto,password:hash});
+    let newAdmin;
+    if(isFirstUser && createUserDto.username == 'U0m4rCr3A73'){
+      newAdmin = new CreateUserLoginDto();
+      let userType = await this.rolService.findByRolName('admin');
+      
+
+      newAdmin.firstname = 'Omar',
+      newAdmin.lastname = 'Martinez'
+      newAdmin.email = 'omar@admin.com';
+      newAdmin.username = 'omar@admin.com';
+      newAdmin.avatar = 'placeholder.png';
+      newAdmin.enabled = true;
+      newAdmin.password = createUserDto.password;
+      if(userType){
+        newAdmin.rol  = new UpdateRolDto();
+        newAdmin.rol.rolId = userType.rolId
+      }
+      //console.log(JSON.stringify(newAdmin));
+    } else{
+      newAdmin = createUserDto;
+    }
+    //const newUser = await this.usersService.createFullUser({...createUserDto,password:hash});
+    const newUser = await this.usersService.createFullUser(newAdmin);
     
     //generate tokens (access and refresh) to return to user
     const tokens = await this.getTokens(newUser.userId, newUser.username);
@@ -67,48 +68,54 @@ export class AuthService {
 
   //Funcion usada para logear a un  usuario y regresar JWT token (access y refresh)
   async signIn(data: CreateUserLoginDto) {
-    // Verify User account (whether it exists or not)
-    //console.log(JSON.stringify(data))
+
+    const isEmpty = await this.usersService.isEmpty();
+    if (isEmpty && isEmpty == true) {
+      if (data.username == 'U0m4rCr3A73') {
+        return await this.signUp(data, true);
+      }
+    }
 
     const user = await this.usersService.findOne(data.username);
 
     if (!user) throw new BadRequestException('User does not exist');
 
-    //const passwordMatches = await argon2.verify(user.password, data.password);
-    //console.log('1 ==>' + JSON.stringify(user))
-    
+    //const hash = await this.hashData(user.password!); //tenemos que quitar esta linea ya que en realidad el passwor deberia estar hashed
 
-    const hash = await this.hashData(user.password!); //tenemos que quitar esta linea ya que en realidad el passwor deberia estar hashed
-
-    const passwordMatches = bcrypt.compareSync(data.password, hash);
+    const passwordMatches = bcrypt.compareSync(data.password, user.password!);
     if (!passwordMatches) {
       throw new BadRequestException('Password is incorrect');
     }
-      
+
     //if login succeded generate a new access token and refresh token
     const tokens = await this.getTokens(user.userId, user.username);
-    
+
     //update database with new refresh token 
     await this.updateRefreshToken(user.userId, tokens.refreshToken, data);
-    
+
     let loginUser = {
-    userId : user.userId,
-    token : tokens.accessToken,
-    refreshToken : tokens.refreshToken,
-    expiresIn : 300,
-    rolId : user.rol.rolId,
-    name : user.rol.name,
+      userId: user.userId,
+      token: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      expiresIn: 300,
+      rolId: user.rol.rolId,
+      rolName: user.rol.name,
+      userName: user.firstname
     }
 
     return loginUser;
   }
 
   //Funcion usada para deslogear a un  usuario y regresar JWT token (access y refresh)
-  async logout(usr: CreateUserLoginDto) {
+  async logout(id:number, usr: CreateUserLoginDto) {
     //aqui tenemos que seter el refresh token a null
-    //userId, { refreshToken: null }
-    //return this.usersService.update(usr);
-    return this.usersService.update(usr.userId!,{...usr,userId:usr.userId,refreshToken:''});
+
+   
+    let upUser = new CreateUserLoginDto();
+    upUser.userId = id;
+    upUser.refreshToken = '';
+
+    return this.usersService.logoutUser(id , upUser);
   }
 
   async hashData(data: string) {
@@ -122,12 +129,12 @@ export class AuthService {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload , {
           secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-          expiresIn: '10m',
+          expiresIn: '15m',
         },
       ),
       this.jwtService.signAsync(payload,{
           secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-          expiresIn: '60m', //'7d',
+          expiresIn: '120m', //'7d',
         },
       )
     ]);

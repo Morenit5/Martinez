@@ -33,9 +33,9 @@ export class AuthController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get('logout')
-    logout(@Body() data: CreateUserLoginDto) {
-        this.authService.logout(data);
+    @Post('logout')
+    logout(@Request() req) {
+        this.authService.logout(req.body.id, req.body);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -49,10 +49,7 @@ export class AuthController {
     //@UseGuards(AuthGuard('local'))
     @Post('refresh')
     refreshTokens(@Request() req) {
-        //const userId = req.user['sub'];
-        //const refreshToken = req.user['refreshToken'];
-        //console.log('el usuario ' + userId + ' y el refresh tokenazo: ' + refreshToken)
-
+        
         return this.authService.refreshTokens(req.body);
     }
 

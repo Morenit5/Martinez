@@ -15,6 +15,7 @@ export interface LoginContext {
 
 const baseUrl = environment.apiUrl;
 const loginUrl = baseUrl + '/auth/login';
+const logoutUrl = baseUrl + '/auth/logout';
 const refreshTokenUrl = baseUrl + '/auth/refresh';
 
 
@@ -40,7 +41,7 @@ constructor(private readonly _credentialsService: CredentialsService,private rea
       token: '123456',
       refreshToken: '123456',
       expiresIn: 3600,
-      roles: ['admin'],
+      roles: [],
       email: 'john@email.com',
       firstName: 'John',
       lastName: 'Doe',
@@ -50,15 +51,15 @@ constructor(private readonly _credentialsService: CredentialsService,private rea
     return this.http.post<any>(loginUrl, instanceToPlain(credentials)).pipe(
       map(res => {
         if (res) {
-          console.log('Login successful');
+          //console.log('Login successful con ');
           //console.log(JSON.stringify(res))
 
           credentials.id = res.userId;
           credentials.token = res.token;
           credentials.refreshToken = res.refreshToken;
           credentials.expiresIn = res.expiresIn;
-          credentials.roles.push(res.name);
-
+          credentials.roles.push(res.rolName);
+          credentials.firstName = res.userName
           this._credentialsService.setCredentials(credentials, context.remember);
         }
         return credentials;
@@ -119,8 +120,28 @@ refreshToken(): Observable<any> {
    * @return True if the user was logged out successfully.
    */
   logout(): Observable<any> {
-    this._credentialsService.setCredentials();
-    window.location.href = '/login';
-    return of(true);
+    const currentCredentials = this._credentialsService.credentials;
+    
+    const credentials: Credentials = new Credentials({
+      id: currentCredentials.id,
+      token: currentCredentials.token,
+      refreshToken: currentCredentials.refreshToken,
+      expiresIn: 3600,
+      
+    });
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + currentCredentials.token
+    });
+
+    return this.http.post<any>(logoutUrl, instanceToPlain(credentials),{ headers }).pipe(
+      map(res => {
+        console.log('logout exitoso')
+        return of(true);
+      }
+    ));
+
+    
   }
 }

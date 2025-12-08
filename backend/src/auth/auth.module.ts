@@ -12,6 +12,7 @@ import { ServiceUser } from 'src/services/User.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EntityUser } from 'src/entities/User.entity';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
+import { RolModule } from 'src/modules/Rol.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
       //secret: process.env.JWT_ACCESS_SECRET,
       //signOptions: { expiresIn: '180s' },
     }),
+    RolModule
   ],
   providers: [AuthService,LocalStrategy,JwtStrategy,RefreshTokenStrategy,ServiceUser,TypeORMExceptions],
   controllers: [AuthController],
