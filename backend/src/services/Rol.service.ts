@@ -23,6 +23,10 @@ export class ServiceRol {
     return this.rolesRepository.findOneBy({ rolId });
   }
 
+   findByRolName(rolName: string): Promise<any> {
+    return this.rolesRepository.findOneBy({ name:rolName });
+  }
+
 
 
 

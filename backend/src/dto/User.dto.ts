@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { IsNotEmpty, IsEmail, IsOptional, IsString, IsObject, isNotEmpty, IsNumber, IsBoolean, IsPhoneNumber } from 'class-validator';
-import { CreateRolDto, RolDto } from './Rol.dto';
+import { CreateRolDto, RolDto, UpdateRolDto } from './Rol.dto';
 import { Exclude, Expose, Type } from 'class-transformer';
 
 export class userDto {
@@ -71,7 +71,7 @@ export class CreateUserDto  {
   lastname: string;
 
   @IsObject()
-  rol: CreateRolDto; //@OneToOne(() => EntityRol, rol => rol.rolId)
+  rol: CreateRolDto | UpdateRolDto; //@OneToOne(() => EntityRol, rol => rol.rolId)
 
   @IsOptional()
   @IsPhoneNumber('US', { message: 'Invalid US phone number' })

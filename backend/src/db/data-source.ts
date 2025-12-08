@@ -51,7 +51,7 @@ function postgresFactory(dbUtil: DbUtilService_Cls) {
 
 var dbUtils = new DbUtilService_Cls(new ConfigService());
 //console.log(getDefaultOptions(dbUtils));
-console.log('prueba')
+//console.log('prueba')
 
 const opts = getDefaultOptions(dbUtils);
 export const AppDataSource = new DataSource({

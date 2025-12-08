@@ -4,6 +4,7 @@ import { CreateUserDto, CreateUserLoginDto, UpdateUserDto, userDto } from '../dt
 import { EntityUser } from '../entities/User.entity';
 import { Repository } from 'typeorm';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ServiceUser {
@@ -51,19 +52,30 @@ export class ServiceUser {
         
     }
 
+    async isEmpty(): Promise<boolean> {
+
+        const result = await this.userRepository.query(
+            `SELECT 1 FROM entity_user LIMIT 1`
+        );
+    
+        return result.length === 0;
+    }
+
     //este endpoint es para crear usuario completo con user . clave, permisos etc
     async createFullUser(user: CreateUserLoginDto): Promise<userDto> {
 
-    // verificamos que el usuario no se encuentre duplicado
-    const existingUser = await this.userRepository.findOne({ where: { email: user.email, enabled: false } });
+        //console.log(JSON.stringify(user));
+        // verificamos que el usuario no se encuentre duplicado
+        const existingUser = await this.userRepository.findOne({ where: { email: user.email, enabled: false } });
 
-    if(JSON.stringify(existingUser).length >0 )
-    {
-      user.userId = existingUser?.userId;
-      user.enabled= true; // lo habilitamos  
-    }
+        if (existingUser && JSON.stringify(existingUser).length > 0) {
+            user.userId = existingUser?.userId;
+            user.enabled = true; // lo habilitamos  
+        }
 
-        const newUser = this.userRepository.create(user);
+        const hash = await this.hashData(user.password);
+
+        const newUser = this.userRepository.create({ ...user, password: hash });
         return this.userRepository.save(newUser);
     }
 
@@ -82,4 +94,13 @@ export class ServiceUser {
         await this.userRepository.update(userId, entity);
         return this.userRepository.findOneBy({ userId });
     }
+
+    async logoutUser(userId: number, entity: CreateUserLoginDto): Promise<userDto | null> {
+        await this.userRepository.update(userId, entity);
+        return this.userRepository.findOneBy({ userId });
+    }
+
+     async hashData(data: string) {
+        return await bcrypt.hash(data, 10);
+      }
 }
