@@ -5,6 +5,8 @@ import { CredentialsService } from '@app/auth';
 import { Credentials } from '@core/entities';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { instanceToPlain } from 'class-transformer';
+import { Router } from '@angular/router';
+import { ToastUtility } from '@app/@core/utils/toast.utility';
 
 export interface LoginContext {
   username: string;
@@ -25,7 +27,7 @@ const refreshTokenUrl = baseUrl + '/auth/refresh';
  */
 @Injectable({ providedIn: 'root', })
 export class AuthenticationService {
-constructor(private readonly _credentialsService: CredentialsService,private readonly http: HttpClient) {}
+constructor(private readonly _credentialsService: CredentialsService,private readonly http: HttpClient,private readonly router: Router,private toast: ToastUtility) {}
 
   /**
    * Authenticates the user.
@@ -52,7 +54,7 @@ constructor(private readonly _credentialsService: CredentialsService,private rea
       map(res => {
         if (res) {
           //console.log('Login successful con ');
-          //console.log(JSON.stringify(res))
+          console.log(JSON.stringify(res))
 
           credentials.id = res.userId;
           credentials.token = res.token;
@@ -60,7 +62,17 @@ constructor(private readonly _credentialsService: CredentialsService,private rea
           credentials.expiresIn = res.expiresIn;
           credentials.roles.push(res.rolName);
           credentials.firstName = res.userName
-          this._credentialsService.setCredentials(credentials, context.remember);
+
+          if(res.fu == true){
+            this.toast.showToast('Usuario actualizado correctamente, porfavor inicia session con tu nuevo usuario!!', 7000, 'check2-circle', true);
+            setTimeout(() => {
+              this.signOutIntialUser();
+            }, 3000); 
+            
+          }else {
+            this._credentialsService.setCredentials(credentials, context.remember);
+          }
+          
         }
         return credentials;
       }
@@ -114,6 +126,27 @@ refreshToken(): Observable<any> {
     );
   }
 
+
+  private  signOutIntialUser() {
+    if (!this._credentialsService.isAuthenticated()) {
+      this._credentialsService.setCredentials();
+      this.router.navigate(['/login']).then(() => {
+        window.location.reload();
+      });
+    } else {
+      this.logout().subscribe({
+        next: () => {
+         this._credentialsService.setCredentials();
+          this.router.navigate(['/login']).then(() => {
+            window.location.reload();
+          });
+        },
+        error: () => {
+          console.error('Error logging out');
+        },
+      });
+    }
+  }
 
   /**
    * Logs out the user and clear credentials.

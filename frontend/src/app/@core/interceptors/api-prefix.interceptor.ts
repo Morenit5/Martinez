@@ -10,6 +10,7 @@ import { BehaviorSubject, Observable, Subject, takeUntil, throwError } from 'rxj
 import { TranslateService } from '@ngx-translate/core';
 import { catchError, filter, finalize, switchMap, take } from 'rxjs/operators';
 import { AuthenticationService, CredentialsService } from '@auth';
+import { Router } from '@angular/router';
 
 
 @Injectable({
@@ -25,6 +26,7 @@ export class ApiPrefixInterceptor implements HttpInterceptor {
     private readonly _credentialsService: CredentialsService,
     private readonly _translateService: TranslateService,
      private readonly authService: AuthenticationService,
+     private readonly router: Router
   ) {}
 
   intercept(request: HttpRequest<any>,next: HttpHandler,): Observable<HttpEvent<any>> {
@@ -109,7 +111,17 @@ export class ApiPrefixInterceptor implements HttpInterceptor {
           if (request.url.endsWith('refresh')) {
             
             this.isRefreshing = false;
-            this.authService.logout(); // Handle refresh token expiry
+            this.authService.logout().subscribe({
+              next: () => {
+                this._credentialsService.setCredentials();
+                this.router.navigate(['/login']).then(() => {
+                  window.location.reload();
+                });
+              },
+              error: () => {
+                console.error('Error logging out');
+              },
+            }); // Handle refresh token expiry
             return throwError(() => new Error(err)) //throwError(err);
           }
           return throwError(() => new Error(err))

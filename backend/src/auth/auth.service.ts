@@ -63,7 +63,21 @@ export class AuthService {
     //update database with new refresh token 
     await this.updateRefreshToken(newUser.userId, tokens.refreshToken, createUserDto);
 
-    return tokens; //return generated tokens 
+
+    const user = await this.usersService.findOne(newUser.username!);
+
+    let loginUser = {
+      userId: newUser.userId,
+      token: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      expiresIn: 300,
+      rolId: user!.rol.rolId,
+      rolName: user!.rol.name,
+      userName: newUser.firstname,
+      fu:isFirstUser
+    }
+
+    return loginUser;
   } 
 
   //Funcion usada para logear a un  usuario y regresar JWT token (access y refresh)
