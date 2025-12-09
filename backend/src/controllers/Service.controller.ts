@@ -120,4 +120,29 @@ export class  ControllerService {
         this.exceptions.sendException(error);
       });
   }
+
+   @Put('/generateInvoice/:id')
+  async gnerateInvoice(@Param('id') id: string, @Body() service) {
+
+    try {
+      this.updateService = service;
+    } catch (error) {
+      throw new HttpException({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: "Internal error while updating"
+      },
+        HttpStatus.INTERNAL_SERVER_ERROR, {
+        cause: error
+      });
+    }
+
+    await this.serviceService.generateInvoice(+id, this.updateService)
+      .then((result: any) => {
+        console.log("Result:", result);
+        return result;
+      }).catch((error: any) => {
+        this.exceptions.sendException(error);
+      });
+  }
+
 }

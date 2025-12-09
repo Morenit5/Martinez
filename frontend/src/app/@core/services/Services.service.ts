@@ -25,13 +25,26 @@ export class ServicesInstances {
 
   
     updateService(serviceIstance: ServiceEntity) {
-        /*return this.userService.updateUser(usrInstance).pipe(
-          map((response) =>
-              response.map((user: any) => plainToInstance(UserEntity, user)),
-          ),
-        );*/
+
 
         return this.servicesListService.updateService(serviceIstance).pipe(
+            //tap(value => console.log('Observable value:', value))
+            map(response => {
+                if (Array.isArray(response)) {
+                    return response.map((service: any) => plainToInstance(ServiceEntity, service))
+                } else {
+                    // it's a single object, transform directly
+                    return plainToInstance(ServiceEntity, response)
+                }
+            })
+        );
+    }
+
+      
+    generateInvoice(serviceIstance: ServiceEntity) {
+
+
+        return this.servicesListService.generateInvoice(serviceIstance).pipe(
             //tap(value => console.log('Observable value:', value))
             map(response => {
                 if (Array.isArray(response)) {
@@ -164,11 +177,19 @@ class servicesService {
     updateService(serviceIstance: ServiceEntity)  {
         //let params = new HttpParams();
         //params = params.set('id', serviceIstance.serviceId);
+
         let instance = this.http.put<any>(serviceUrl + '/up/' + serviceIstance.serviceId, serviceIstance,); //{ params: params });
 
         return instance;
     }
 
+     generateInvoice(serviceIstance: ServiceEntity)  {
+        //let params = new HttpParams();
+        //params = params.set('id', serviceIstance.serviceId);
+        let instance = this.http.put<any>(serviceUrl + '/generateInvoice/' + serviceIstance.serviceId, serviceIstance,); //{ params: params });
+
+        return instance;
+    }
     
     getNewInvoiceStatus() {
     

@@ -61,7 +61,7 @@ export class ConfigurationController {
         await this.service.enableDisableInvoiceCreation(enableInvoiceRecurrent.toString());
         
         
-        await this.appService.enableNotifications(enableNotification.toString(), enableOn.toString());
+        //await this.appService.enableNotifications(enableNotification.toString(), enableOn.toString());
         
         
 

@@ -164,7 +164,7 @@ export class AuthService {
 
     let hashedRefreshToken = await this.hashData(refreshToken);
 
-    await this.usersService.update(userId!,{ refreshToken: hashedRefreshToken });
+    await this.usersService.update(userId!,{...usr, refreshToken: hashedRefreshToken });
   }
 
 }

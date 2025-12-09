@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Equal, FindOperator, ILike, In, Not, Or, Repository } from 'typeorm';
+import { Between, Equal, FindOperator, ILike, In, Not, Or, Raw, Repository } from 'typeorm';
 import { EntityService } from '../entities/Service.entity';
 import { CreateServiceDto, ServiceDto, UpdateServiceDto } from '../dto/Service.dto';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
@@ -10,6 +10,7 @@ import { CreateInvoiceDto, UpdateInvoiceDto } from 'src/dto/Invoice.dto';
 import { EntityConfiguration } from 'src/entities/Configuration.entity';
 import { ConfigurationDto, createConfigurationDto } from 'src/dto/Configuration.dto';
 import { EntityInvoice } from 'src/entities/Invoice.entity';
+import { EmailService } from './Email.service';
 
 
 @Injectable()
@@ -22,16 +23,25 @@ export class ServiceService {
               @InjectRepository(EntityInvoice) private invoiceRepository: Repository<EntityInvoice>,
                private readonly exceptions: TypeORMExceptions) { 
    
-
+    console.log('Llegando al constructor');
     this.configurationRepository.find({ 
       where: [{ 
         enabled: true,
       } ],
     }).then((Configurations : any) => {
+      console.log('Configurations:  '+ JSON.stringify(Configurations));
       for(const config of Configurations ){
         if(config.isInvoiceAutomatically == true || config.isInvoiceAutomatically == 'true' ){
+          
+          //if (this.cronJob && !this.cronJob.isActive ) {
+          //this.cronJob.start();
+          
+          console.log('ya fue activado el cron job para crear las nuevas facturas');
+
           this.enableDisableInvoiceCreation('true'); 
            //console.log('se inicializo la auto generacion de invoices')
+        //}
+          
         }
       }
      }).catch((error: any) => {
@@ -339,6 +349,7 @@ export class ServiceService {
 
       }],
     }).then((result: any) => {
+      console.log('RESULT SERVICE: '+JSON.stringify(result));
       return result; // tal vez debamos manipular estos datos antes de mandar al front
     }).catch((error: any) => {
       this.exceptions.sendException(error);
@@ -360,7 +371,7 @@ export class ServiceService {
     
   }
 
-   async updateInvoice(serviceId: number, entity: UpdateServiceDto): Promise<ServiceDto | null> {
+   async generateInvoice(serviceId: number, entity: UpdateServiceDto): Promise<ServiceDto | null> {
     
     let invoice= new UpdateInvoiceDto();
     invoice = entity.invoice![0];
@@ -416,6 +427,7 @@ export class ServiceService {
       }
       if (finalValue == false) {
         this.cronJob.stop();
+        console.log('ya fue desactivado el cron job para no crear nuevas facturas')
       }
 
       let configs: createConfigurationDto;// = new createConfigurationDto();
@@ -459,15 +471,26 @@ export class ServiceService {
   async updateServiceInvoice(): Promise<void> {
  
     //let serviceIds: number[] = [];
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth()+1;
+    const currentFullYear = currentDate.getFullYear();
+    let invoiceDate = currentFullYear +'-'+currentMonth;
     let serviceList = await this.findAllRecurrentServices();
 
     for(const serviceInst of serviceList ){
-      await this.createAutomaticNewInvoice(serviceInst);
-    }
 
+      console.log('SERVICE ID: '+ serviceInst.serviceId + ' INVOICE DATE: ' +invoiceDate);
+      //revisar si existe la factura del mes, sino, crearla
+      let existsInvoice = await this.findInvoiceByMonth(serviceInst.serviceId, invoiceDate);
+      console.log('ENCUENTRA ' + JSON.stringify(existsInvoice));
+
+      if (existsInvoice && existsInvoice.exists == false) {
+        await this.createAutomaticNewInvoice(serviceInst);
+      }      
+    }
   }
 
-  private async createAutomaticNewInvoice(service: ServiceDto): Promise<ServiceDto>{
+  private async createAutomaticNewInvoice(service: ServiceDto): Promise<ServiceDto|null>{
     const currentDate = new Date();//.toISOString().slice(0, 10); //en teoria debe ser ==> año/mes/01 ya que se genera cada primero de mes
     const currentMonthIndex: number = new Date().getMonth();
     let chosenMonth =  this.months[currentMonthIndex]; 
@@ -490,14 +513,24 @@ export class ServiceService {
     invoiceItem.invoicedMonth = chosenMonth;
     invoiceItem.invoiceStatus = 'Por_Pagar';
     invoiceItem.payment = [paymentItem];
+    invoiceItem.service =new UpdateServiceDto();
+    invoiceItem.service!.serviceId =service.serviceId;
     
 
-    let serviceUp :UpdateServiceDto = new UpdateServiceDto();
+   /* let serviceUp :UpdateServiceDto = new UpdateServiceDto();
     serviceUp.serviceId = service.serviceId;
     serviceUp.invoice = [invoiceItem];
-  
+    
+    let invoice= new UpdateInvoiceDto();
+    invoice = entity.invoice![0];
+    invoice.service =new UpdateServiceDto();
+    invoice.service.serviceId= serviceId;*/
 
-    return this.serviceRepository.save(serviceUp);
+    let variable : number=service.serviceId;
+     await this.invoiceRepository.save(invoiceItem);
+    return this.serviceRepository.findOneBy({ serviceId: variable })
+
+    //return this.serviceRepository.save(serviceUp);
   }
 
     getAutoInvoiceStatus():{} {
@@ -514,28 +547,32 @@ export class ServiceService {
   }
 
   
-    async findInvoiceByMonth(serviceId: number, invoiceMonth: string): Promise<{}|void> {
+    async findInvoiceByMonth(serviceId: number, invoiceDate: string): Promise<{exists}|void> {
       
       let serv : EntityService = new EntityService();
       serv.serviceId = serviceId;
     return await this.invoiceRepository.find({
+
       where: [{
         service :{
           serviceId: serviceId
         },
-        invoicedMonth: invoiceMonth,
+        invoiceDate: Raw(
+      alias => `TO_CHAR(${alias}, 'YYYY-MM') = :formattedDate`,
+      { formattedDate: invoiceDate }
+    ),
       }],
     }).then((result: any) => {
      
       if(result.length>0)
       {
         //console.log('result tenemos algo');
-        return { active: true };
+        return { exists: true }; // si se encontraron resultados y se le comunica al front
       }
       else
       {
         //console.log('No hay resultados');
-        return { active: false};
+        return { exists: false}; // no encontró registros y se le comunica al front
       }
       //return result; 
     

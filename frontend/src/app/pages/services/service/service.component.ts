@@ -1,6 +1,6 @@
 import { formatDate } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, Inject, LOCALE_ID, OnInit } from '@angular/core';
+import { Component, Inject, LOCALE_ID, OnInit, provideExperimentalZonelessChangeDetection } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ClientEntity } from '@app/@core/entities/Client.entity';
 import { ServiceEntity, ServiceDetailEntity } from '@app/@core/entities/Service.entity';
@@ -13,6 +13,8 @@ import { DateAdapterService } from '@app/shared/services/date-adapter.service';
 import { NgbDateAdapter, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
 import { Subscription } from 'rxjs';
+import { InvoiceEntity } from '@app/@core/entities/Invoice.entity';
+import { PaymentEntity } from '@app/@core/entities/Payment.entity';
 
 enum Status {
   EnProceso = "En_Proceso",
@@ -32,12 +34,12 @@ enum paymentStatus {
   standalone: false,
   templateUrl: './service.component.html',
   styleUrl: './service.component.scss',
-  providers: [{ provide: NgbDateAdapter, useClass: DateAdapterService}]
+  providers: [{ provide: NgbDateAdapter, useClass: DateAdapterService }]
 })
-export class ServiceComponent implements OnInit{
+export class ServiceComponent implements OnInit {
 
 
- cliente;
+  cliente;
 
   valueSubscription: Subscription;
 
@@ -45,7 +47,7 @@ export class ServiceComponent implements OnInit{
   isUpdating = false; // bandera para saber cuando el servicio esta actualizando
   serviceList: ServiceEntity[] = [];
   clientList: ClientEntity[] = [];
-  
+
   //entities usados para crear un servicio nuevo
   service: ServiceEntity;
   serviceDelete: ServiceEntity;
@@ -70,7 +72,7 @@ export class ServiceComponent implements OnInit{
   services: ServiceEntity[] = [];// se crea un array vacio de la interfaz
   paginatedServices: ServiceEntity[] = [];
   page = 1; // Página actual
-  pageSize = 7; // Elementos por página
+  pageSize = 2; // Elementos por página
   collectionSize = 0; // Total de registros
   totalPages = 0;
   currentPage = 1;
@@ -86,7 +88,7 @@ export class ServiceComponent implements OnInit{
   serviceLabel: string = 'Registro de Servicios';
   serviceButton: string = 'Registrar';
   serviceForm: FormGroup;
- 
+
   /*PDF*/
   facturaDatos: any;
   pdfUrl: string | null = null;
@@ -97,15 +99,15 @@ export class ServiceComponent implements OnInit{
   inputLength: number = 0;
   reqTabId: number;
   activeService = 1;  // para controlar el servicio activo ==> fijo/eventual/extra , por default es fijo
-  
+
   radioOptions = ['Fijo', 'Extra', 'Eventual'];
   isExtraSwitchValue: boolean = false;
   isRecurrentService: boolean = false;
   isExtraOption: boolean = false;
   extraValue: string = this.radioOptions[0]; //valor seleccionado por defecto para radio opciones es Fijo
-  lastUsedValue:string;
-  clientesFijos:string = 'Fijo';
-  clientesEventuales:string = 'Eventual';
+  lastUsedValue: string;
+  clientesFijos: string = 'Fijo';
+  clientesEventuales: string = 'Eventual';
 
   //Variables para el tab de Pagos
   paymentForm: FormGroup;
@@ -119,27 +121,27 @@ export class ServiceComponent implements OnInit{
   paymentMethodIsValid: boolean = true;
   taxAmountIsValid: boolean = true;
   paymentStatusIsValid: boolean = true;
-  
+
   //search bar para pagos
   clientEntitiyToGet: string;  //el cliente que queremos buscar su pago, esto tambien puede contener el pago en efectivo
   originalClientServicesValues: ServiceEntity[] = [];  //para retener valores originales cuando se hace una busqueda en el tab de pagos
-  esPagoCash:string;
+  esPagoCash: string;
 
   initialServiceFormValues: any;
   initialPaymentFormValues: any;
   initialInvoiceUpdateValues: any;
 
   //Forms para actualizacion de la factura (Generar Y Mandar)
-  invoiceUpdateform:FormGroup; 
+  invoiceUpdateform: FormGroup;
 
   //para buscar por services 
   originalValues: ServiceEntity[] = [];  //para detener valores originales cuando se hace una busqueda en el tab de Consulta
   serviceEntitiyToGet: any;
 
-  months: string[] = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  months: string[] = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
   //recurrencia
-  isRecurrencyEnabled:boolean = false;
+  isRecurrencyEnabled: boolean = false;
 
   // VARIABLES
   showToastWarning = false;
@@ -162,25 +164,25 @@ export class ServiceComponent implements OnInit{
       }),
       serviceDetail: this.serviceFrm.array([]),
       invoice: this.serviceFrm.array([]),
-      isExtra: [''] 
+      isExtra: ['']
     });
     this.initialServiceFormValues = this.serviceForm.value;
 
     this.paymentForm = this.serviceFrm.group({
       invoiceId: [],
       invoiceDate: [],
-      invoicedMonth:[],
+      invoicedMonth: [],
       invoiceNumber: [],
       totalAmount: [],
       invoiceName: [],
       subtotalAmount: [],
-      isGenerated:[false],
+      isGenerated: [false],
       service: this.serviceFrm.group({
         serviceId: ['', Validators.required],
-        status:[]
+        status: []
       }),
       payment: this.serviceFrm.array([]),
-      
+      //
     });
     this.initialPaymentFormValues = this.paymentForm.value;
 
@@ -195,26 +197,27 @@ export class ServiceComponent implements OnInit{
   }
 
   siEliminar() {
-this.deleteServiceDetail(this.serviceDelete);
-this.showToastWarning = false;
-}
+    console.log('this.serviceDelete: '+JSON.stringify(this.serviceDelete));
+    this.deleteServiceDetail(this.serviceDelete);
+    this.showToastWarning = false;
+  }
 
-    cancelarToast() {
-   // this.showToast = false;
+  cancelarToast() {
+    // this.showToast = false;
     this.showToastWarning = false;
     this.serviceDelete = null;
   }
 
   preguntarEliminar(serviceDTO: ServiceEntity) {
 
-    this.serviceDelete=serviceDTO;
+    this.serviceDelete = serviceDTO;
     // this.showToast = true;
-    this.showToastWarningMessage('¿Desea eliminar este Servicio?');
+    this.showToastWarningMessage('¿Desea eliminar el Servicio "'+ serviceDTO.serviceName+'" ?');
 
   }
-  
+
   // add the invoice group
-  addInvoiceUpdateArray(id:number,updateInvStatus:boolean=false): boolean {
+  addInvoiceUpdateArray(id: number, updateInvStatus: boolean = false): boolean {
     try {
       let invoiceArrayFrm;
       if (updateInvStatus) {
@@ -230,7 +233,7 @@ this.showToastWarning = false;
         });
       }
 
-      if(this.InvoiceUpdateFormArray == null || this.InvoiceUpdateFormArray == undefined){
+      if (this.InvoiceUpdateFormArray == null || this.InvoiceUpdateFormArray == undefined) {
         this.createInvoiceUpdateForm();
       }
 
@@ -271,14 +274,14 @@ this.showToastWarning = false;
     return this.serviceForm.get('serviceDetail') as FormArray;
   }
 
-  createPaymentItemFormGroup(servEnt: ServiceEntity,invoiceIndex:number): boolean {
+  createPaymentItemFormGroup(servEnt: ServiceEntity, invoiceIndex: number): boolean {
     let metodoPago = servEnt.invoice[invoiceIndex].payment[0].paymentMethod; // paymentEnt.paymentMethod;
-    if(this.esPagoCash){
+    if (this.esPagoCash) {
       metodoPago = 'Cash';
     }
-    if(metodoPago == undefined || metodoPago == null || metodoPago == 'none'){
-       this.toast.showToastWarning('Metodo de pago no ha sido seleccionado', 5000);
-       return false;
+    if (metodoPago == undefined || metodoPago == null || metodoPago == 'none') {
+      this.toast.showToastWarning('Metodo de pago no ha sido seleccionado', 5000);
+      return false;
     }
 
     let paymentItem = this.serviceFrm.group({
@@ -304,19 +307,20 @@ this.showToastWarning = false;
 
   // ************* Inicia - Metodos para crear los valores por default de Invoice y Payment Cuando se genera un service *************
 
-  createDefaultInvoiceFormGroup(formatedDate:any): boolean {
+  createDefaultInvoiceFormGroup(formatedDate: any): boolean {
     try {
-      let chosenMonth =  this.months[(formatedDate.split('-')[1]) - 1]; //restamos uno ya que el array de months comienza en 0 
+      let chosenMonth = this.months[(formatedDate.split('-')[1]) - 1]; //restamos uno ya que el array de months comienza en 0 
 
       let invoiceItem = this.serviceFrm.group({
         invoiceId: [],
         invoiceDate: [formatedDate],
-        invoicedMonth:[chosenMonth],
+        invoicedMonth: [chosenMonth],
         invoiceNumber: [1],
         totalAmount: [0],
         invoiceName: [''],
         subtotalAmount: [0],
         payment: this.serviceFrm.array([]),
+        //enabled:[]
       });
 
       this.defaultInvoiceFormArray.clear();
@@ -324,7 +328,7 @@ this.showToastWarning = false;
       return true;
 
     } catch (error) {
-      console.log('ERROR:'+error);
+      console.log('ERROR:' + error);
       return false;
     }
   }
@@ -333,8 +337,8 @@ this.showToastWarning = false;
     return this.serviceForm.get('invoice') as FormArray;
   }
 
-  createDefaultPaymentItemFormGroup(formatedDate:any) {
-   let paymentItem = this.serviceFrm.group({
+  createDefaultPaymentItemFormGroup(formatedDate: any) {
+    let paymentItem = this.serviceFrm.group({
       paymentId: [],
       paymentDate: [formatedDate],
       paymentAmount: [0],
@@ -353,15 +357,15 @@ this.showToastWarning = false;
     return this.defaultInvoiceFormArray.at(0).get('payment') as FormArray;
   }
   // ************* Termina - Metodos para crear los valores por default de Invoice y Payment Cuando se genera un service *************
- 
 
-  async generateInvoice(service: ServiceEntity, invoiceIndex : number) {
+
+  async generateInvoice(service: ServiceEntity, invoiceIndex: number) {
     //Al “Generar Factura” necesitamos actualizar ==> entity_service, entity_invoice con los siguientes valores:
     //entitiy_service >> Status = T e r m i n a d o
     //entity_invoice >> isGenerated = True
-   
-    let pdfBlob:any;
-    (await this.emailService.generateInvoice(service,invoiceIndex)).subscribe({
+
+    let pdfBlob: any;
+    (await this.emailService.generateInvoice(service, invoiceIndex)).subscribe({
       next: (resp) => {
         pdfBlob = resp;
 
@@ -371,37 +375,37 @@ this.showToastWarning = false;
         this.toast.showToast('Factura no generada', 3000, 'check2-square', true);
       },
       complete: () => {
-        if(service.status == Status.Recurrente){
-          this.updateRecurrenteChildInvoiceStatusGenerated(service,invoiceIndex, pdfBlob)
+        if (service.status == Status.Recurrente) {
+          this.updateRecurrenteChildInvoiceStatusGenerated(service, invoiceIndex, pdfBlob)
         } else {
-           this.updateGenerateInvoiceStatus(service,invoiceIndex, pdfBlob)
+          this.updateGenerateInvoiceStatus(service, invoiceIndex, pdfBlob)
         }
-       
+
       }
     });
 
   }
 
-  private updateGenerateInvoiceStatus(service: ServiceEntity, invoiceIndex:number, pdfBlob:any) {
-  
+  private updateGenerateInvoiceStatus(service: ServiceEntity, invoiceIndex: number, pdfBlob: any) {
+
     const invUpdated = this.addInvoiceUpdateArray(service.invoice[invoiceIndex].invoiceId);
-    
-    if(invUpdated == false){
+
+    if (invUpdated == false) {
       this.toast.showToast('Error al generar la Factura!!', 3000, 'x-circle', false);
       return;
     }
 
-    
+
     this.invoiceUpdateform.patchValue({ //puede ser patchValue(para llenado parcial de la forma) en lugar de setValue,
       serviceId: service.serviceId,
-      status: service.status == 'Recurrente'? Status.Recurrente: Status.Terminado,
+      status: service.status == 'Recurrente' ? Status.Recurrente : Status.Terminado,
       //serviceName: service.serviceName
     })
 
     console.log(this.invoiceUpdateform.value)
 
     if (this.invoiceUpdateform.valid) {
-      this.serviceInstance.updateService(this.invoiceUpdateform.value).subscribe({  
+      this.serviceInstance.updateService(this.invoiceUpdateform.value).subscribe({
         next: (response) => { },
         error: (err) => {
           this.toast.showToast('Error al generar la Factura!!', 3000, 'x-circle', false);
@@ -421,8 +425,8 @@ this.showToastWarning = false;
 
   }
 
-  private updateRecurrenteChildInvoiceStatusGenerated(service: ServiceEntity, invoiceIndex:number, pdfBlob:any,closeServiceInvoice:boolean = false) {
-  
+  private updateRecurrenteChildInvoiceStatusGenerated(service: ServiceEntity, invoiceIndex: number, pdfBlob: any, closeServiceInvoice: boolean = false) {
+
     let invoiceArrayFrm;
     try {
       if (closeServiceInvoice == false) {
@@ -441,9 +445,9 @@ this.showToastWarning = false;
       console.log(error);
     }
 
-  
+
     if (invoiceArrayFrm.valid) {
-      this.invoiceInstance.addInvoice(invoiceArrayFrm.value).subscribe({  
+      this.invoiceInstance.addInvoice(invoiceArrayFrm.value).subscribe({
         next: (response) => { },
         error: (err) => {
           this.toast.showToast('Error al generar la Factura!!', 3000, 'x-circle', false);
@@ -454,9 +458,9 @@ this.showToastWarning = false;
             this.getAllServicesIntances(); //Traemos todas las intances  
             this.toast.showToast('Factura generada correctamente ', 3000, 'check2-square', true)
             this.generarPdf(pdfBlob);
-            
+
           } else { //caso  de uso para cuando se envia la factura
-            this.sendEmail(service,invoiceIndex);
+            this.sendEmail(service, invoiceIndex);
             //this.getAllServicesIntances(); //Traemos todas las intances  
             //this.toast.showToast('Factura generada correctamente ', 5000, 'check2-square', true)
           }
@@ -468,13 +472,13 @@ this.showToastWarning = false;
     } else {
       this.invoiceUpdateform.markAllAsTouched();
       this.toast.showToast('Error al generar el fomulario de Factura !!', 3000, 'x-circle', false)
-      
+
     }
 
-  }  
+  }
 
 
-  async updateSendMailAndCloseStatus(service: ServiceEntity, invoiceIndex:number) {
+  async updateSendMailAndCloseStatus(service: ServiceEntity, invoiceIndex: number) {
 
 
     if (service.status == Status.Recurrente) {
@@ -483,8 +487,8 @@ this.showToastWarning = false;
     }
 
     const invUpdated = this.addInvoiceUpdateArray(service.invoice[invoiceIndex].invoiceId, true);
-    
-    if(invUpdated == false){
+
+    if (invUpdated == false) {
       this.toast.showToast('Error al generar la Factura!!', 3000, 'x-circle', false);
       return;
     }
@@ -502,10 +506,10 @@ this.showToastWarning = false;
           this.toast.showToast('Error al enviar el correo!!', 3000, 'x-circle', false);
         },
         complete: () => {
-          this.sendEmail(service,invoiceIndex);
+          this.sendEmail(service, invoiceIndex);
           this.invoiceUpdateform.reset(this.initialInvoiceUpdateValues);
         }
-        
+
       });
 
     } else {
@@ -515,45 +519,45 @@ this.showToastWarning = false;
   }
 
   async generarPdf(pdfBytes) {
-  
+
     const blob = new Blob([pdfBytes as unknown as ArrayBuffer], { type: 'application/pdf' });
     this.pdfUrl = URL.createObjectURL(blob);
     const nuevaVentana = window.open(this.pdfUrl, '_blank');
 
     // Si el navegador bloquea la ventana, ofrecer descarga
-  if (!nuevaVentana) {
-    const link = document.createElement('a');
-    link.href = this.pdfUrl;
-    link.download;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(this.pdfUrl);
-     this.isLoading = false;
-    this.getAllServicesIntances(); //Traemos todas las intances
-  }
-    
+    if (!nuevaVentana) {
+      const link = document.createElement('a');
+      link.href = this.pdfUrl;
+      link.download;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(this.pdfUrl);
+      this.isLoading = false;
+      this.getAllServicesIntances(); //Traemos todas las intances
+    }
+
   }
 
-  sendEmail(ServiceDto: ServiceEntity,invoiceIndex:number) {
+  sendEmail(ServiceDto: ServiceEntity, invoiceIndex: number) {
 
     //verificar si hay factura existente
     // si no hay, sugerir al usuario, crear factura
     // si hay,  verificar  y luego enviarla
     //verificamos el cliente-servicio seleccionado
 
-    this.emailService.sendEmail(ServiceDto,invoiceIndex).subscribe({
-      next: () => {},
+    this.emailService.sendEmail(ServiceDto, invoiceIndex).subscribe({
+      next: () => { },
       error: (err) => {
         console.error(err);
         this.toast.showToast('Error al enviar el correo ', 3000, 'check2-square', true);
       },
       complete: () => {
-          this.toast.showToast('Correo enviado con factura Adjunta  ', 3000, 'check2-square', true)
-          //this.invoiceUpdateform.reset(this.initialInvoiceUpdateValues);
-          this.getAllServicesIntances(); //Traemos todas las intances  
-          
-        }
+        this.toast.showToast('Correo enviado con factura Adjunta  ', 3000, 'check2-square', true)
+        //this.invoiceUpdateform.reset(this.initialInvoiceUpdateValues);
+        this.getAllServicesIntances(); //Traemos todas las intances  
+
+      }
     });
   }
 
@@ -564,7 +568,7 @@ this.showToastWarning = false;
     this.lastUsedValue = this.clientesFijos;
     this.getAllServicesIntancesBy(this.clientesFijos); // de entrada traemos clientes fijos solamente
     this.getRecurrentInvoiceStatus();
-    
+
   }
 
 
@@ -576,7 +580,7 @@ this.showToastWarning = false;
 
     } else if (changeEvent.nextId === 2) { //para llamar  los servicios eventuales
       this.getAllServicesIntancesBy(this.clientesEventuales);
-      
+
     }
   }
 
@@ -584,33 +588,33 @@ this.showToastWarning = false;
     this.getAllServicesIntancesBy(this.clientesFijos, this.isExtraSwitchValue);
   }
 
-  onRecurrentSwitchChange(){
+  onRecurrentSwitchChange() {
     //este metodo nos ayudara solo para saber el valor de this.isRecurrentService
     //de lo contrario este metodo no es necesario
     //console.log(this.isRecurrentService)
   }
 
- 
+
   onRadioChange() {
 
-   if (this.extraValue == 'Extra') {
+    if (this.extraValue == 'Extra') {
       this.isExtraOption = true;
     } else {
       this.isExtraOption = false;
     }
-    
-    let cltType = this.extraValue == 'Fijo' || this.extraValue == 'Extra'? 'Fijo':'Eventual'; 
-    
+
+    let cltType = this.extraValue == 'Fijo' || this.extraValue == 'Extra' ? 'Fijo' : 'Eventual';
+
     //esto evita tantas llamadas al backend en caso que haga click en los radio botones varias veces a  la vez
-    if((this.lastUsedValue == 'Fijo' || this.lastUsedValue == 'Extra') &&  this.extraValue != 'Eventual') { return }
-    if((this.lastUsedValue == 'Eventual') &&  (this.extraValue != 'Fijo' && this.extraValue != 'Extra') ) { return }
+    if ((this.lastUsedValue == 'Fijo' || this.lastUsedValue == 'Extra') && this.extraValue != 'Eventual') { return }
+    if ((this.lastUsedValue == 'Eventual') && (this.extraValue != 'Fijo' && this.extraValue != 'Extra')) { return }
 
     //this.serviceForm.get('client').reset(); 
     this.getallClientsBy(cltType);
     this.lastUsedValue = cltType;
-       
+
   }
-  
+
 
   /*METODOS PAGINACION*/
   private updatePaginatedData(): void {
@@ -631,7 +635,7 @@ this.showToastWarning = false;
    */
   getAllServicesIntances() {
     this.isLoading = true;
-   
+
     this.serviceInstance.getAllServices().subscribe({
       next: (servList) => {
         this.originalClientServicesValues = servList;
@@ -645,7 +649,7 @@ this.showToastWarning = false;
         console.error(error);
       },
       complete: () => {
-       this.isLoading = false;
+        this.isLoading = false;
       }
     });
   }
@@ -666,7 +670,7 @@ this.showToastWarning = false;
         this.services = this.serviceList;
         this.collectionSize = this.services.length;
         this.paginatedServices = this.services.slice(0, this.pageSize);
-       
+
       },
       error: (error) => {
         console.error(error);
@@ -675,8 +679,8 @@ this.showToastWarning = false;
   }
 
   getallClientsBy(clientType: string) {
-   
-    this.clientList.length=0;
+
+    this.clientList.length = 0;
     this.clientInstance.getAllClientsBy(clientType).subscribe({
       next: (clientsList) => {
 
@@ -684,7 +688,7 @@ this.showToastWarning = false;
           this.clientList = [...this.clientList, element];
         });
 
-        
+
         //this.clientList = clientsList;
       },
       error: (error) => {
@@ -719,19 +723,19 @@ this.showToastWarning = false;
 
     this.serviceLabel = 'Registro de Servicios';
     this.serviceButton = 'Registrar'
-    
+
 
     this.isReadOnly = false; //enable de regreso el field cliente
     //go back to consulta tab
     this.recivedTabIndex = 0;
     this.reqTabId = 0;
     this.activeService = 1;
-    
+
   }
 
-  resetFields(){
+  resetFields() {
     this.serviceForm.reset(this.initialServiceFormValues);
-    if(this.itemsFormArray != null) { this.itemsFormArray.clear(); }
+    if (this.itemsFormArray != null) { this.itemsFormArray.clear(); }
     this.serviceDetails.length = 0; //remove from UI
 
     //cleanup UI for next service details
@@ -740,14 +744,14 @@ this.showToastWarning = false;
     this.description = undefined;
     this.price = undefined;
     this.unitMeasurement = undefined;
-    
+
     this.isRecurrentService = false; //reseteamos la bandera de servicio recurrente
     this.isExtraOption = false;
     this.extraValue = 'Fijo';
 
-    this.isUpdating = false; 
+    this.isUpdating = false;
   }
-    
+
   //SE llama cuando Creamos o Actualizamos un Servicio
   onSubmit(action: string) {
 
@@ -756,7 +760,7 @@ this.showToastWarning = false;
       if (this.isRecurrentService) {
         this.serviceForm.get('status').setValue(Status.Recurrente);
       }
-      
+
       this.totalPrice = 0; //reset to zero prior to do final calculation
       this.serviceForm.get('isExtra').setValue(this.isExtraOption);  //this is boolean therefore we change its value here to either true or false according to value in isExtraOption 
       this.serviceForm.value['serviceDetail'].forEach((item: any) => {
@@ -770,19 +774,19 @@ this.showToastWarning = false;
       if (action == 'Registrar') {
 
         console.log(JSON.stringify(this.serviceForm.value));
-        
+
         this.serviceForm.get('price').setValue(this.totalPrice); // totalPrice contiene la sumatoria del total de la factura
         const success = this.createDefaultInvoiceFormGroup(this.serviceForm.get('serviceDate').value);
-        if(success){
+        if (success) {
           this.createDefaultPaymentItemFormGroup(this.serviceForm.get('serviceDate').value);
-        }else {
+        } else {
           this.toast.showToast('no se pudo crear el invoice por default!', 3000, 'check2-circle', false);
           return;
         }
-        
+
         this.serviceInstance.addService(this.serviceForm.value).subscribe({
           next: (response) => {
-           
+
             console.table(response);
             this.toast.showToast('Servicio creado exitosamente!!', 3000, 'check2-circle', true);
           },
@@ -791,7 +795,7 @@ this.showToastWarning = false;
             this.toast.showToast('Error crear el servicio!!', 3000, 'x-circle', false);
           },
           complete: () => {
-            
+
             this.onCancel() // llamamos on cancel para poder irnos al tab de consulta
           }
         });
@@ -799,19 +803,19 @@ this.showToastWarning = false;
       } else if (action == 'Actualizar') {
 
         this.serviceForm.get('price').setValue(this.totalPrice); // totalPrice contiene la sumatoria del total de la factura
-       //this.serviceForm.removeControl('invoice');
-    
-      
+        //this.serviceForm.removeControl('invoice');
+
+
         this.serviceInstance.updateService(this.serviceForm.value).subscribe({
           next: (response) => {
             this.toast.showToast('Servicio actualizado exitosamente!!', 3000, 'check2-circle', true);
           },
           error: (err) => {
-            
+
             this.toast.showToast('Error al actualizar el servicio!!', 3000, 'x-circle', false);
           },
           complete: () => {
-            this.onCancel(); 
+            this.onCancel();
             this.getAllServicesIntances();
             this.initialServiceForm(); // Se agrega este metodo para reinicializar los valores despues de actualizar
           }
@@ -819,7 +823,7 @@ this.showToastWarning = false;
       }
 
     } else {
-    
+
       this.serviceForm.markAllAsTouched();
       this.toast.showToast('Campos Inválidos, por favor revise el formulario!!', 3000, 'x-circle', false);
     }
@@ -831,18 +835,18 @@ this.showToastWarning = false;
    * si el pago es cash entonces el payment status sera 'Pagado', el Service Status sera 'Terminado' y el invoice isGenerated sera 'True'
    * de caso contrario se sigue el flujo normal de cobro para generar facturas
   */
-  onPaymentSubmit(serviceEnt:ServiceEntity,invoiceIndex:number) {
+  onPaymentSubmit(serviceEnt: ServiceEntity, invoiceIndex: number) {
 
 
-    const succesful = this.createPaymentItemFormGroup(serviceEnt,invoiceIndex);
-    if(!succesful){ 
+    const succesful = this.createPaymentItemFormGroup(serviceEnt, invoiceIndex);
+    if (!succesful) {
       return;
     }
 
     this.totalPrice = 0; //reset to zero prior to do final calculation
-    this.calculateTotal(serviceEnt.price? serviceEnt.price.toString(): '0');
-    this.calculateTotal(serviceEnt.invoice[invoiceIndex].payment[0].taxAmount? serviceEnt.invoice[invoiceIndex].payment[0].taxAmount.toString(): '0');
-    
+    this.calculateTotal(serviceEnt.price ? serviceEnt.price.toString() : '0');
+    this.calculateTotal(serviceEnt.invoice[invoiceIndex].payment[0].taxAmount ? serviceEnt.invoice[invoiceIndex].payment[0].taxAmount.toString() : '0');
+
 
     let invoiceNum = uuidv4();
     this.paymentForm.patchValue({ //puede ser patchValue(para llenado parcial de la forma) en lugar de setValue,
@@ -853,17 +857,17 @@ this.showToastWarning = false;
       invoicedMonth: serviceEnt.invoice[invoiceIndex].invoicedMonth,
       invoiceName: this.removeExtraSpaces(serviceEnt.client.name) + '_' + this.removeExtraSpaces(serviceEnt.client.lastName) + '_' + invoiceNum + '.pdf',
       subtotalAmount: serviceEnt.invoice[invoiceIndex].payment[0].paymentAmount,
-      isGenerated: this.esPagoCash && this.esPagoCash == 'Cash'? true : serviceEnt.invoice[invoiceIndex].isGenerated,
+      isGenerated: this.esPagoCash && this.esPagoCash == 'Cash' ? true : serviceEnt.invoice[invoiceIndex].isGenerated,
       service: {
         serviceId: serviceEnt.serviceId,
-        status: this.esPagoCash && this.esPagoCash == 'Cash'? Status.Cerrado : serviceEnt.status,
+        status: this.esPagoCash && this.esPagoCash == 'Cash' ? Status.Cerrado : serviceEnt.status,
       }
       //payment: este se llena cuando llamos a this.createPaymentItemFormGroup al comienzo de este metodo
     })
 
     if (this.paymentForm.valid) {
       console.log(this.paymentForm);
-      this.invoiceInstance.addInvoice(this.paymentForm.value).subscribe({  
+      this.invoiceInstance.addInvoice(this.paymentForm.value).subscribe({
         next: (response) => {
           this.toast.showToast('Pago generado exitosamente!!', 3000, 'check2-circle', true);
         },
@@ -891,7 +895,7 @@ this.showToastWarning = false;
   }
 
   getMessage(message: number) {
-   
+
     if (message == undefined) { //es undefined en la primera vez que carga, por default ponemos al tab 0 para q se muestre
       message = 0;
       this.recivedTabIndex = 0;
@@ -905,49 +909,71 @@ this.showToastWarning = false;
 
     //debemos ver si esto ya esta cargado tal vez usar un metodo para cache values
     //y no ir tantas veces a la backend
-    if(message == 0){  //Tab Consulta
-      this.getAllServicesIntancesBy(this.clientesFijos,false);
+    if (message == 0) {  //Tab Consulta
+      this.getAllServicesIntancesBy(this.clientesFijos, false);
       this.getRecurrentInvoiceStatus();
     }
 
-    if(message == 1){  //Tab Crear Servicio
-      
+    if (message == 1) {  //Tab Crear Servicio
+
       this.onRadioChange();
     }
- 
-    if(message == 2){  //Tab Pagos
+
+    if (message == 2) {  //Tab Pagos
       this.getAllServicesIntances();
     }
   }
 
-deleteServiceDetail(serviceDTO: ServiceEntity) {
-
-  //preguntar antes de eliminar
- this.showToast = false;
+  deleteServiceDetail(serviceDTO: ServiceEntity) {
+console.log('LLEGA AL INICIO '+JSON.stringify(serviceDTO));
+    //preguntar antes de eliminar
+    this.showToast = false;
 
     // verificamos el estatus del pago, si no hay pago- confirmacion de pago, preguntar si se desea eliminar
     // caso de que el pago esta pagado, pero no se ha generado la factura, no se debera poder eliminar
     // caso de que la factura ya se genero pero no se ha enviado al cliente, no se debera poder eliminar
-        const serviceObject = new ServiceEntity();
-        serviceObject.enabled = false; // deshabilitamos el objeto
-        serviceObject.serviceId = serviceDTO.serviceId;
-        this.serviceInstance.updateService(serviceObject).subscribe({
-          next: (response) => {
-            this.toast.showToast('Servicio eliminado exitosamente!!', 3000, 'check2-circle', true);
-          },
-          error: (err) => {
-            this.toast.showToast('Error al eliminar el Servicio!!', 3000, 'x-circle', false);
-          },
-          complete: () => {
-            this.getAllServicesIntances();
-          }
-        });
+    const serviceObject = new ServiceEntity();
+    let invoiceObjectArray:InvoiceEntity[] = [];
+    let invoiceObject = new InvoiceEntity();
+    //let paymentObjectArray: PaymentEntity[]=[];
+    //let paymentObject = new PaymentEntity();
+    invoiceObject.enabled=false;
+    invoiceObject.invoiceNumber=serviceDTO.invoice[0].invoiceNumber;
+    invoiceObject.invoiceId = serviceDTO.invoice[0].invoiceId;
+    //paymentObject.enabled=false;
+    //paymentObject.paymentId= serviceDTO.invoice[0].payment[0].invoiceId;
+    //paymentObject.paymentAmount=serviceDTO.invoice[0].payment[0].paymentAmount;
+    //paymentObject.paymentMethod=serviceDTO.invoice[0].payment[0].paymentMethod;
+    //paymentObject.paymentStatus=serviceDTO.invoice[0].payment[0].paymentStatus;
+    //paymentObject.invoiceId = serviceDTO.invoice[0].payment[0].invoiceId;
+    //paymentObjectArray.push(paymentObject);
+    //invoiceObject.payment=paymentObjectArray;
+    invoiceObjectArray.push(invoiceObject);
+    serviceObject.enabled = false; // deshabilitamos el objeto
+    serviceObject.serviceId = serviceDTO.serviceId;
+    serviceObject.invoice = invoiceObjectArray;
+
+    console.log('SERVICE OBJECT: '+ JSON.stringify(serviceObject));
+
+
+    
+    this.serviceInstance.updateService(serviceObject).subscribe({
+      next: (response) => {
+        this.toast.showToast('Servicio eliminado exitosamente!!', 3000, 'check2-circle', true);
+      },
+      error: (err) => {
+        this.toast.showToast('Error al eliminar el Servicio!!', 3000, 'x-circle', false);
+      },
+      complete: () => {
+        this.getAllServicesIntances();
+      }
+    });
     //this.toast.showToast('Hay que implementar este metodo', 7000, 'x-circle', false);
   }
 
   updateServiceDetail(serviceDTO: ServiceEntity) {
 
-    if(this.isUpdating){
+    if (this.isUpdating) {
       this.resetFields() //este metodo sirve para limpiar 
     }
 
@@ -961,22 +987,22 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
     this.client = serviceDTO.client;
 
     if (this.client.clientType == 'Fijo') {
-      if(!serviceDTO.isExtra){
+      if (!serviceDTO.isExtra) {
         this.extraValue = this.radioOptions[0];
-      }else{
+      } else {
         this.extraValue = this.radioOptions[1];
       }
 
     } else { //Eventual
       this.extraValue = this.radioOptions[2];
     }
-   
+
     this.cliente = this.client.clientId;
-    
-    
+
+
     //this.getallClientsBy(this.extraValue);
 
-    this.isRecurrentService = serviceDTO.status == Status.Recurrente? true:false;
+    this.isRecurrentService = serviceDTO.status == Status.Recurrente ? true : false;
 
     this.serviceForm = this.serviceFrm.group({
       //campos del servicio
@@ -989,10 +1015,10 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
         clientId: this.client.clientId,
       }),
       serviceDetail: this.serviceFrm.array([]),
-      //invoice:this.serviceFrm.array([]),
-      isExtra:this.isExtraOption
+      invoice:this.serviceFrm.array([]),
+      isExtra: this.isExtraOption
     });
-     
+
 
     const sDetails: ServiceDetailEntity[] = JSON.parse(JSON.stringify(serviceDTO.serviceDetail))
 
@@ -1008,11 +1034,10 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
     }
   }
 
-  initialServiceForm()
-  {
+  initialServiceForm() {
     this.serviceForm = this.serviceFrm.group({
       //campos del servicio
-       serviceId: [],
+      serviceId: [],
       serviceName: ['', Validators.required],
       serviceDate: [''],
       status: [Status.EnProceso],
@@ -1055,8 +1080,8 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
     this.serviceDetails.push(servDetail);
   }
 
-  private calculateTotal(itemPrice: string){
-    this.totalPrice += parseInt(itemPrice, 10) ;
+  private calculateTotal(itemPrice: string) {
+    this.totalPrice += parseInt(itemPrice, 10);
   }
 
   onDeleteDetails(itemIndex: number) {
@@ -1099,11 +1124,11 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
       if (!(/^\d+(\.\d+)?$/.test(inputValue))) { //contiene solo numeros
         this.inputLength = 0; //si contiene numeros y letras reseteamos a 0 ya que no prenderemos el boton "agregar detalles" en este caso
       }
-      this.onInputBlur((event.target as HTMLInputElement).name,'');
+      this.onInputBlur((event.target as HTMLInputElement).name, '');
     }
   }
 
-  onInputBlur(control: string, value:any) {
+  onInputBlur(control: string, value: any) {
     if (control == 'serviceType') {
       this.serviceTypeIsValid = this.serviceType && this.serviceType.length > 0 ? true : false;
 
@@ -1120,23 +1145,23 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
       this.unitMeasurementIsValid = this.unitMeasurement && this.unitMeasurement.length > 0 ? true : false;
 
     } else if (control == 'paymentAmount') {
-      this.paymentAmountIsValid = value && !isNaN(value)? true : false;
+      this.paymentAmountIsValid = value && !isNaN(value) ? true : false;
 
-    } 
+    }
     else if (control == 'taxAmount') {
-      this.taxAmountIsValid = value && !isNaN(value)? true : false;
+      this.taxAmountIsValid = value && !isNaN(value) ? true : false;
 
     } else if (control == 'paymentMethod') {
-      
-      this.paymentMethodIsValid = value? value =='none'? false: true: false;
-    } 
-    
+
+      this.paymentMethodIsValid = value ? value == 'none' ? false : true : false;
+    }
+
   }
-   
+
   onKeyUp(event: KeyboardEvent) {
     if (event.key === 'Enter') {
-     
-      if (this.clientEntitiyToGet == undefined || this.clientEntitiyToGet.trim().length===0) { return; }
+
+      if (this.clientEntitiyToGet == undefined || this.clientEntitiyToGet.trim().length === 0) { return; }
 
       this.clientEntitiyToGet = this.clientEntitiyToGet.replace(/\s+/g, ' ').trim();
       if (this.clientEntitiyToGet.toLocaleLowerCase() == 'pago cash') { //este es para ocultar pagos en efectivo
@@ -1167,7 +1192,7 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
 
       if ((this.clientEntitiyToGet && this.clientEntitiyToGet.length == 0) || !this.clientEntitiyToGet) {
         if (this.originalValues && this.originalValues.length !== 0) {
-          
+
           this.serviceList = this.originalClientServicesValues;
           this.collectionSize = this.serviceList.length;
           this.paginatedServices = this.serviceList.slice(0, this.pageSize);
@@ -1176,7 +1201,7 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
     }
   }
 
-   onNameChange(newValue: string) {
+  onNameChange(newValue: string) {
     this.clientEntitiyToGet = newValue;
   }
 
@@ -1227,7 +1252,7 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
   pagosFindByCientService(): ServiceEntity[] {
 
     //buscamos primero por cliente de lo contrario nos movemos a buscar por services
-    let searchResults: ServiceEntity[] = this.originalClientServicesValues.filter(item => item.client.name.includes(this.clientEntitiyToGet)); 
+    let searchResults: ServiceEntity[] = this.originalClientServicesValues.filter(item => item.client.name.includes(this.clientEntitiyToGet));
 
     //si no encontramos nada atraves de nombre buscamos atraves de nombre
     if (searchResults.length <= 0) {
@@ -1237,7 +1262,7 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
   }
 
   regenerarFacturaRecurrente(entity: ServiceEntity) {
-    
+
     const currentDate = new Date();
     let currentDateFormatted = formatDate(currentDate, 'yyyy-MM-dd', this.locale);
     this.serviceForm.get('serviceId').setValue(entity.serviceId);
@@ -1256,79 +1281,89 @@ deleteServiceDetail(serviceDTO: ServiceEntity) {
 
     const currentMonth = months[currentDate.getMonth()];
     const currentFullMonth = fullNameMonths[currentDate.getMonth()];
+    
+    let invoiceDate = currentDate.getFullYear()+'-'+ currentDate.getMonth()+1;
 
     if (this.serviceForm.valid) {
 
-       // verificamos si existe factura en el mes actual
-       //console.log('VEAMO QUE SE MANDA DEL ID '+entity.serviceId);
-       console.log('currentMonth: '+currentMonth);
-       let servId : number = entity.serviceId;
-       let exists:any =  this.serviceInstance.getInvoicesXMonth(servId, currentMonth).subscribe({
-      next: (invoiceExists) => {
-        console.log('INVOICES '+invoiceExists.active);
-                return invoiceExists;
-      },
-      error: (error) => {
-        console.error(error);
-        this.toast.showToast(error, 3000, 'x-circle', false);
-      },
-    });
-       
-        if (exists.active ==true || exists.active == 'true')
-         {
-     
-          // mando mensaje 
-          this.toast.showToastWarning('La factura del mes de "'+ currentFullMonth +'" ya existe! <br><br> *Recordatorio: <br> Crear la factura cada inicio de mes.', 3000);
-          return;
-        } else {
-         
-       
+      // verificamos si existe factura en el mes actual
+      //console.log('VEAMO QUE SE MANDA DEL ID '+entity.serviceId);
+      console.log('currentMonth: ' + currentMonth);
+      let servId: number = entity.serviceId;
+      let exists: any = this.serviceInstance.getInvoicesXMonth(servId, invoiceDate).subscribe({
+        next: (invoiceExists) => {
 
-      const success = this.createDefaultInvoiceFormGroup(currentDateFormatted); //agregamos el default invoice a la serviceForm
-      if (success) {
-        this.createDefaultPaymentItemFormGroup(currentDateFormatted); //agregamos el default payment al invoiceGroup q acabamos de agregar
-      } else {
-        this.toast.showToast('no se pudo crear el invoice!!', 3000, 'check2-circle', false);
-        return;
-      }
+          /**/
+
+          if (invoiceExists.exists == true || invoiceExists.exists == 'true') {
+
+            // mando mensaje 
+            this.toast.showToastWarning('La factura del mes de "' + currentFullMonth + '" ya existe! <br><br> *Recordatorio: <br> Crear la factura cada inicio de mes.', 3000);
+            
+            return;
+          } else {
+
+            const success = this.createDefaultInvoiceFormGroup(currentDateFormatted); //agregamos el default invoice a la serviceForm
+            if (success) {
+              this.createDefaultPaymentItemFormGroup(currentDateFormatted); //agregamos el default payment al invoiceGroup q acabamos de agregar
+            } else {
+              this.toast.showToast('no se pudo crear el invoice!!', 3000, 'check2-circle', false);
+              return;
+            }
 
 
-      //remove unnecessary fields
-      this.serviceForm.removeControl('serviceDate');
-      this.serviceForm.removeControl('status');
-      this.serviceForm.removeControl('price');
-      this.serviceForm.removeControl('serviceDetail');
-      this.serviceForm.removeControl('isExtra');
-      //this.serviceForm.removeControl('serviceName');
-     // this.serviceForm.removeControl('client');
+            //remove unnecessary fields
+            this.serviceForm.removeControl('serviceDate');
+            this.serviceForm.removeControl('status');
+            this.serviceForm.removeControl('price');
+            this.serviceForm.removeControl('serviceDetail');
+            this.serviceForm.removeControl('isExtra');
+            //this.serviceForm.removeControl('serviceName');
+            // this.serviceForm.removeControl('client');
 
-      this.serviceInstance.updateService(this.serviceForm.value).subscribe({
-        next: (response) => {
-          this.toast.showToast('Servicio recurrente actualizado exitosamente!!', 3000, 'check2-circle', true);
+            this.serviceInstance.generateInvoice(this.serviceForm.value).subscribe({
+              next: (response) => {
+                this.toast.showToast('Servicio recurrente actualizado exitosamente!!', 3000, 'check2-circle', true);
+              },
+              error: (err) => {
+
+                this.toast.showToast('Error al actualizar el servicio recurrente!!', 3000, 'x-circle', false);
+              },
+              complete: () => {
+                this.onCancel();
+                this.getAllServicesIntances();
+                this.initialServiceForm();
+              }
+            });
+          }// termino else
+          /**/
+
+          console.log('INVOICES ' + invoiceExists.exists);
+          return exists;
         },
-        error: (err) => {
-
-          this.toast.showToast('Error al actualizar el servicio recurrente!!', 3000, 'x-circle', false);
+        error: (error) => {
+          console.error(error);
+          this.toast.showToast(error, 3000, 'x-circle', false);
         },
         complete: () => {
           this.onCancel();
           this.getAllServicesIntances();
+          this.initialServiceForm();
         }
       });
+
     }
-    } // termino else
   }
 
-  existenceInvoice(serviceId: number, invoicedMonth: string)
-  {
+  existenceInvoice(serviceId: number, invoicedMonth: string) {
 
     this.serviceInstance.getInvoicesXMonth(serviceId, invoicedMonth).subscribe({
       next: (servList) => {
 
-        console.log('servList: '+ JSON.stringify(servList));
+        console.log('servList: ' + JSON.stringify(servList));
         this.originalValues = servList;
         this.serviceList = servList;
-        
+
       },
       error: (error) => {
         console.error(error);
