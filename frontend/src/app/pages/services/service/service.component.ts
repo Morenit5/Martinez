@@ -197,7 +197,7 @@ export class ServiceComponent implements OnInit {
   }
 
   siEliminar() {
-    console.log('this.serviceDelete: '+JSON.stringify(this.serviceDelete));
+   
     this.deleteServiceDetail(this.serviceDelete);
     this.showToastWarning = false;
   }
@@ -401,8 +401,6 @@ export class ServiceComponent implements OnInit {
       status: service.status == 'Recurrente' ? Status.Recurrente : Status.Terminado,
       //serviceName: service.serviceName
     })
-
-    console.log(this.invoiceUpdateform.value)
 
     if (this.invoiceUpdateform.valid) {
       this.serviceInstance.updateService(this.invoiceUpdateform.value).subscribe({
@@ -773,8 +771,6 @@ export class ServiceComponent implements OnInit {
 
       if (action == 'Registrar') {
 
-        console.log(JSON.stringify(this.serviceForm.value));
-
         this.serviceForm.get('price').setValue(this.totalPrice); // totalPrice contiene la sumatoria del total de la factura
         const success = this.createDefaultInvoiceFormGroup(this.serviceForm.get('serviceDate').value);
         if (success) {
@@ -866,7 +862,7 @@ export class ServiceComponent implements OnInit {
     })
 
     if (this.paymentForm.valid) {
-      console.log(this.paymentForm);
+     
       this.invoiceInstance.addInvoice(this.paymentForm.value).subscribe({
         next: (response) => {
           this.toast.showToast('Pago generado exitosamente!!', 3000, 'check2-circle', true);
@@ -925,7 +921,7 @@ export class ServiceComponent implements OnInit {
   }
 
   deleteServiceDetail(serviceDTO: ServiceEntity) {
-console.log('LLEGA AL INICIO '+JSON.stringify(serviceDTO));
+
     //preguntar antes de eliminar
     this.showToast = false;
 
@@ -953,7 +949,7 @@ console.log('LLEGA AL INICIO '+JSON.stringify(serviceDTO));
     serviceObject.serviceId = serviceDTO.serviceId;
     serviceObject.invoice = invoiceObjectArray;
 
-    console.log('SERVICE OBJECT: '+ JSON.stringify(serviceObject));
+    
 
 
     
@@ -1287,8 +1283,6 @@ console.log('LLEGA AL INICIO '+JSON.stringify(serviceDTO));
     if (this.serviceForm.valid) {
 
       // verificamos si existe factura en el mes actual
-      //console.log('VEAMO QUE SE MANDA DEL ID '+entity.serviceId);
-      console.log('currentMonth: ' + currentMonth);
       let servId: number = entity.serviceId;
       let exists: any = this.serviceInstance.getInvoicesXMonth(servId, invoiceDate).subscribe({
         next: (invoiceExists) => {
@@ -1338,7 +1332,7 @@ console.log('LLEGA AL INICIO '+JSON.stringify(serviceDTO));
           }// termino else
           /**/
 
-          console.log('INVOICES ' + invoiceExists.exists);
+        
           return exists;
         },
         error: (error) => {
@@ -1360,7 +1354,7 @@ console.log('LLEGA AL INICIO '+JSON.stringify(serviceDTO));
     this.serviceInstance.getInvoicesXMonth(serviceId, invoicedMonth).subscribe({
       next: (servList) => {
 
-        console.log('servList: ' + JSON.stringify(servList));
+        
         this.originalValues = servList;
         this.serviceList = servList;
 
