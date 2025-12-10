@@ -54,7 +54,7 @@ constructor(private readonly _credentialsService: CredentialsService,private rea
       map(res => {
         if (res) {
           //console.log('Login successful con ');
-          console.log(JSON.stringify(res))
+          //console.log(JSON.stringify(res))
 
           credentials.id = res.userId;
           credentials.token = res.token;

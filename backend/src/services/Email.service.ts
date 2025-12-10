@@ -196,8 +196,25 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
     //console.log('FilePath:  '+filePath);
     const inv =  entity.invoice? entity.invoice[invoiceIndex] : undefined;
     
-    const invoiceName: string=  inv? inv.invoiceName : 'YeseniaRejon-20250824.pdf';
+    const invoiceName: string=  inv? inv.invoiceName : 'no_invoice.pdf';
     //console.log("ENTITY: "+ JSON.stringify(entity));
+
+    if(invoiceName == 'no_invoice.pdf'){
+      return { message: 'No se encontro la factura, favor de volver a generarla' };
+    } 
+
+    try {
+      await this.getClientInvoice(invoiceName);
+    } catch (error: unknown) {
+      console.log(error)
+      if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+
+        return { message: 'No se encontro la factura, favor de volver a generarla' };
+
+      } else {
+        return { message: 'Error al tratar de obtener la factura, favor de volver a generarla' };
+      }
+    }
 
     const info = await this.transporter.sendMail({
       from: 'francisco.usa.227@gmail.com',
