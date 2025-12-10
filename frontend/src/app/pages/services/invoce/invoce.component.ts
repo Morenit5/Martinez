@@ -248,7 +248,14 @@ export class InvoceComponent {
   sendEmail(ServiceDto: ServiceEntity,invoiceIndex:number) {
 
     this.emailService.sendEmail(ServiceDto,invoiceIndex).subscribe({
-      next: () => this.toast.showToast('Factura reenviada correctamente ', 5000, 'check2-square', true),
+      next: (resp) => {
+        console.log(resp)
+        if(resp.message == 'No se encontro la factura, favor de volver a generarla' || resp.message == 'Error al tratar de obtener la factura, favor de volver a generarla'){
+          this.toast.showToast(resp.message , 5000, 'check2-square', false);
+        }else {
+          this.toast.showToast('Factura reenviada correctamente ', 5000, 'check2-square', true)
+        }
+      },
       error: (err) => {
         console.error(err);
         this.toast.showToast('Error al reenviar la factura ', 5000, 'check2-square', false);

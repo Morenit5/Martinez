@@ -545,14 +545,19 @@ export class ServiceComponent implements OnInit {
     //verificamos el cliente-servicio seleccionado
 
     this.emailService.sendEmail(ServiceDto, invoiceIndex).subscribe({
-      next: () => { },
+      next: (resp) => {
+        if(resp.message == 'No se encontro la factura, favor de volver a generarla'){
+          this.toast.showToast(resp.message , 5000, 'check2-square', false);
+        }else {
+          this.toast.showToast('Factura enviada correctamente ', 5000, 'check2-square', true)
+        }
+      },
       error: (err) => {
         console.error(err);
         this.toast.showToast('Error al enviar el correo ', 3000, 'check2-square', true);
       },
       complete: () => {
-        this.toast.showToast('Correo enviado con factura Adjunta  ', 3000, 'check2-square', true)
-        //this.invoiceUpdateform.reset(this.initialInvoiceUpdateValues);
+        
         this.getAllServicesIntances(); //Traemos todas las intances  
 
       }
@@ -931,28 +936,16 @@ export class ServiceComponent implements OnInit {
     const serviceObject = new ServiceEntity();
     let invoiceObjectArray:InvoiceEntity[] = [];
     let invoiceObject = new InvoiceEntity();
-    //let paymentObjectArray: PaymentEntity[]=[];
-    //let paymentObject = new PaymentEntity();
+    
     invoiceObject.enabled=false;
     invoiceObject.invoiceNumber=serviceDTO.invoice[0].invoiceNumber;
     invoiceObject.invoiceId = serviceDTO.invoice[0].invoiceId;
-    //paymentObject.enabled=false;
-    //paymentObject.paymentId= serviceDTO.invoice[0].payment[0].invoiceId;
-    //paymentObject.paymentAmount=serviceDTO.invoice[0].payment[0].paymentAmount;
-    //paymentObject.paymentMethod=serviceDTO.invoice[0].payment[0].paymentMethod;
-    //paymentObject.paymentStatus=serviceDTO.invoice[0].payment[0].paymentStatus;
-    //paymentObject.invoiceId = serviceDTO.invoice[0].payment[0].invoiceId;
-    //paymentObjectArray.push(paymentObject);
-    //invoiceObject.payment=paymentObjectArray;
+
     invoiceObjectArray.push(invoiceObject);
     serviceObject.enabled = false; // deshabilitamos el objeto
     serviceObject.serviceId = serviceDTO.serviceId;
     serviceObject.invoice = invoiceObjectArray;
 
-    
-
-
-    
     this.serviceInstance.updateService(serviceObject).subscribe({
       next: (response) => {
         this.toast.showToast('Servicio eliminado exitosamente!!', 3000, 'check2-circle', true);
@@ -961,7 +954,7 @@ export class ServiceComponent implements OnInit {
         this.toast.showToast('Error al eliminar el Servicio!!', 3000, 'x-circle', false);
       },
       complete: () => {
-        this.getAllServicesIntances();
+        this.getMessage(0)
       }
     });
     //this.toast.showToast('Hay que implementar este metodo', 7000, 'x-circle', false);
