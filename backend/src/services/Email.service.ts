@@ -55,7 +55,7 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
       for(const config of Configurations ){
         if(config.enableNotification == true || config.enableNotification == 'true' ){
           this.enableNotifications('true',config.enableOnDate);
-           console.log('se inicializo la auto generacion de invoices')
+          // console.log('se inicializo la auto generacion de invoices')
         }
       }
      }).catch((error: any) => {
@@ -510,7 +510,12 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
         return await this.configRepository.save(newConfiguration);
       } catch (e: any) {
         // Postgres
-        if (e.code === '23505') throw new ConflictException('El correo ya está registrado.');
+        if (e.code === '23505'){
+        throw new ConflictException('El correo ya está registrado.');
+        } else{
+
+           this.exceptions.sendException(e)
+        }
         throw e;
       }
     }

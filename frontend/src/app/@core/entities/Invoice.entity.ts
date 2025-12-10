@@ -15,5 +15,6 @@ export class InvoiceEntity {
     service?: ServiceEntity; //@OneToMany(() => EntityService, service => service.serviceId)
     invoiceStatus:string;
     isGenerated: boolean;
+    enabled: boolean;
    
 }
