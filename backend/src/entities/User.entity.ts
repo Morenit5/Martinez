@@ -25,17 +25,20 @@ export class EntityUser {
   @Column({ unique: true }) //para que el correo no se repita en la bd
   email: string;
 
-  @Column({ unique: true, nullable:true }) //para que el correo no se repita en la bd
+  @Column({ unique: true, nullable:true }) //para que el telefono sea unico y no se repita en la bd
   phone?: string;
 
-  @Column({ type: 'varchar', nullable:true, default:'placeholder.png'}) //para que el correo no se repita en la bd
+  @Column({ type: 'varchar', nullable:true, default:'placeholder.png'}) 
   avatar: string;
 
   @Column({ type: 'boolean', default: true })
   enabled: boolean;
 
-   @Column({ type: 'varchar', nullable:true,})
+  @Column({ type: 'varchar', nullable:true,})
   refreshToken:string;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  registryDate: Date;
   
 }
  

@@ -110,6 +110,14 @@
               <input type="text" class="form-control col-form-label" formControlName="phone" id="phone" />
             </div>
 
+            <div class="mb-3">
+             <label>&#160;Fecha de Registro</label><br>
+              <div class="input-group">
+                <input class="form-control" placeholder="yyyy-mm-dd" name="registryDate" ngbDatepicker #d="ngbDatepicker" formControlName="registryDate" />
+                <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">📅</button>
+              </div>
+            </div>
+            
             <div class="mb-3 ">
             <label class="form-label">&#160;</label>
             <div class="input-group-append"  >

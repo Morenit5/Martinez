@@ -6,7 +6,8 @@ import { ToastUtility } from '@app/@core/utils/toast.utility';
 import { RolEntity, UserEntity } from '@app/@core/entities/User.entity';
 import { RolesInstances, UsersInstances } from '@app/@core/services/Users.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-
+import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
+import { DateAdapterService } from '@app/shared/services/date-adapter.service';
 
 
 @Component({
@@ -14,6 +15,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
   standalone: false,
+  providers: [{ provide: NgbDateAdapter, useClass: DateAdapterService}]
 })
 export class ListComponent implements OnInit {
 
@@ -29,7 +31,8 @@ export class ListComponent implements OnInit {
   usersButton: string = 'Registrar';
   avatarFileName = '';
   imageUrl: SafeUrl;
-  
+  registryDate: string = undefined;
+
   reqTabId: number;
   recivedTabIndex: number = 0;
   isLoading = true;
@@ -59,7 +62,8 @@ export class ListComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
       rol: ['', Validators.required],
-      phone: []
+      phone: [],
+      registryDate: ['']//,
     });
     this.initialUsersFormValues = this.usersForm.value;
 
@@ -172,7 +176,8 @@ export class ListComponent implements OnInit {
       email: userInstance.email,
       password: userInstance.password, //Este campo no se regresa de la bd entonces esta vacio
       rol: this.rolEntity,
-      phone: userInstance.phone
+      phone: userInstance.phone,
+      registryDate: userInstance.registryDate
     });
 
  
