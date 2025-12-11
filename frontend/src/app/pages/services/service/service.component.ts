@@ -520,7 +520,7 @@ export class ServiceComponent implements OnInit {
 
     const blob = new Blob([pdfBytes as unknown as ArrayBuffer], { type: 'application/pdf' });
     this.pdfUrl = URL.createObjectURL(blob);
-    const nuevaVentana = window.open(this.pdfUrl, '_blank');
+    const nuevaVentana = window.open(this.pdfUrl, '_blank'); 
 
     // Si el navegador bloquea la ventana, ofrecer descarga
     if (!nuevaVentana) {
@@ -532,7 +532,7 @@ export class ServiceComponent implements OnInit {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(this.pdfUrl);
       this.isLoading = false;
-      this.getAllServicesIntances(); //Traemos todas las intances
+     /* this.getAllServicesIntances(); //Traemos todas las intances*/
     }
 
   }

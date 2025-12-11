@@ -69,8 +69,8 @@
                                             ngbTooltip="Ver Factura del Servicio"><i
                                                 class="bi bi-filetype-pdf"></i></button>
 
-                                        <button class="btn btn-sm btn-outline-info" (click)="sendEmail(parentItem, i)"
-                                            ngbTooltip="Reenviar Factura"><i class="bi bi-envelope-at"></i></button>
+                                        <button  type="button" class="btn btn-sm btn-outline-info" name="btnSendEmail" (click)="sendEmail(parentItem, i)"
+                                            ngbTooltip="Reenviar Factura"  [disabled]="displayBtnSendEmail"><i class="bi bi-envelope-at"></i></button>
                                     </td>
                                 </tr>
                                 }

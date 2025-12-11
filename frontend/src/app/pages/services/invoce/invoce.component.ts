@@ -45,6 +45,8 @@ export class InvoceComponent {
 
   showColumn= true;
   displayBtnCash = false;
+  displayBtnSendEmail = false;
+ 
 
   constructor(private toast: ToastUtility, private readonly serviceInstance: ServicesInstances, private readonly emailService: EmailService) { 
    
@@ -54,6 +56,7 @@ export class InvoceComponent {
   ngOnInit() {
      this.getAllClosedServicesIntances(); // de entrada traemos clientes fijos solament
      this.displayBtnCash= false;
+     this.displayBtnSendEmail = false;
   }
 
   private async openPDFViewer() {
@@ -235,23 +238,29 @@ export class InvoceComponent {
       },
       error: (err) => {
         console.error(err);
-        this.toast.showToast('Error al obtener la factura del servicio', 5000, 'check2-square', true);
+        this.toast.showToast('Error al obtener la factura del servicio', 3000, 'check2-square', true);
+        this.getAllClosedServicesIntances();
       },
       complete: () => {
+        
         this.isLoading = false;
-       
-        window.open(this.pdfUrl, '_blank');
+        this.openPDFViewer();
+        
       }
     });
   }
 
   sendEmail(ServiceDto: ServiceEntity,invoiceIndex:number) {
+this.displayBtnSendEmail = true;
 
     this.emailService.sendEmail(ServiceDto,invoiceIndex).subscribe({
       next: () => this.toast.showToast('Factura reenviada correctamente ', 5000, 'check2-square', true),
       error: (err) => {
         console.error(err);
         this.toast.showToast('Error al reenviar la factura ', 5000, 'check2-square', false);
+      },
+      complete: () => {
+        this.displayBtnSendEmail =false;
       }
     });
   }
