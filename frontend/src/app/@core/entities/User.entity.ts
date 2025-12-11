@@ -27,6 +27,8 @@ export class UserEntity {
   enabled: boolean;
   
   imgBlob: SafeUrl;
+
+  registryDate?: Date;
   
   get fullName(): string {
     return `${this.firstname} ${this.lastname}`;

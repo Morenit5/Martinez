@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { IsNotEmpty, IsEmail, IsOptional, IsString, IsObject, isNotEmpty, IsNumber, IsBoolean, IsPhoneNumber } from 'class-validator';
+import { IsNotEmpty, IsEmail, IsOptional, IsString, IsObject, isNotEmpty, IsNumber, IsBoolean, IsPhoneNumber, IsDate } from 'class-validator';
 import { CreateRolDto, RolDto, UpdateRolDto } from './Rol.dto';
 import { Exclude, Expose, Type } from 'class-transformer';
 
@@ -48,6 +48,11 @@ export class userDto {
 
   @Expose()
   @IsOptional()
+  @IsDate()
+  registryDate: Date;
+
+  @Expose()
+  @IsOptional()
   @IsString()  
   avatar?:string;
 
@@ -76,6 +81,10 @@ export class CreateUserDto  {
   @IsOptional()
   @IsPhoneNumber('US', { message: 'Invalid US phone number' })
   phone?: string;
+
+  @IsOptional()
+  @IsDate()
+  registryDate: Date;  
 
   @Expose()
   @IsOptional()
