@@ -106,10 +106,11 @@ export class ClientComponent implements OnInit {
             this.toast.showToast('Cliente registrado exitosamente!!', 3000, 'check2-circle', true);
           },
           error: (err) => {
-            let errorMessage = JSON.stringify(err.error.error);
-            if (errorMessage.startsWith('"Error:')) {
+            let errorMessage = err.error;
+            /*if (errorMessage.startsWith('"Error:')) {
               errorMessage = errorMessage.slice(7, errorMessage.length - 1);
-            }
+            }*/
+            errorMessage = errorMessage.toString().slice(0, errorMessage.length - 1);
             this.toast.showToast(errorMessage/*'Error al registar la categoria!!'*/, 3000, 'x-circle', false);
           },
           complete: () => {

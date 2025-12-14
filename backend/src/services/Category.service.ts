@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { EntityCategory } from '../entities/Category.entity';
@@ -33,7 +33,7 @@ export class ServiceCategory {
     });
   }
 
-  async create(category: Partial<CreateCategoryDto>): Promise<CategoryDto | null> {
+  async create(category: Partial<CreateCategoryDto>): Promise<CategoryDto | any> {
     // verificamos que la categoria no se encuentre duplicada
     const existingCategory = await this.categoryRepository.findOne({ where: { name: category.name, enabled: false }  });
 
@@ -50,8 +50,18 @@ export class ServiceCategory {
       return await this.categoryRepository.save(newCategory);
     } catch (e: any) {
       // Postgres
-      if (e.code === '23505') throw new ConflictException('La categoría ya está registrada.');
-      throw e;
+      if (e.code === '23505'){
+        //console.log('if e:'+e);
+        throw new BadRequestException/*ConflictException*/('Error: La categoría ya está registrada.');
+        //throw e;
+        //return { error: 'Error: La categoría ya está registrada.'}
+      }
+      else{
+        //console.log('else e:'+e);
+        throw new BadRequestException(e);
+        //return e;
+      } 
+      
     }
   }
 

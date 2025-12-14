@@ -50,14 +50,14 @@ export class LoginComponent  implements OnInit {
         next: (res) => {
           // Navigate to the home page or any other page after successful login.
           if (res) {
-            console.log('Login successful');
+            //console.log('Login successful');
             this.router.navigate(
                 [this.route.snapshot.queryParams['redirect'] || '/dashboard'],
                 { replaceUrl: true },
               )
               .then(() => {
                 // Handle the navigation
-                console.log('Navigated to dashboard');
+                //console.log('Navigated to dashboard');
               });
           }
         },

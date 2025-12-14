@@ -402,7 +402,7 @@ export class ServiceService {
   async enableDisableInvoiceCreation(enable: string): Promise<{}> {
 
     const finalValue: boolean = enable.toLocaleLowerCase() === 'true';
-    let x: number = 5;
+    let x: number = 15;
     //const schedule = `0 0 6 1 * *`;  // el primero de cada mes a las 6 de la mañana
     const forTesting = `0 */${x} * * * *`;  //cada 10 minutos
 

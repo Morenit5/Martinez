@@ -75,7 +75,8 @@ export class ApiPrefixInterceptor implements HttpInterceptor {
             return this.handle401Error(request, next);
             
           } else{
-            return throwError(() => new Error(error.message)) //throwError(error);
+            console.log(error);
+            return throwError(() => error/*.errormessage*/); //throwError(error);
           }
          
         }),
