@@ -22,8 +22,8 @@ export class CategoryService {
 
   addCategory(category: iCategory): Observable<iCategory> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    let regresa = this.http.post<iCategory>(this.apiUrl, JSON.stringify(category),{ headers });
-    return regresa;
+    return this.http.post<any>(this.apiUrl, JSON.stringify(category),{ headers });
+    
   }
 
   updateCategory(category: iCategory): Observable<iCategory> {

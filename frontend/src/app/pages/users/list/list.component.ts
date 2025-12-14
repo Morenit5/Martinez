@@ -235,14 +235,18 @@ export class ListComponent implements OnInit {
           },
           error: (err) => {
            
-            let errorMessage = JSON.stringify(err.error.error); 
+            let errorMessage = err.error;  
+          console.log(err);    
+
+           errorMessage = errorMessage.toString().slice(7, errorMessage.length - 1);
+            this.toast.showToast(errorMessage/*'Error al registar la categoria!!'*/, 3000, 'x-circle', false);
            
-            if(errorMessage.includes('duplicate key value violates unique constraint')){
+            /*if(errorMessage.includes('duplicate key value violates unique constraint')){
               this.toast.showToast( 'El usuario ya existe, por favor revisa el usuario y correo electrónico!', 3000, 'x-circle', false);
              
             } else {
               this.toast.showToast( errorMessage, 3000, 'x-circle', false);
-            }
+            }*/
            
 
           },

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto, CreateUserLoginDto, UpdateUserDto, userDto } from '../dto/User.dto';
 import { EntityUser } from '../entities/User.entity';
@@ -62,7 +62,7 @@ export class ServiceUser {
     }
 
     //este endpoint es para crear usuario completo con user . clave, permisos etc
-    async createFullUser(user: CreateUserLoginDto): Promise<userDto> {
+    async createFullUser(user: CreateUserLoginDto): Promise<userDto | any> {
 
         //console.log(JSON.stringify(user));
         // verificamos que el usuario no se encuentre duplicado
@@ -75,8 +75,24 @@ export class ServiceUser {
 
         const hash = await this.hashData(user.password);
 
+        try {
         const newUser = this.userRepository.create({ ...user, password: hash });
         return this.userRepository.save(newUser);
+        } catch (e: any) {
+              // Postgres
+              if (e.code === '23505'){
+                console.log('if e:'+e);
+                throw new BadRequestException/*ConflictException*/('Error: El usuario ya está registrado');
+                //throw e;
+                //return { error: 'Error: La categoría ya está registrada.'}
+              }
+              else{
+                console.log('else e:'+e);
+                throw new BadRequestException(e);
+                //return e;
+              } 
+              
+            }
     }
 
     //este endpoint es para crear usuario detalles como el nombre apellidos etc

@@ -131,7 +131,7 @@ export class CategoryComponent {
 
   onPageChange(newPage: number): void {
     this.page = newPage;
-    console.log(this.page);
+   // console.log(this.page);
 
     this.updatePaginatedData();
   }
@@ -150,18 +150,17 @@ export class CategoryComponent {
       if (accion == 'Registrar') {
         this.categoryService.addCategory(this.categoryForm.value).subscribe({
           next: (response) => {
+            
             this.toast.showToast('Categoría registrada exitosamente!!', 3000, 'check2-circle', true);
-            console.log(response);
+           
           },
           error: (err) => {
-            
-            let errorMessage = JSON.stringify(err.error.error);
-            console.log(errorMessage);
-            if (errorMessage.startsWith('"Error:')) {
-              console.log(errorMessage);
-              errorMessage = errorMessage.slice(7, errorMessage.length - 1);
-            }
-            this.toast.showToast(errorMessage/*'Error al registar la categoria!!'*/, 7000, 'x-circle', false);
+           
+            let errorMessage = err.error;
+           
+
+           errorMessage = errorMessage.toString().slice(7, errorMessage.length - 1);
+            this.toast.showToast(errorMessage/*'Error al registar la categoria!!'*/, 3000, 'x-circle', false);
           },
           complete: () => {
             this.onClear();
@@ -186,7 +185,7 @@ export class CategoryComponent {
       }
 
     } else {
-      console.log(this.categoryForm.valid);
+      //console.log(this.categoryForm.valid);
       this.categoryForm.markAllAsTouched();
       this.toast.showToast('Campos inválidos, por favor revise el formulario!!', 3000, 'x-circle', false);
     }
@@ -228,7 +227,7 @@ export class CategoryComponent {
       categoryType: categoryInstance.categoryType
     });
 
-    console.log(categoryInstance);
+    //console.log(categoryInstance);
   }
 
   async deleteCategory(category: iCategory) {

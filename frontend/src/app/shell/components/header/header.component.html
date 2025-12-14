@@ -11,17 +11,17 @@
         <div role="button" (click)="toggleSideMenu()" class="col header_toggle"> <i style="color: #222f04; text-decoration: none;"  class='bi bi-list' id="header-toggle"></i> </div>
       </div>
       <div class="col" id="title">
-        <h2 class="pacifico">Martinez Gardening</h2>
+        <h2 class="pacifico">Mart&iacute;nez Gardening</h2>
       </div>
-      <div class="col d-flex justify-content-end" id="inoutsign">
-        <div ngbDropdown  class="tex dropdown mt-sm-auto ms-auto ms-sm-0 flex-shrink-1 ">
+      <div class="col d-flex justify-content-end" id="inoutsign" >
+        <div ngbDropdown  class="tex dropdown mt-sm-auto ms-auto ms-sm-0 flex-shrink-1 " ngbTooltip="Cerrar sesi&oacute;n">
           <a class="px-sm-0 px-2 nav-link" ngbDropdownToggle id="dropdownUser1" role="button">
            
             <i alt="hugenerd" width="35" height="35"  class="bi bi-door-open-fill rounded-circle"></i>
             <span class="d-none d-sm-inline mx-1">{{currentUser}}</span>
           </a>
-          <div ngbDropdownMenu aria-labelledby="dropdownUser1" class="dropdown-menu ">
-            <a class="dropdown-item" (click)="signOut()">Sign out</a>
+          <div ngbDropdownMenu aria-labelledby="dropdownUser1" class="dropdown-menu hand-cursor-btn">
+            <a class="dropdown-item" (click)="signOut()"  >Cerrar sesi&oacute;n</a>
           </div>
         </div>
       </div>
@@ -38,10 +38,10 @@
   <div class="popper-menu-content" style="width: 150px">
     <ul>
       <li (click)="hide()">
-        <label translate>Profile</label>
+        <label translate>Perfil</label>
       </li>
       <li (click)="hide()" routerLink="/logout">
-        <label translate>Logout</label>
+        <label translate>Cerrar sesi&oacute;n</label>
       </li>
     </ul>
   </div>

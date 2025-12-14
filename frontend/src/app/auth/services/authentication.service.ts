@@ -64,7 +64,7 @@ constructor(private readonly _credentialsService: CredentialsService,private rea
           credentials.firstName = res.userName
 
           if(res.fu == true){
-            this.toast.showToast('Usuario actualizado correctamente, porfavor inicia session con tu nuevo usuario!!', 7000, 'check2-circle', true);
+            this.toast.showToast('Usuario actualizado correctamente, por favor inicia sesión con tu nuevo usuario!!', 3000, 'check2-circle', true);
             setTimeout(() => {
               this.signOutIntialUser();
             }, 3000); 
@@ -90,7 +90,7 @@ refreshToken(): Observable<any> {
     if (!newCredentials.refreshToken) {
       this.logout();
     }
-    console.log('tratando de refrescar el token' );
+    //console.log('tratando de refrescar el token' );
 
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ refreshToken(): Observable<any> {
       }),
 
       tap((response: any) => {
-        console.log('llego al front authentication esto == > ' + response)
+        //console.log('llego al front authentication esto == > ' + response)
         newCredentials.token = response.accessToken;
         newCredentials.refreshToken = response.refreshToken;
 
@@ -170,7 +170,7 @@ refreshToken(): Observable<any> {
 
     return this.http.post<any>(logoutUrl, instanceToPlain(credentials),{ headers }).pipe(
       map(res => {
-        console.log('logout exitoso')
+        //console.log('logout exitoso')
         return of(true);
       }
     ));
