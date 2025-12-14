@@ -207,20 +207,15 @@ export class ToolComponent implements OnInit {
 
      
       if (accion == 'Registrar') {
-         console.log("ENTRA AL METODO ONSUBMIT REGISTRAR: "+ this.toolForm);
+        //console.log("ENTRA AL METODO ONSUBMIT REGISTRAR: "+ this.toolForm);
         this.toolService.addTool(this.toolForm.value).subscribe({
           next: (response) => {
             this.toast.showToast('Herramienta registrada exitosamente!!', 3000, 'check2-circle', true);
             
           },
           error: (err) => {
-            
-            let errorMessage = JSON.stringify(err.error.error);
-            
-            if (errorMessage.startsWith('"Error:')) {
-              
-              errorMessage = errorMessage.slice(7, errorMessage.length - 1);
-            }
+            let errorMessage = err.error;
+            errorMessage = errorMessage.toString().slice(7, errorMessage.length - 1);
             this.toast.showToast(errorMessage, 3000, 'x-circle', false);
           },
           complete: () => {
@@ -247,7 +242,7 @@ export class ToolComponent implements OnInit {
       }
     } else {
       
-       console.log("ENTRA AL ELSE: "+ JSON.stringify(this.toolForm.value));
+      
       this.toolForm.markAllAsTouched();
       this.toast.showToast('Campos inválidos, por favor revise el formulario!!', 3000, 'x-circle', false);
     }

@@ -37,8 +37,7 @@ export class ServiceCategory {
     // verificamos que la categoria no se encuentre duplicada
     const existingCategory = await this.categoryRepository.findOne({ where: { name: category.name, enabled: false }  });
 
-    if(JSON.stringify(existingCategory).length >0 )
-    {
+    if(JSON.stringify(existingCategory).length >0 ) {
       category.categoryId = existingCategory?.categoryId;
       category.enabled= true; // lo habilitamos  
     }
@@ -51,15 +50,12 @@ export class ServiceCategory {
     } catch (e: any) {
       // Postgres
       if (e.code === '23505'){
-        //console.log('if e:'+e);
-        throw new BadRequestException/*ConflictException*/('Error: La categoría ya está registrada.');
-        //throw e;
-        //return { error: 'Error: La categoría ya está registrada.'}
+        throw new BadRequestException('Error: La categoría ya está registrada ');
       }
       else{
-        //console.log('else e:'+e);
+        
         throw new BadRequestException(e);
-        //return e;
+        
       } 
       
     }
