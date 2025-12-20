@@ -22,7 +22,7 @@ export class ConfigurationService {
         } catch (e: any) {
             // Postgres
             if (e.code === '23505'){
-                throw new ConflictException('El correo ya está registrado.');
+                throw new ConflictException('Error al configurar la recurrencia.');
             } else {
                 
                 this.exceptions.sendException(e)
@@ -32,6 +32,12 @@ export class ConfigurationService {
     }
 
     findAll(): Promise<EntityConfiguration[]> {
-        return this.configRepository.find();
+        return this.configRepository.find({
+            select: {
+                configurationId: true,
+                isInvoiceAutomatically: true,
+                
+            },
+        });
     }
 }

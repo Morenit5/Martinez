@@ -44,6 +44,7 @@ export class ConfigurationController {
         let enableOn;
         let enableInvoiceRecurrent;
 
+        //Actualizamos la base de datos
         let confUpdated = await this.confService.create(configuration).then((result: any) => {
             
             return result;
@@ -58,7 +59,7 @@ export class ConfigurationController {
         enableInvoiceRecurrent = entitiyConf.isInvoiceAutomatically;
 
         
-        await this.service.enableDisableInvoiceCreation(enableInvoiceRecurrent.toString());
+        await this.service.enableDisableInvoiceCreation(enableInvoiceRecurrent.toString()); //prendemos el cron job
         
         
         //await this.appService.enableNotifications(enableNotification.toString(), enableOn.toString());

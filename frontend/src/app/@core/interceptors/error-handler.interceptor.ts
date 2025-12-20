@@ -31,29 +31,26 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
         let errorMessage;
+        //console.log('error interceptor ' + JSON.stringify(error))
         switch (error.status) {
-          case 400:
-            errorMessage = `Bad Request: ${error.error.message || error.statusText}`;
-            // this.toastr.error(errorMessage);
-            break;
           case 401:
             if (error.url.endsWith('refresh')) {
               this.authService.logout();
+            }else{
+              errorMessage = error;
             }
             break;
           case 403:
             if (error.url.endsWith('refresh')) {
               this.authService.logout();
+            }else{
+              errorMessage = error;
             }
             break;
-          case 404:
-            errorMessage = `Not Found: ${error.error.message || error.statusText}`;
-            break;
-          case 500:
-             errorMessage = error.error;
-            break;
+          
           default:
-            errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+            //console.log('entro en el default')
+            errorMessage = error;
         }
 
         

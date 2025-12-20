@@ -8,7 +8,7 @@
                 <div ngbAccordion [closeOthers]="true" activeIds="reminder-panel">
                     <div ngbAccordionItem id="reminder-panel" [collapsed]="false">
                         <h2 ngbAccordionHeader>
-                            <button ngbAccordionButton>Autorecurrencia y Recordatorios</button>
+                            <button ngbAccordionButton>Autorecurrencia</button>
                         </h2>
                         <div ngbAccordionCollapse>
                             <div ngbAccordionBody>
@@ -60,14 +60,14 @@
                             </div>
                         </div>
                     </div>
-                    <div *ngIf="showEmailSection==true" ngbAccordionItem>
+                    <!--<div *ngIf="showEmailSection==true" ngbAccordionItem>
                         <h2 ngbAccordionHeader>
                             <button ngbAccordionButton>Correo Electronico</button>
                         </h2>
                         <div ngbAccordionCollapse>
                             <div ngbAccordionBody>
                                 <ng-template>
-                                    <!-- Fila 1 -->
+                                    
                                     <div class="row mb-3">
                                         <div id="Client-Left-Column" class="col-md-6">
                                             <label for="name" class="form-label">Correo*</label>
@@ -78,7 +78,7 @@
                                             <label for="password" class="form-label">Password*</label>
                                             <input type="password" id="password" class="form-control" formControlName="password">
                                     
-                                            <!-- Botón -->
+                                            
                                             <div class="row">
                                                 <div class="col text-end">
                                                     <div class="mt-3 text-end">
@@ -86,13 +86,13 @@
                                                         
                                                     </div>
                                                 </div>
-                                            </div><!--Fin class=row-->
+                                            </div>
                                         </div>
                                     </div>
                                 </ng-template>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                 </div>
                
             </form>
