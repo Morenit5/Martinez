@@ -4,6 +4,7 @@ import { ConfigurationService } from '@app/@core/services/Configuration.service'
 import { EmailService } from '@app/@core/services/Email.service';
 import { ServicesInstances } from '@app/@core/services/Services.service';
 import { ToastUtility } from '@app/@core/utils/toast.utility';
+import { forkJoin, map } from 'rxjs';
 
 
 @Component({
@@ -30,11 +31,11 @@ export class ConfigsComponent implements OnInit {
 
     this.configForm = this.fbTool.group({
       configurationId: [],
-      email: [''],
-      password: [''],
-      enableNotification: [''],
+      //email: [''],
+      //password: [''],
+      //enableNotification: [true],
       isInvoiceAutomatically: [''],
-      enableOnDate: [''],
+      //enableOnDate: [27],
 
     });
     this.initialConfigFormValues = this.configForm.value;
@@ -58,14 +59,14 @@ export class ConfigsComponent implements OnInit {
         if(this.confId != null){
           this.configForm.get('configurationId').setValue(this.confId);
         }
-        this.configForm.get('enableOnDate').setValue(27);
+        //this.configForm.get('enableOnDate').setValue(27);
        
         this.configService.setConfigurations(this.configForm.value).subscribe({
           next: (response) => {
             this.toast.showToast('Configuraciones Actualizadas correctamente!!', 7000, 'check2-circle', true);
           },
           error: (err) => {
-           let errorMessage = JSON.stringify(err.error.error);
+           let errorMessage = JSON.stringify(err.error);
             console.log(errorMessage);
             if (errorMessage.startsWith('"Error:')) {
               console.log(errorMessage);
@@ -94,9 +95,9 @@ export class ConfigsComponent implements OnInit {
 
 
   getAllValues(){
-    this.getConfigStatus();
+    //this.getConfigStatus();
     this.getAutoInvoiceStatus()
-    this.getEmailConfiguration();
+    //this.getEmailConfiguration(); //no tiene caso ir a buscar la config del correo ya q no esta activa en la ui
   } 
 
   getMessage(message: number) {
@@ -108,7 +109,7 @@ export class ConfigsComponent implements OnInit {
     this.recivedTabIndex = message;
   }
 
-  async getConfigStatus() {
+  /*async getConfigStatus() {
 
     //obtenemos el status desde el mail service que es dnd esta 
     //el cronjob en lugar de la base de datos de configurations
@@ -124,27 +125,61 @@ export class ConfigsComponent implements OnInit {
       },
 
     });
-  }
+  }*/
 
-    getAutoInvoiceStatus() {
+  getAutoInvoiceStatus() {
 
     //obtenemos el status desde el Servicio  service que es dnd esta 
     //el cronjob en lugar de la base de datos de configurations
     //para saber el status en tiempo real
-    this.serviceInstance.getAutoInvoiceStatus().subscribe({
-      next: (response) => {
-        console.log('response de automatic service ' + JSON.stringify(response));
-        this.configForm.get('isInvoiceAutomatically').setValue(response.active);
-        
-      },
-      error: (error) => {
-        console.error(error);
-      },
+    const confInRealTime = this.serviceInstance.getAutoInvoiceStatus();
+    const confInDB = this.configService.getConfig();
+    let rtValue;
+    let dbValue;
+    forkJoin([confInRealTime, confInDB])
+      .pipe(
+        // Use the map operator to transform the array result into meaningful properties
+        map(([rtConfig, dbConfig]) => {
+           //console.log(dbConfig)
+          return { rtConfig, dbConfig };
+        })
+      )
+      .subscribe({
+        next: (data) => {
+          // This block executes only after all requests are successful and complete
+          rtValue = data.rtConfig.active;
+          dbValue = data.dbConfig[0].isInvoiceAutomatically;
+          this.confId = data.dbConfig[0].configurationId;
 
-    });
+          if (rtValue == dbValue) {
+            this.configForm.get('configurationId').setValue(data.dbConfig[0].configurationId);
+            this.configForm.get('isInvoiceAutomatically').setValue(dbValue);
+          } else {
+            //esta desfasada la base de datos con los datos de real time asi q hay q actualizar la base de datos
+            this.configForm.get('configurationId').setValue(data.dbConfig[0].configurationId);
+            this.configForm.get('isInvoiceAutomatically').setValue(rtValue);
+            this.configService.setConfigurations(this.configForm.value).subscribe({
+              next: (response) => {
+                this.toast.showToast('Configuraciones Actualizadas correctamente!!', 7000, 'check2-circle', true);
+              },
+              error: (err) => {
+                this.toast.showToast('Error al obtener datos de autorecurrencia', 7000, 'x-circle', false);
+              },
+              complete: () => {
+                this.getAllValues();
+
+              }
+
+            });
+          }
+        },
+        error: (error) => {
+          console.error('One of the requests failed:', error);
+        }
+      })
   }
 
-  getEmailConfiguration() {
+  /*getEmailConfiguration() {
     this.configService.getConfig().subscribe({
       next: (response) => {
         this.configForm.get('configurationId').setValue(response[0].configurationId);
@@ -155,5 +190,5 @@ export class ConfigsComponent implements OnInit {
         console.error(error);
       },
     });
-  }
+  }*/
 }

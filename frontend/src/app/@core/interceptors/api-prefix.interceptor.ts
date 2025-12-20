@@ -70,16 +70,23 @@ export class ApiPrefixInterceptor implements HttpInterceptor {
       const cancelSubject = new Subject<any>();
       this._ongoingRequests.set(requestKey, cancelSubject);
 
-      return next.handle(request).pipe(takeUntil(cancelSubject),catchError((error: HttpErrorResponse) => {
-        if (error.status === 401 || error.status === 403) {
-            return this.handle401Error(request, next);
-            
-          } else{
-            console.log(error);
-            return throwError(() => error/*.errormessage*/); //throwError(error);
-          }
-         
-        }),
+      return next.handle(request).pipe(takeUntil(cancelSubject), catchError((error: HttpErrorResponse) => {
+        if (error && error.status && (error.status === 401 || error.status === 403)) {
+           //console.log('ejecutamos el error de refrescar')
+          return this.handle401Error(request, next);
+
+        } else if (undefined == error || undefined == error.status){
+          //console.log('este es el error ==>' + error)
+          this._credentialsService.setCredentials();
+          this.router.navigate(['/login']).then(() => {
+            window.location.reload();
+          });
+          return throwError(() => error/*.errormessage*/); //throwError(error);
+        } else {
+          //console.log(error);
+          return throwError(() => error/*.errormessage*/); //throwError(error);
+        }
+      }),
         finalize(() => {
           this._ongoingRequests.delete(requestKey);
           cancelSubject.complete();
@@ -121,9 +128,13 @@ export class ApiPrefixInterceptor implements HttpInterceptor {
               },
               error: () => {
                 console.error('Error logging out');
+                this._credentialsService.setCredentials();
+                this.router.navigate(['/login']).then(() => {
+                  window.location.reload();
+                });
               },
             }); // Handle refresh token expiry
-            return throwError(() => new Error(err)) //throwError(err);
+            //return throwError(() => new Error(err)) //throwError(err);
           }
           return throwError(() => new Error(err))
           

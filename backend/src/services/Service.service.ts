@@ -32,16 +32,7 @@ export class ServiceService {
       console.log('Configurations:  '+ JSON.stringify(Configurations));
       for(const config of Configurations ){
         if(config.isInvoiceAutomatically == true || config.isInvoiceAutomatically == 'true' ){
-          
-          //if (this.cronJob && !this.cronJob.isActive ) {
-          //this.cronJob.start();
-          
-          console.log('ya fue activado el cron job para crear las nuevas facturas');
-
           this.enableDisableInvoiceCreation('true'); 
-           //console.log('se inicializo la auto generacion de invoices')
-        //}
-          
         }
       }
      }).catch((error: any) => {
@@ -349,7 +340,7 @@ export class ServiceService {
 
       }],
     }).then((result: any) => {
-      console.log('RESULT SERVICE: '+JSON.stringify(result));
+      console.log('Todos los servicos recurrentes activos: '+JSON.stringify(result));
       return result; // tal vez debamos manipular estos datos antes de mandar al front
     }).catch((error: any) => {
       this.exceptions.sendException(error);
@@ -365,8 +356,13 @@ export class ServiceService {
 
   async update(serviceId: number, entity: UpdateServiceDto): Promise<ServiceDto | null> {
     
-
-     await this.serviceRepository.save(entity);
+    entity.serviceDetail = entity.serviceDetail!.map((child) => {
+      if (!child.id) {
+        delete child.serviceDetailsId;
+      }
+      return child;
+    });
+    await this.serviceRepository.save(entity);
     return this.serviceRepository.findOneBy({ serviceId })
     
   }
@@ -411,7 +407,7 @@ export class ServiceService {
         this.cronJob = new CronJob(forTesting, async () => {
           try {
             await this.updateServiceInvoice();
-            console.log('Factura creada correctamente')
+            
           } catch (e) {
             console.error(e);
           }
@@ -479,11 +475,14 @@ export class ServiceService {
 
     for(const serviceInst of serviceList ){
 
-      console.log('SERVICE ID: '+ serviceInst.serviceId + ' INVOICE DATE: ' +invoiceDate);
+      
       //revisar si existe la factura del mes, sino, crearla
       let existsInvoice = await this.findInvoiceByMonth(serviceInst.serviceId, invoiceDate);
-      console.log('ENCUENTRA ' + JSON.stringify(existsInvoice));
-
+      
+      if(existsInvoice && existsInvoice.exists == true){
+        console.log('La factura para service id: '+ serviceInst.serviceId + ' con  invoice date: ' +invoiceDate + ' ya existe, no hay nada que generar');
+      }
+      
       if (existsInvoice && existsInvoice.exists == false) {
         await this.createAutomaticNewInvoice(serviceInst);
       }      
@@ -527,7 +526,8 @@ export class ServiceService {
     invoice.service.serviceId= serviceId;*/
 
     let variable : number=service.serviceId;
-     await this.invoiceRepository.save(invoiceItem);
+    await this.invoiceRepository.save(invoiceItem);
+    console.log('Factura automatica creada correctamente..')
     return this.serviceRepository.findOneBy({ serviceId: variable })
 
     //return this.serviceRepository.save(serviceUp);

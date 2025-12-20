@@ -72,7 +72,7 @@ export class ServiceComponent implements OnInit {
   services: ServiceEntity[] = [];// se crea un array vacio de la interfaz
   paginatedServices: ServiceEntity[] = [];
   page = 1; // Página actual
-  pageSize = 2; // Elementos por página
+  pageSize = 7; // Elementos por página
   collectionSize = 0; // Total de registros
   totalPages = 0;
   currentPage = 1;
@@ -804,9 +804,8 @@ export class ServiceComponent implements OnInit {
       } else if (action == 'Actualizar') {
 
         this.serviceForm.get('price').setValue(this.totalPrice); // totalPrice contiene la sumatoria del total de la factura
-        //this.serviceForm.removeControl('invoice');
-
-
+        this.serviceForm.removeControl('invoice');
+        
         this.serviceInstance.updateService(this.serviceForm.value).subscribe({
           next: (response) => {
             this.toast.showToast('Servicio actualizado exitosamente!!', 3000, 'check2-circle', true);
@@ -1258,29 +1257,29 @@ export class ServiceComponent implements OnInit {
     this.serviceForm.get('serviceName').setValue('Servicio');
     this.serviceForm.get('client.clientId').setValue(entity.client.clientId);
 
-    const months = [
+    /*const months = [
       'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
       'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
-    ];
+    ];*/
 
     const fullNameMonths = [
       'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
       'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
     ];
 
-    const currentMonth = months[currentDate.getMonth()];
+    //const currentMonth = months[currentDate.getMonth()];
     const currentFullMonth = fullNameMonths[currentDate.getMonth()];
     
-    let invoiceDate = currentDate.getFullYear()+'-'+ currentDate.getMonth()+1;
+    let cMonth = currentDate.getMonth()+1;
+    let invoiceDate = currentDate.getFullYear() + '-' + cMonth;
 
     if (this.serviceForm.valid) {
 
       // verificamos si existe factura en el mes actual
       let servId: number = entity.serviceId;
-      let exists: any = this.serviceInstance.getInvoicesXMonth(servId, invoiceDate).subscribe({
+      
+      this.serviceInstance.getInvoicesXMonth(servId, invoiceDate).subscribe({
         next: (invoiceExists) => {
-
-          /**/
 
           if (invoiceExists.exists == true || invoiceExists.exists == 'true') {
 
@@ -1289,7 +1288,7 @@ export class ServiceComponent implements OnInit {
             
             return;
           } else {
-
+            
             const success = this.createDefaultInvoiceFormGroup(currentDateFormatted); //agregamos el default invoice a la serviceForm
             if (success) {
               this.createDefaultPaymentItemFormGroup(currentDateFormatted); //agregamos el default payment al invoiceGroup q acabamos de agregar
@@ -1318,15 +1317,12 @@ export class ServiceComponent implements OnInit {
               },
               complete: () => {
                 this.onCancel();
-                this.getAllServicesIntances();
+                this.getAllServicesIntancesBy(this.clientesFijos); 
                 this.initialServiceForm();
               }
-            });
+            }); 
           }// termino else
-          /**/
-
-        
-          return exists;
+           
         },
         error: (error) => {
           console.error(error);
@@ -1334,7 +1330,7 @@ export class ServiceComponent implements OnInit {
         },
         complete: () => {
           this.onCancel();
-          this.getAllServicesIntances();
+          this.getAllServicesIntancesBy(this.clientesFijos); // de entrada traemos clientes fijos solamente
           this.initialServiceForm();
         }
       });
