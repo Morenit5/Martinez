@@ -356,12 +356,15 @@ export class ServiceService {
 
   async update(serviceId: number, entity: UpdateServiceDto): Promise<ServiceDto | null> {
     
-    entity.serviceDetail = entity.serviceDetail!.map((child) => {
+    if(entity && entity.serviceDetail){
+      entity.serviceDetail = entity.serviceDetail.map((child) => {
       if (!child.id) {
         delete child.serviceDetailsId;
       }
       return child;
     });
+    }
+
     await this.serviceRepository.save(entity);
     return this.serviceRepository.findOneBy({ serviceId })
     
