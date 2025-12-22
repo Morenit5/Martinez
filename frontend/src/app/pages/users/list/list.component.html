@@ -12,6 +12,7 @@
               <th>Nombre</th>
               <th>Correo Electr&oacute;nico</th>
               <th>Tel&eacute;fono</th>
+              <th>Rol</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -30,10 +31,11 @@
               </td>
               <td>{{ user.email }}</td>
               <td>{{ user.phone }}</td>
+              <td>{{ user.rol.name}}</td>
               <td style="width: 8%; text-align: center; ">
                 <button class="btn btn-sm btn-outline-info" (click)="updateUser(user)" ngbTooltip="Actualizar Usuario"><i class="bi bi-pencil-fill"></i>
                 </button>
-                <button  class="btn btn-sm btn-outline-danger" (click)="deleteUser(user)" ngbTooltip="Eliminar Usuario"><i class="bi bi-trash-fill"></i>
+                <button  class="btn btn-sm btn-outline-danger" *ngIf="user.userId != '1' "  (click)="deleteUser(user)" ngbTooltip="Eliminar Usuario"><i class="bi bi-trash-fill"></i>
                 </button></td>
             </tr>
             }

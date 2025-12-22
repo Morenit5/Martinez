@@ -155,8 +155,13 @@ export class CategoryComponent {
            
           },
           error: (err) => {
-           
-            let errorMessage = err.error;
+            let errorMessage;
+            if (err.error.error) {
+              errorMessage = err.error.error;
+            }
+            else {
+              errorMessage = err;
+            }
            
 
            errorMessage = errorMessage.toString().slice(7, errorMessage.length - 1);

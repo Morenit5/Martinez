@@ -135,7 +135,7 @@ export class InvoceComponent {
         if (this.mesToGet != undefined) {
           this.toast.showToastWarning('No se encontraron facturas del mes ' + this.entitiyToGet, 5000, 'x-circle');
         } else {
-          this.toast.showToastWarning('No se encontraron facturas del Usuario ' + this.entitiyToGet, 5000, 'x-circle');
+          this.toast.showToastWarning('No se encontraron facturas del cliente ' + this.entitiyToGet, 5000, 'x-circle');
         }
 
       }

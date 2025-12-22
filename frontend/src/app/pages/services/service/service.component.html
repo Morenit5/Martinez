@@ -79,7 +79,7 @@
                     </ng-container>
                     
                     <ng-template #EsRecurrente>
-                      <button *ngIf="isRecurrencyEnabled==false"  class="btn btn-sm btn-outline-success" (click)="regenerarFacturaRecurrente(parentItem)" ngbTooltip="Renovar Servicio"><i class="bi bi-arrow-repeat"></i></button>
+                      <button *ngIf="isRecurrencyEnabled==false"  class="btn btn-sm btn-outline-success" (click)="regenerarFacturaRecurrente(parentItem)" ngbTooltip="Renovar Servicio Recurrente"><i class="bi bi-arrow-repeat"></i></button>
                       <button class="btn btn-sm btn-outline-primary" (click)="updateServiceDetail(parentItem)" ngbTooltip="Actualizar Servicio"><i class="bi bi-pencil"></i></button>
                       <!--<button class="btn btn-sm btn-outline-danger " (click)="deleteServiceDetail(parentItem)" ngbTooltip="Eliminar Servicio"><i class="bi bi-trash"></i></button>-->
                       <button class="btn btn-sm btn-outline-danger " (click)="preguntarEliminar(parentItem)" ngbTooltip="¿Desea eliminar este servicio?"><i class="bi bi-trash"></i></button>  
@@ -279,7 +279,7 @@
               <div class="input-group-append">
                 <div class="text-end">
                   <button [disabled]="disableDetailsButton()" type="button" class="btn btn-sm btn-outline-info" (click)="onAddDetails()">Agregar Tarea</button>
-                  <button type="submit" form="serviceFormId" class="btn btn-sm btn-outline-primary">{{serviceButton}}</button>
+                  <button type="submit" form="serviceFormId" class="btn btn-sm btn-outline-primary" [disabled]="isUpdateBtnDisabled">{{serviceButton}}</button>
                   <button type="button" class="btn btn-sm btn-outline-danger" (click)="onCancel()">Cancelar</button>
                 </div>
               </div>
@@ -433,7 +433,7 @@
                           
                               <button *ngIf="!childInvoice.payment[0].isServicePaid" class="btn btn-sm btn-outline-success" (click)="onPaymentSubmit(parentItem,i)" ngbTooltip="Confirmar Pago"><i class="bi bi-currency-dollar"></i></button>
                               <button *ngIf="childInvoice.payment[0].isServicePaid" class="btn btn-sm btn-outline-primary" (click)="generateInvoice(parentItem, i)" ngbTooltip="Generar Factura"><i class="bi bi-receipt-cutoff"></i></button>
-                              <button *ngIf="childInvoice.payment[0].isServicePaid && childInvoice.isGenerated" class="btn btn-sm btn-outline-info" (click)="updateSendMailAndCloseStatus(parentItem,i)"
+                              <button *ngIf="childInvoice.payment[0].isServicePaid && childInvoice.isGenerated" [disabled]="displayBtnSendEmail" class="btn btn-sm btn-outline-info" (click)="updateSendMailAndCloseStatus(parentItem,i)"
                                 ngbTooltip="Enviar Correo y Cerrar Servicio"><i class="bi bi-envelope-at"></i></button>
                           
                             </div>
