@@ -40,8 +40,8 @@ export class ServiceComponent implements OnInit {
 
 
   cliente;
-
-  valueSubscription: Subscription;
+  isUpdateBtnDisabled:boolean= false;
+    valueSubscription: Subscription;
 
   isLoading = false;
   isUpdating = false; // bandera para saber cuando el servicio esta actualizando
@@ -146,6 +146,7 @@ export class ServiceComponent implements OnInit {
   // VARIABLES
   showToastWarning = false;
   toastWarningMessage = '';
+  displayBtnSendEmail: boolean= false;
 
   constructor(private toast: ToastUtility, private readonly serviceInstance: ServicesInstances, private readonly invoiceInstance: InvoiceInstances,
     private readonly clientInstance: ClientInstances, http: HttpClient, private serviceFrm: FormBuilder, @Inject(LOCALE_ID) private locale: string) {
@@ -477,7 +478,7 @@ export class ServiceComponent implements OnInit {
 
 
   async updateSendMailAndCloseStatus(service: ServiceEntity, invoiceIndex: number) {
-
+  this.displayBtnSendEmail = true;
 
     if (service.status == Status.Recurrente) {
       this.updateRecurrenteChildInvoiceStatusGenerated(service, invoiceIndex, null, true);
@@ -557,7 +558,7 @@ export class ServiceComponent implements OnInit {
         this.toast.showToast('Error al enviar el correo ', 3000, 'check2-square', true);
       },
       complete: () => {
-        
+        this.displayBtnSendEmail = false;
         this.getAllServicesIntances(); //Traemos todas las intances  
 
       }
@@ -1066,6 +1067,7 @@ export class ServiceComponent implements OnInit {
 
     //agregamos los details a la UI
     this.serviceDetails.push(servDetail);
+    this.isUpdateBtnDisabled=false; //deshabilitamos el botón
   }
 
   private calculateTotal(itemPrice: string) {
@@ -1079,6 +1081,7 @@ export class ServiceComponent implements OnInit {
   }
 
   onEditDetails(servDetail: ServiceDetailEntity, entityIndex: number) {
+    this.isUpdateBtnDisabled=true; //deshabilitamos el botón
     //cleanup UI for next service details
     this.serviceType = servDetail.serviceType;
     this.quantity = servDetail.quantity;
@@ -1170,7 +1173,7 @@ export class ServiceComponent implements OnInit {
           this.paginatedServices = this.serviceList.slice(0, this.pageSize);
 
         } else {
-          this.toast.showToastWarning('No se encontraron Pagos para ese nombre o servicio', 5000, 'x-circle');
+          this.toast.showToastWarning('No se encontraron Pagos para ese servicio', 5000, 'x-circle');
         }
 
       }
