@@ -1,7 +1,7 @@
-import { Component, ElementRef, inject, OnInit, SecurityContext, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UseRandomUser } from '@core/usecases';
 import { RandomUserEntity } from '@core/entities';
-import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastUtility } from '@app/@core/utils/toast.utility';
 import { RolEntity, UserEntity } from '@app/@core/entities/User.entity';
 import { RolesInstances, UsersInstances } from '@app/@core/services/Users.service';
@@ -236,7 +236,7 @@ export class ListComponent implements OnInit {
           error: (err) => {
            
             let errorMessage = err.error;  
-          console.log(err);    
+          //console.log(err);    
 
            errorMessage = errorMessage.toString().slice(7, errorMessage.length - 1);
             this.toast.showToast(errorMessage/*'Error al registar la categoria!!'*/, 3000, 'x-circle', false);
@@ -333,7 +333,7 @@ export class ListComponent implements OnInit {
       result = this.userInstances.getUserAvatar(avatarName);
 
     } catch (error) {
-      console.log(error);
+      //console.log(error);
     }
     return result;
   }
@@ -403,7 +403,7 @@ export class ListComponent implements OnInit {
   onPageChange(newPage: number): void {
     //console.log('AQUI ENTRA');
     this.page = newPage;
-    console.log(this.page);
+    //console.log(this.page);
     this.updatePaginatedData();
   }
   /*FIN METODOS DE PAGINACION*/

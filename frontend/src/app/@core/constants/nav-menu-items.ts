@@ -1,5 +1,5 @@
 import { ROLE } from '../../auth/enums/roles.enum';
-import { PERMISSIONS } from '../../auth/enums/permissions.enum';
+//import { PERMISSIONS } from '../../auth/enums/permissions.enum';
 import { NavMenuItem } from '@core/interfaces';
 
 // THIS FILE CONTAINS THE NAVIGATION MENU ITEMS FOR THE SIDEBAR AND ALL OTHER NAVIGATION MENUS WHICH ARE USED IN THE APPLICATION AND ARE CONSTANT

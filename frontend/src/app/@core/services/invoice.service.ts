@@ -55,7 +55,7 @@ export class InvoiceService {
           let params = new HttpParams();
           params = params.set('efectivo', esCash);
           
-          console.log('vamos a llamar esto' + esCash)
+          //console.log('vamos a llamar esto' + esCash)
           return this.http.get<any>(serviceUrl + '/cash',{ params: params });
           //.subscribe(data => { console.log(data); });
       }

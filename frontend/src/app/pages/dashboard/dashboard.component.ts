@@ -125,7 +125,7 @@ export class DashboardComponent implements OnInit {
     this.serviceInstance.getAllEnabled().subscribe({
       next: (servList) => {
         this.serviceList = servList;
-        console.log('ServiceList: '+this.serviceList[0].serviceName);
+        //console.log('ServiceList: '+this.serviceList[0].serviceName);
       },
       error: (error) => {
         console.error(error);

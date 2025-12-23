@@ -3,7 +3,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { environment } from '@env/environment';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { filter } from 'rxjs/operators';
-import { NavMode, ShellService } from '@app/shell/services/shell.service';
+import { ShellService } from '@app/shell/services/shell.service';
 import { webSidebarMenuItems } from '@core/constants';
 import { CredentialsService } from '@auth';
 import { NavMenuItem } from '@core/interfaces';

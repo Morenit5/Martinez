@@ -45,7 +45,7 @@ export class PaymentService {
   }*/
 
   add(payment: PaymentEntity): Observable<PaymentEntity> {
-    console.log('PAYMENT ' + JSON.stringify(payment));
+    //console.log('PAYMENT ' + JSON.stringify(payment));
 
     let regresa = this.http.post<PaymentEntity>(this.apiUrl, JSON.stringify(payment));
     //console.log('REGRESA '+regresa);

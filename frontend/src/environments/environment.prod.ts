@@ -6,6 +6,7 @@ export const environment = {
   defaultLanguage: 'en-US',
   supportedLanguages: ['en-US', 'es-ES'],
 
-  apiUrl: 'http://192.168.0.158:3001/api/v1',
+  apiUrl:'https://martinez-sq7g.onrender.com/api/v1',
+  //apiUrl: 'http://192.168.0.158:3001/api/v1',
 
 };

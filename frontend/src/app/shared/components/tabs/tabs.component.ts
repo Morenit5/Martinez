@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, NgModule, OnInit, Output, SimpleChanges } from '@angular/core';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
-import { CommonModule, NgFor } from '@angular/common';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'tabs',
