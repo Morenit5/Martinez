@@ -1,6 +1,6 @@
 import { formatDate } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, Inject, LOCALE_ID, OnInit, provideExperimentalZonelessChangeDetection } from '@angular/core';
+import { Component, Inject, LOCALE_ID, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ClientEntity } from '@app/@core/entities/Client.entity';
 import { ServiceEntity, ServiceDetailEntity } from '@app/@core/entities/Service.entity';
@@ -14,7 +14,7 @@ import { NgbDateAdapter, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
 import { Subscription } from 'rxjs';
 import { InvoiceEntity } from '@app/@core/entities/Invoice.entity';
-import { PaymentEntity } from '@app/@core/entities/Payment.entity';
+//import { PaymentEntity } from '@app/@core/entities/Payment.entity';
 
 enum Status {
   EnProceso = "En_Proceso",
@@ -329,7 +329,7 @@ export class ServiceComponent implements OnInit {
       return true;
 
     } catch (error) {
-      console.log('ERROR:' + error);
+      //console.log('ERROR:' + error);
       return false;
     }
   }
@@ -441,7 +441,7 @@ export class ServiceComponent implements OnInit {
       }
 
     } catch (error) {
-      console.log(error);
+      //console.log(error);
     }
 
 
@@ -501,7 +501,7 @@ export class ServiceComponent implements OnInit {
       this.serviceInstance.addService(this.invoiceUpdateform.value).subscribe({
         next: (response) => { },
         error: (err) => {
-          console.log(err);
+          //console.log(err);
           this.toast.showToast('Error al enviar el correo!!', 3000, 'x-circle', false);
         },
         complete: () => {
@@ -793,7 +793,7 @@ export class ServiceComponent implements OnInit {
             this.toast.showToast('Servicio creado exitosamente!!', 3000, 'check2-circle', true);
           },
           error: (err) => {
-            console.log(err);
+            //console.log(err);
             this.toast.showToast('Error crear el servicio!!', 3000, 'x-circle', false);
           },
           complete: () => {
@@ -873,7 +873,7 @@ export class ServiceComponent implements OnInit {
           this.toast.showToast('Pago generado exitosamente!!', 3000, 'check2-circle', true);
         },
         error: (err) => {
-          console.log(err);
+          //console.log(err);
           this.toast.showToast('Error al generar el Pago!!', 3000, 'x-circle', false);
         },
         complete: () => {

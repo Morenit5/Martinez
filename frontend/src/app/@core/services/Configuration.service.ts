@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ServiceEntity } from '../entities/Service.entity';
+//import { ServiceEntity } from '../entities/Service.entity';
 import { environment } from '@env/environment';
 import { ConfigurationEntity } from '../entities/Configuration.entity';
 
@@ -29,10 +29,10 @@ export class ConfigurationService {
     }
 
     addConfiguration(configuration: ConfigurationEntity): Observable<ConfigurationEntity> {
-        console.log('Email.service: ' + JSON.stringify(configuration));
+        //console.log('Email.service: ' + JSON.stringify(configuration));
         const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
         let regresa = this.http.post<ConfigurationEntity>(this.configUrl, JSON.stringify(configuration), { headers });
-        console.log('Email.service front: ' + regresa);
+        //console.log('Email.service front: ' + regresa);
         return regresa;
     }
 

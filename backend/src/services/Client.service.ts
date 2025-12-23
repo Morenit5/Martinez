@@ -33,7 +33,7 @@ export class ServiceClient {
   }
 
   findAllWithServices(): Promise<ClientDto[]> {
-   console.log('se ejecuto 1')
+   //console.log('se ejecuto 1')
     var users=  this.clientRepository.find({ 
       relations: {
         service: true,
@@ -49,7 +49,7 @@ export class ServiceClient {
 
 
   findOneWithServices(clientId: number): Promise<ClientDto|null> {
-     console.log('se ejecuto 2')
+     //console.log('se ejecuto 2')
      var user =  this.clientRepository.find({ 
       where: { clientId: clientId },
       relations: {

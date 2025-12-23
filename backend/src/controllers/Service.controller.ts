@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param,  HttpException, HttpStatus,  Put, Query, ConsoleLogger, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param,  HttpException, HttpStatus,  Put, Query, Res, UseGuards } from '@nestjs/common';
 import { ServiceService} from '../services/Service.service';
 import { TypeORMExceptions } from '../exceptions/TypeORMExceptions';
 import { CreateServiceDto, ServiceDto, UpdateServiceDto } from '../dto/Service.dto';
@@ -138,7 +138,7 @@ export class  ControllerService {
 
     await this.serviceService.generateInvoice(+id, this.updateService)
       .then((result: any) => {
-        console.log("Result:", result);
+        //console.log("Result:", result);
         return result;
       }).catch((error: any) => {
         this.exceptions.sendException(error);

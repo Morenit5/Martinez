@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CategoryEntity } from '@app/@core/entities/Category.entity';
 import { iCategory } from '@app/@core/interfaces/Category.interface';
@@ -131,8 +131,6 @@ export class CategoryComponent {
 
   onPageChange(newPage: number): void {
     this.page = newPage;
-   // console.log(this.page);
-
     this.updatePaginatedData();
   }
   /*FIN METODOS DE PAGINACION*/
@@ -190,7 +188,7 @@ export class CategoryComponent {
       }
 
     } else {
-      //console.log(this.categoryForm.valid);
+      
       this.categoryForm.markAllAsTouched();
       this.toast.showToast('Campos inválidos, por favor revise el formulario!!', 3000, 'x-circle', false);
     }

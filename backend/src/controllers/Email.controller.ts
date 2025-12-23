@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Post, Query, Res, UseGuards } from '@nestjs/common';
 import { EmailService } from 'src/services/Email.service';
 import { Response } from 'express';
 import { ServiceDto } from 'src/dto/Service.dto';
@@ -85,7 +85,7 @@ export class EmailController {
 
     return await this.appService.create(this.createConfig)
       .then((result: any) => {
-        console.log("Result:", result);
+        //console.log("Result:", result);
         return result;
       }).catch((error: any) => {
        

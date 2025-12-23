@@ -1,4 +1,4 @@
-import { InvoiceDetailsEntity } from "./InvoiceDetails.entity";
+//import { InvoiceDetailsEntity } from "./InvoiceDetails.entity";
 import { PaymentEntity } from "./Payment.entity";
 import { ServiceEntity } from "./Service.entity";
 

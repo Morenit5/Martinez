@@ -66,15 +66,15 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
  async configInit()  {
    await this.findConfigVariables();
     
-   console.log(this.emailConfig + ' ' + this.passConfig);
+   //console.log(this.emailConfig + ' ' + this.passConfig);
     this.transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',  // tu servidor SMTP
       port: 587,
       encryption: 'TLS',
       secure: false,
       auth: {
-        user: this.emailConfig,//'francisco.usa.227@gmail.com', //  Poner correo válido
-        pass: this.passConfig,//'xmwzwuxotnqpvmjp',     //  Contraseña de aplicación
+        user: this.emailConfig, //  Poner correo válido
+        pass: this.passConfig,      //  Contraseña de aplicación
       },
     });
   }
@@ -93,7 +93,7 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
         this.cronJob = new CronJob(schedule/*forTesting*/, async () => {
           try {
             await this.checkUnpaidServices();
-            console.log('Correos aparentemente enviados correctamente')
+            //console.log('Correos aparentemente enviados correctamente')
           } catch (e) {
             console.error(e);
           }
@@ -103,7 +103,7 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
       if (finalValue == true) {
         if (!this.cronJob.isActive) {
           this.cronJob.start();
-          console.log('ya fue activado el cron job para recordatorio de correos')
+          //console.log('ya fue activado el cron job para recordatorio de correos')
         }
       }
       if (finalValue == false) {
@@ -117,7 +117,7 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
   }
 
   getNotificationStatus():{} {
-    console.log('llegamos al service job notification')
+    //console.log('llegamos al service job notification')
     let resp:{active:boolean, notifyOnDate:any} = {active:false, notifyOnDate:''};
     if(this.cronJob == undefined || this.cronJob == null){return resp;}
     
@@ -129,7 +129,7 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
        resp = {active:false, notifyOnDate:''};
     }
 
-     console.log('el job del service esta activo')
+     //console.log('el job del service esta activo')
     return resp;
   }
 
@@ -182,8 +182,8 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
   async sendReminderMail(emailList:string[] = [] ) {
      const body = EmailReminderOptions.html1 + EmailReminderOptions.html2 + EmailReminderOptions.html3 + EmailReminderOptions.html4 + EmailReminderOptions.html5;
       await this.transporter.sendMail({
-        from: 'francisco.usa.227@gmail.com',
-        to: 'francisco.usa.227@gmail.com',
+        from: this.emailConfig, 
+        to: this.emailConfig, 
         bcc: emailList,
         subject: EmailReminderOptions.subject,
         html: body,
@@ -206,7 +206,7 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
     try {
       await this.getClientInvoice(invoiceName);
     } catch (error: unknown) {
-      console.log(error)
+      //console.log(error)
       if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
 
         return { message: 'No se encontro la factura, favor de volver a generarla' };
@@ -217,10 +217,11 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
     }
 
     const info = await this.transporter.sendMail({
-      from: 'francisco.usa.227@gmail.com',
+      from: this.emailConfig,
       to: entity.client.email,
       subject: EmailOptions.subject,
       //text: EmailOptions.text,
+      bcc: this.emailConfig,
       html: EmailOptions.html + EmailOptions.greetings + EmailOptions.signature,
       attachments: [
         {

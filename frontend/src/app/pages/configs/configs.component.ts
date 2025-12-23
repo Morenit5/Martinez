@@ -80,7 +80,7 @@ export class ConfigsComponent implements OnInit {
             this.toast.showToast(errorMessage, 3000, 'x-circle', false);
           },
           complete: () => {
-            console.log('Completamos la acción, ahora vamos a traer datos')
+            //console.log('Completamos la acción, ahora vamos a traer datos')
             this.getAllValues();
 
           }
