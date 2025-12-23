@@ -23,13 +23,13 @@ export class ServiceService {
               @InjectRepository(EntityInvoice) private invoiceRepository: Repository<EntityInvoice>,
                private readonly exceptions: TypeORMExceptions) { 
    
-    console.log('Llegando al constructor');
+    //console.log('Llegando al constructor');
     this.configurationRepository.find({ 
       where: [{ 
         enabled: true,
       } ],
     }).then((Configurations : any) => {
-      console.log('Configurations:  '+ JSON.stringify(Configurations));
+      //console.log('Configurations:  '+ JSON.stringify(Configurations));
       for(const config of Configurations ){
         if(config.isInvoiceAutomatically == true || config.isInvoiceAutomatically == 'true' ){
           this.enableDisableInvoiceCreation('true'); 
@@ -340,7 +340,7 @@ export class ServiceService {
 
       }],
     }).then((result: any) => {
-      console.log('Todos los servicos recurrentes activos: '+JSON.stringify(result));
+      //console.log('Todos los servicos recurrentes activos: '+JSON.stringify(result));
       return result; // tal vez debamos manipular estos datos antes de mandar al front
     }).catch((error: any) => {
       this.exceptions.sendException(error);
@@ -402,12 +402,12 @@ export class ServiceService {
 
     const finalValue: boolean = enable.toLocaleLowerCase() === 'true';
     let x: number = 15;
-    //const schedule = `0 0 6 1 * *`;  // el primero de cada mes a las 6 de la mañana
+    const schedule = `0 0 6 1 * *`;  // el primero de cada mes a las 6 de la mañana
     const forTesting = `0 */${x} * * * *`;  //cada 10 minutos
 
     try {
       if (this.cronJob == null || this.cronJob == undefined) {
-        this.cronJob = new CronJob(forTesting, async () => {
+        this.cronJob = new CronJob(schedule, async () => {
           try {
             await this.updateServiceInvoice();
             
@@ -421,12 +421,12 @@ export class ServiceService {
         if (!this.cronJob.isActive) {
           this.cronJob.start();
 
-          console.log('ya fue activado el cron job para crear las nuevas facturas')
+          //console.log('ya fue activado el cron job para crear las nuevas facturas')
         }
       }
       if (finalValue == false) {
         this.cronJob.stop();
-        console.log('ya fue desactivado el cron job para no crear nuevas facturas')
+        //console.log('ya fue desactivado el cron job para no crear nuevas facturas')
       }
 
       let configs: createConfigurationDto;// = new createConfigurationDto();

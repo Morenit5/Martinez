@@ -28,7 +28,7 @@ export class DbUtilService_Cls {
         this.databaseMigrations = [this.migrationFolder + "/*.ts"]
 
         if(undefined == this.hostname || undefined == this.username || undefined == this.password || undefined == this.databasename){
-            console.log('something is wrong with the database config');
+            //console.log('something is wrong with the database config');
             exit(1);
         }
     }

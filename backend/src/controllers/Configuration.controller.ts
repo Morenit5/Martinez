@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get,  Post, Query, Res, UseGuards } from '@nestjs/common';
 import { EmailService } from 'src/services/Email.service';
 import { Response } from 'express';
 import { EntityConfiguration } from 'src/entities/Configuration.entity';

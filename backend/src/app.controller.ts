@@ -15,7 +15,7 @@ export class AppController {
  
   @Post('/login')
   async login(@Request() req) {
-    console.log('llega en el AppController')
+    //console.log('llega en el AppController')
     return this.authService.signIn(req.user);
   }
 

@@ -14,7 +14,7 @@ import { jwtConstants } from '../constants';
 export class LocalStrategy extends  PassportStrategy( Strategy,'local') {
 
     constructor() {
-      console.log('la estrategia fue generada')
+      //console.log('la estrategia fue generada')
       super({
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
         ignoreExpiration: false,
@@ -24,7 +24,7 @@ export class LocalStrategy extends  PassportStrategy( Strategy,'local') {
     }
 
   async validate(req: Request, payload: any) {
-    console.log('llamamos al validate del jwt-refresh')
+    //console.log('llamamos al validate del jwt-refresh')
     let auth = req.get('Authorization');
     const refreshToken = auth?.replace('Bearer', '').trim();
     return { ...payload, refreshToken };

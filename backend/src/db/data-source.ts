@@ -30,7 +30,7 @@ function postgresFactory(dbUtil: DbUtilService_Cls) {
 
         poolErrorHandler: async (err) => {
           const reconnection = setInterval(async () => {
-            console.log('Retrying connection...');
+            //console.log('Retrying connection...');
             const connection = new DataSource({
               type: 'postgres',
               host: dbUtil.getHost(),

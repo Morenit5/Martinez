@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Param, Delete, HttpException, HttpStatus, Put, UploadedFile, UseInterceptors, ParseFilePipeBuilder, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Res, UseGuards } from '@nestjs/common';
-import { CreateUserDto, CreateUserLoginDto, UpdateUserDto, userDto } from '../dto/User.dto';
+import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, Put, UploadedFile, UseInterceptors, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Res, UseGuards } from '@nestjs/common';
+import { CreateUserLoginDto, UpdateUserDto, userDto } from '../dto/User.dto';
 import { TypeORMExceptions } from '../exceptions/TypeORMExceptions';
 import { ServiceUser } from '../services/User.service';
 import { Serializer } from 'src/interceptors/UserTransform.interceptor';
@@ -111,7 +111,7 @@ export class ControllerUser {
       });
       return resp;
     } catch (error) {
-      console.error('An error occurred during async upload: ', error);
+      //console.error('An error occurred during async upload: ', error);
       throw error; // Re-throw to propagate the error
     }
   }
