@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Param, Delete, Put, HttpException, HttpStatus, Patch, UseGuards } from '@nestjs/common';
 import { ServiceCategory } from 'src/services/Category.service';
-import { EntityCategory } from 'src/entities/Category.entity';
+//import { EntityCategory } from 'src/entities/Category.entity';
 import { TypeORMExceptions } from 'src/exceptions/TypeORMExceptions';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CategoryDto, CreateCategoryDto, UpdateCategoryDto } from 'src/dto/Category.dto';

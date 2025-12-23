@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Body, Param, Delete, HttpException, HttpStatus, Put, UseGuards } from '@nestjs/common';
-import { CreateUserDto, CreateUserLoginDto, UpdateUserDto, userDto } from '../dto/User.dto';
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+//import { CreateUserDto, CreateUserLoginDto, UpdateUserDto, userDto } from '../dto/User.dto';
 import { TypeORMExceptions } from '../exceptions/TypeORMExceptions';
-import { ServiceUser } from '../services/User.service';
+//import { ServiceUser } from '../services/User.service';
 import { Serializer } from 'src/interceptors/UserTransform.interceptor';
 import { ServiceRol } from 'src/services/Rol.service';
 import { RolDto } from 'src/dto/Rol.dto';
