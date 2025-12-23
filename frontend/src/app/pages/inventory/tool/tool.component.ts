@@ -1,5 +1,5 @@
-import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, inject, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { CategoryEntity } from '@app/@core/entities/Category.entity';
 import { ToolEntity } from '@app/@core/entities/Tool.entity';
@@ -207,7 +207,7 @@ export class ToolComponent implements OnInit {
 
      
       if (accion == 'Registrar') {
-        //console.log("ENTRA AL METODO ONSUBMIT REGISTRAR: "+ this.toolForm);
+        
         this.toolService.addTool(this.toolForm.value).subscribe({
           next: (response) => {
             this.toast.showToast('Herramienta registrada exitosamente!!', 3000, 'check2-circle', true);

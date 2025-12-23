@@ -255,7 +255,7 @@ this.displayBtnSendEmail = true;
 
     this.emailService.sendEmail(ServiceDto,invoiceIndex).subscribe({
       next: (resp) => {
-        console.log(resp)
+        //console.log(resp)
         if(resp.message == 'No se encontro la factura, favor de volver a generarla' || resp.message == 'Error al tratar de obtener la factura, favor de volver a generarla'){
           this.toast.showToast(resp.message , 5000, 'check2-square', false);
         }else {

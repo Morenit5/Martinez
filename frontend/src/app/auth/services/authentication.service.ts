@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, lastValueFrom, map, Observable, of, tap, throwError } from 'rxjs';
+import { catchError,  map, Observable, of, tap, throwError } from 'rxjs';
 import { environment } from '@env/environment';
 import { CredentialsService } from '@app/auth';
 import { Credentials } from '@core/entities';

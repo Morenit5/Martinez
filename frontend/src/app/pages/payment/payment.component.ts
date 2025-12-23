@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+//import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, inject, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { PaymentEntity } from '@app/@core/entities/Payment.entity';
@@ -60,7 +60,7 @@ export class PaymentComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     // changes.prop contains the old and the new value...
-    console.log('Cada vez que se llama metodo OnChanges');
+    
   }
 
   getMessage(message: number) {
@@ -70,8 +70,7 @@ export class PaymentComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.getMessage(0);
     /*this.toolList =this.toolService.fetchData();*/
-    //console.log('Cada vez que se llama metodo OnInit');
-    //this.toolList = this.toolService.fetchData1();
+        //this.toolList = this.toolService.fetchData1();
 
     /*this.paymentService.getCategories().subscribe(data => {
       this.payments = data;
@@ -87,14 +86,14 @@ export class PaymentComponent implements OnInit, OnChanges {
       {
         let convertDate = JSON.parse(JSON.stringify(this.paymentForm.controls['paymentDate'].value));
         let fechaConvertida = convertDate.year + '-' + convertDate.month + '-' + convertDate.day;
-        console.log(this.paymentForm.valid);
+        //console.log(this.paymentForm.valid);
         this.paymentForm.value['paymentDate'] = fechaConvertida;
         //const newTool: ToolEntity = this.toolForm.value;
 
         this.paymentService.add(this.paymentForm.value).subscribe({
           next: (response) => {
             this.toast.showToast('Pago registrado exitosamente!!', 3000, 'check2-circle', true);
-            console.log(response);
+            //console.log(response);
           },
           error: (err) => {
             this.toast.showToast('Error al registar el pago!!', 3000, 'x-circle', false);
@@ -119,16 +118,14 @@ export class PaymentComponent implements OnInit, OnChanges {
   }
 
   filterResults(text: string) {
-    console.log('Entra a FilterResults');
-
-    if (!text) {
+        if (!text) {
       this.filteredPaymentList = this.payments;
       return;
     }
     this.filteredPaymentList = this.payments.filter((payment) =>
       payment.paymentMethod.toLowerCase().includes(text.toLowerCase()),
     );
-    console.log("entra aqui" + this.filteredPaymentList);
+    //console.log("entra aqui" + this.filteredPaymentList);
   }
 
   updatePayment(paymentInstance: iPayment) {
@@ -147,7 +144,7 @@ export class PaymentComponent implements OnInit, OnChanges {
       //invoiceId: paymentInstance.invoiceId 
     });
 
-    console.log(paymentInstance);
+    //console.log(paymentInstance);
   }
 
   async deletePayment(payment: iPayment) {
@@ -158,7 +155,7 @@ export class PaymentComponent implements OnInit, OnChanges {
     //console.log("ToolComponent "+ JSON.stringify(toolObject));
 
     this.paymentService.update(payment.paymentId, paymentObject).then(data => {
-      console.log('Datos con promise:', data);
+   
       this.paymentList = this.paymentService.fetchData1();
     }).catch(error => {
       console.error('Error al eliminar', error);
