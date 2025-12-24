@@ -192,7 +192,7 @@ export class CategoryComponent {
     } else {
       //console.log(this.categoryForm.valid);
       this.categoryForm.markAllAsTouched();
-      this.toast.showToast('Campos inválidos, por favor revise el formulario!!', 3000, 'x-circle', false);
+      this.toast.showToast('Campo inválido, por favor revise el formulario!!', 3000, 'x-circle', false);
     }
 
   }
