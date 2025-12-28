@@ -205,9 +205,12 @@ export class ToolComponent implements OnInit {
 
     if (this.toolForm.valid) {
 
-     
+      let code=  this.toolForm.get('code').value;
+      this.toolForm.get('code').setValue(code.trim());
+           
       if (accion == 'Registrar') {
         
+
         this.toolService.addTool(this.toolForm.value).subscribe({
           next: (response) => {
             this.toast.showToast('Herramienta registrada exitosamente!!', 3000, 'check2-circle', true);
