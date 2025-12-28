@@ -525,6 +525,7 @@ export class ServiceComponent implements OnInit {
 
     // Si el navegador bloquea la ventana, ofrecer descarga
     if (!nuevaVentana) {
+       nuevaVentana.onload = () => {
       const link = document.createElement('a');
       link.href = this.pdfUrl;
       link.download;
@@ -534,7 +535,9 @@ export class ServiceComponent implements OnInit {
       window.URL.revokeObjectURL(this.pdfUrl);
       this.isLoading = false;
      /* this.getAllServicesIntances(); //Traemos todas las intances*/
-    }
+    
+       };
+      }
 
   }
 
