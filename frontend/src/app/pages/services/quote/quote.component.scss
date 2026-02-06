@@ -1,0 +1,54 @@
+.table-success{
+    background-color: #6dab8f ; 
+    color: white;
+}
+
+.table-progress{
+    background-color: #91c2cc ;
+    color: white;
+}
+
+.table-recurrent{
+    background-color: #88b67b ;
+    color: white;
+}
+
+.table-danger{
+    background-color:gold ;
+}
+
+a[role="button"] {
+  color: blue; /* Or a specific hex code like #0000FF */
+}
+
+a[role="button"]:hover {
+  color: blue; /* Or a specific hex code like #0000FF */
+  text-decoration:underline; 
+}
+
+.containerService {
+  //width: 85%;
+  /* Ancho deseado */
+  margin: 0 auto;
+  /* Centra horizontalmente */
+  background-color: rgba(235, 243, 238, 0.678);
+  /* Opcional, para visualizar */
+  height: 100%;
+}
+
+.list-group-scrollable {
+    max-height: 150px; /* Adjust this value as needed */
+    overflow-y: scroll;
+}
+
+.actions-container {
+  display: flex;
+  /* Optional: Add space between buttons */
+  gap: 1px; 
+  /* Optional: Align buttons to the end of the container */
+  justify-content: flex-end; 
+}
+
+.toastDelete{
+  background-color: rgb(255, 209, 57) !important;
+}
