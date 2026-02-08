@@ -55,7 +55,8 @@ export class ServiceService {
         status: Not('Cerrado'),
         invoice: {
            invoiceStatus: Not('Cerrado'),
-        }
+        },
+        isQuote: false
       } ],
     }).then((result: any) => {
       return result; // tal vez debamos manipular estos datos antes de mandar al front
@@ -65,6 +66,29 @@ export class ServiceService {
 
     return services;
   }
+
+  async findAllQuotes(): Promise<ServiceDto[]> {
+    var services: ServiceDto[] = await this.serviceRepository.find({ 
+     relations: {
+        client: true,
+        serviceDetail:true,
+      },
+       where: [{ 
+        enabled: true,
+        status: Not('Cerrado'),
+        invoice: {
+           invoiceStatus: Not('Cerrado'),
+        },
+        isQuote: true
+      } ],
+    }).then((result: any) => {
+      return result; // tal vez debamos manipular estos datos antes de mandar al front
+    }).catch((error: any) => {
+      this.exceptions.sendException(error);
+    });
+
+    return services;
+  }  
 
   async findAllClosed(first?: string, last?: string, month?: string): Promise<ServiceDto[]> {
     var services: ServiceDto[];
@@ -83,6 +107,7 @@ export class ServiceService {
         },
         where: [{
           enabled: true,
+          isQuote: false,
           status: Or(Equal('Cerrado'),Equal('Recurrente')),
           invoice: {
             isGenerated:true,
@@ -100,10 +125,11 @@ export class ServiceService {
 
     } else {
 
-      let whereClause: { enabled: boolean, client?: { name?: string| FindOperator<string>, lastName?:string | FindOperator<string> }, invoice?: { invoiceDate?:any, payment?:{ paymentMethod?:any } }}[] = [];
+      let whereClause: { enabled: boolean, isQuote: boolean, client?: { name?: string| FindOperator<string>, lastName?:string | FindOperator<string> }, invoice?: { invoiceDate?:any, payment?:{ paymentMethod?:any } }}[] = [];
       if(first && !last && !month) { 
         whereClause.push({
           enabled: true,
+          isQuote: false,
           client: {
             name: ILike(`%${first}%`),
           },
@@ -117,6 +143,7 @@ export class ServiceService {
       } else if(last && !first && !month){
         whereClause.push({
           enabled: true,
+          isQuote: false,
           client: {
             lastName:ILike(`%${last}%`),
           },
@@ -130,6 +157,7 @@ export class ServiceService {
       else if(first && last && !month){
         whereClause.push({
           enabled: true,
+          isQuote: false,
           client: {
             name: ILike(`%${first}%`),
             lastName: ILike(`%${last}%`)
@@ -148,6 +176,7 @@ export class ServiceService {
         const endDate = new Date(currentYear.toString() + '-' + currentMonth + '-31');
         whereClause.push({
           enabled: true,
+          isQuote: false,
           invoice: {
             invoiceDate:  Between(startDate, endDate),
             payment: {
@@ -193,6 +222,7 @@ export class ServiceService {
         },
         where: [{
           enabled: true,
+          isQuote: false,
           status: 'Cerrado',
           invoice: {
             payment: {
@@ -208,7 +238,7 @@ export class ServiceService {
 
     } else {
 
-      let whereClause: { enabled: boolean, status: string, invoice?: { invoiceDate?:any, payment?:{ paymentMethod?:any } }}[] = [];
+      let whereClause: { enabled: boolean, isQuote: boolean, status: string, invoice?: { invoiceDate?:any, payment?:{ paymentMethod?:any } }}[] = [];
       if(month){
         let currentMonth = months.indexOf(month)+1;
         const startDate = new Date(currentYear.toString() + '-' + currentMonth + '-01');
@@ -216,6 +246,7 @@ export class ServiceService {
         
         whereClause.push({
           enabled: true,
+          isQuote: false,
           status: 'Cerrado',
           invoice: {
             invoiceDate:  Between(startDate, endDate),
@@ -263,6 +294,7 @@ export class ServiceService {
         where: [{
           enabled: true,
           isExtra: true,
+          isQuote: false,
           status: Not('Cerrado'),
           client: {
             clientType: 'Fijo'
@@ -290,6 +322,7 @@ export class ServiceService {
         where: [{
           enabled: true,
           isExtra: false,
+          isQuote: false,
           status: Not('Cerrado'),
           client: {
             clientType: clntType
@@ -386,7 +419,23 @@ export class ServiceService {
   async findAllEnabled(): Promise<ServiceDto[]> {
     var services: ServiceDto[] = await this.serviceRepository.find({
       where: [{
-        enabled: true
+        enabled: true,
+        isQuote: false
+      }],
+    }).then((result: any) => {
+      return result; // tal vez debamos manipular estos datos antes de mandar al front
+    }).catch((error: any) => {
+      this.exceptions.sendException(error);
+    });
+
+    return services;
+  }
+
+    async findAllEnabledQuotes(): Promise<ServiceDto[]> {
+    var services: ServiceDto[] = await this.serviceRepository.find({
+      where: [{
+        enabled: true,
+        isQuote: true
       }],
     }).then((result: any) => {
       return result; // tal vez debamos manipular estos datos antes de mandar al front
