@@ -9,6 +9,7 @@ import { PaymentComponent } from './payment/payment.component';
 import { ServiceComponent } from './services/service/service.component';
 import { InvoceComponent } from './services/invoce/invoce.component';
 import { ConfigsComponent } from './configs/configs.component';
+import { QuoteComponent } from './services/quote/quote.component';
 //import { AuthenticationGuard } from '@app/auth/guard/authentication.guard';
 
 const routes: Routes = [
@@ -21,6 +22,10 @@ const routes: Routes = [
       path: 'users',
       loadChildren: () =>
         import('./users/users.module').then((m) => m.UsersModule),
+    },
+    {
+      path: 'quote',
+      component: QuoteComponent,
     },
     {
       path: 'service',

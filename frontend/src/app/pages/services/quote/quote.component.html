@@ -1,0 +1,267 @@
+<div>
+  <tabs [tabItems]="['Consulta', 'Crear Cotizaci&oacute;n']" [tabIcons]="['journal-check', 'plus-circle', 'cash-coin']" [requiredTabId]=reqTabId  (tabIndex)="getMessage($event)">
+  </tabs>
+  <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3">
+<ngb-toast
+  *ngIf="showToastWarning"
+  [autohide]="false"
+  class="toastDelete"><!--text-dark border border-dark-->
+  <div class="d-flex flex-column">
+    <strong class="mb-2">{{ toastWarningMessage }}</strong>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-danger btn-sm me-2" (click)="siEliminar()" ><!---->
+        Sí
+      </button> &nbsp;&nbsp;&nbsp;
+      <button class="btn btn-secondary btn-sm" (click)="cancelarToast()">
+        No
+      </button>
+    </div>
+  </div>
+</ngb-toast>
+
+  </div>
+  <!-- **************** C O M I E N Z A   E L   T A B   D E   C O N S U L T A **************** -->
+  <div *ngIf="recivedTabIndex==0" class="containerService ">
+    <div class="container mt-4">
+      <h3 class="mb-4">Cotizaciones</h3>
+  
+      <div class="table-responsive"> <!--Navigation Menu-->
+        <input type="text" class="form-control" placeholder="Buscar por Cotizaci&oacute;n" (keyup)="onSearchServiceKeyUp($event)" [(ngModel)]="serviceEntitiyToGet">
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Cotizaci&oacute;n</th>
+                <th>Fecha Cotizaci&oacute;n</th>
+                <!--<th>Estado</th>-->
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!--@if (!isLoading) {-->
+              
+              <ng-container> <!--*ngFor="let parentItem of serviceList"   paginatedServices-->
+                @for (parentItem of paginatedServices; track parentItem.serviceId; let i = $index) {
+                  
+                <tr>
+                  
+                  <td>{{parentItem.client.name}} {{parentItem.client.lastName}} </td>
+                  <td>
+                    <a role="button" (click)="toggleDetails(parentItem)" ngbTooltip="Ver más detalles">
+                      {{ parentItem.serviceName }}
+                    </a>
+                  </td>
+                  <td>{{ parentItem.serviceDate | date:'yyyy-MM-dd' }}</td>
+                  <!--<td
+                    [ngClass]="{'table-success': parentItem.status.toLowerCase() == 'terminado', 'table-progress': parentItem.status.toLowerCase() == 'en_proceso', 'table-recurrent': parentItem.status.toLowerCase() == 'recurrente'}">
+                    {{ parentItem.status }}</td>-->
+                  <td>
+                    <ng-container>
+                      <button class="btn btn-sm btn-outline-primary " (click)="updateServiceDetail(parentItem)" ngbTooltip="Actualizar Cotizaci&oacute;n"><i class="bi bi-pencil"></i></button>&nbsp;
+                      <button class="btn btn-sm btn-outline-info" (click)="updateSendMailAndCloseStatus(parentItem,i)" ngbTooltip="Enviar Cotizaci&oacute;n"><i class="bi bi-envelope-at"></i></button>&nbsp;
+                      <button class="btn btn-sm btn-outline-secondary" (click)="createService(parentItem,i)" ngbTooltip="Generar Servicio"><i class="bi bi-check2-circle"></i></button>&nbsp;
+                      <button class="btn btn-sm btn-outline-danger " (click)="preguntarEliminar(parentItem)" ngbTooltip="¿Eliminar Cotizaci&oacute;n?"><i class="bi bi-trash"></i></button>
+                    </ng-container>
+                  </td>
+                </tr>
+                <tr *ngIf="parentItem.showDetails">
+                  <td colspan="5">
+                      <table class="table caption-top table-striped-columns">
+                      <caption>Detalles de la Cotizaci&oacute;n </caption>
+                      <thead>
+                        <tr>
+                          <th>Tipo</th>
+                          <th>Descripci&oacute;n</th>
+                          <th>Unidades</th>
+                          <th>Cantidad</th>
+                          <th>Precio</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let childItem of parentItem.serviceDetail">
+                          <td>{{ childItem.serviceType }}</td>
+                          <td>{{ childItem.description }}</td>
+                          <td>{{ childItem.unitMeasurement }}</td>
+                          <td>{{ childItem.quantity }}</td>
+                          <td>${{ childItem.price }}</td>
+
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              }
+              </ng-container>
+             <!-- } @else {
+              <tr>
+                <td colspan="5" style="text-align: center">Cargando....</td>
+              </tr>
+              }-->
+            </tbody>
+          </table>
+          <!-- Paginación -->
+        <ngb-pagination class="d-flex justify-content-center" [(page)]="page" [pageSize]="pageSize"
+          [collectionSize]="services.length" (pageChange)="onPageChange($event)" [boundaryLinks]="true" [maxSize]="3"
+          *ngIf="services.length> pageSize"> {{services.length}}
+        </ngb-pagination>
+        <!--Fin Paginacion-->
+        </div>
+        
+      </div>
+    </div><!--Fin container mt-4-->
+  </div>
+  <!-- **************** T E R M I N A   E L   T A B   D E   C O N S U L T A **************** -->
+
+  <!-- **************** E M P I E Z A   E L   T A B   D E   C R E A R   C O T I Z A C I O N E S **************** -->
+  <div *ngIf="recivedTabIndex==1" class="containerService">
+    <div class="container mt-4">
+      <h3 class="mb-4">{{serviceLabel}}</h3>
+
+       
+        <div *ngFor="let option of radioOptions; let i = index" class="form-check form-check-inline">
+          <input disabled="{{isReadOnly}}"  class="form-check-input"  type="radio" name="isExtra"  [(ngModel)]="extraValue" [value]="option" id="{{option}}" (change)="onRadioChange()">
+          <label class="form-check-label" for="{{option}}">{{option}}</label>
+        </div>
+
+        <hr class="border-secondary border-3">
+        
+        <form [formGroup]="serviceForm" id="serviceFormId" (ngSubmit)="onSubmit(serviceButton)">
+        <div class="row">
+          <!-- Row 1 / Columna 1 -->
+          <div id="Service-Left-Column" class="col-md-6">
+            <div  class="mb-3">
+              <div formGroupName="client">
+              <label for="clientSelect">&nbsp;Cliente*</label>
+              <ng-select readonly="{{isReadOnly}}" [items]="clientList" bindLabel="fullName" formControlName="clientId" bindValue="clientId" placeholder="-- Seleccione --"   > </ng-select>
+               <div *ngIf="serviceForm.get('client')?.invalid && serviceForm.get('client')?.touched" class="text-danger">
+                Campo requerido
+              </div>
+              </div>
+            
+              &nbsp; Nombre del Servicio*
+              <input type="text" class="form-control col-form-label" formControlName="serviceName" id="serviceName" />
+              <div *ngIf="serviceForm.get('serviceName')?.invalid && serviceForm.get('serviceName')?.touched" class="text-danger">
+                Campo requerido
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 1 / Columna 2 -->
+          <div id="Service-Right-Column" class="col-md-6">
+            <div class="mb-3">
+              <label for="fecha" class="">&nbsp;*Fecha de Cotizaci&oacute;n</label>
+              <div class="input-group">
+                <input class="form-control" type="text"  id="serviceDate" placeholder="yyyy-mm-dd" name="serviceDate" ngbDatepicker #d="ngbDatepicker" formControlName="serviceDate" />
+                <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">📅</button>
+              </div>
+              <div *ngIf="serviceForm.get('serviceDate')?.invalid && serviceForm.get('serviceDate')?.touched" class="text-danger">
+                Campo requerido
+              </div>
+            </div>
+            <!--<div class="mb-3">
+              <label for="status" class="form-label">&nbsp;Estado del Servicio</label>
+               <div *ngIf="extraValue == 'Extra' || extraValue == 'Eventual'" >
+                  <input type="text" readonly  class="form-control col-form-label" formControlName="status" id="status" />
+              </div>
+             
+              <div *ngIf="extraValue == 'Fijo'"  class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" [ngModelOptions]="{standalone: true}" id="flexSwitchCheckRecurrente" [(ngModel)]="isRecurrentService" (change)="onRecurrentSwitchChange()" ngbTooltip="Activar/Desactivar">
+                <label class="form-check-label" for="flexSwitchCheckRecurrente">Habilitar Servicio Recurrente</label>
+               </div>
+            </div>-->
+          </div>
+
+          <div *ngIf="serviceDetails.length > 0" id="Botton-Column" class="col-md-12">
+            &nbsp; Lista de Tareas
+            <div class="container list-group list-group-scrollable">
+              <div class="row" *ngFor="let servDetail of serviceDetails; index as idx ">
+                <div  class="col-md-11 col-10">
+                  <button  type="button" (click)="onEditDetails(servDetail, idx)" class="list-group-item list-group-item-action">{{idx+1}}.- {{servDetail.description.slice(0,30)}}...</button>
+                </div>
+                <div class="col-md-1 col-2">
+                  <button style="padding-left:25% ; padding-right:25% ;  margin-top: 5%; margin-left: 40%;"  type="button" (click)="onDeleteDetails(idx)" class="btn btn-sm btn-outline-danger"> <i class="bi bi-trash-fill"></i>  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> 
+        <!--Termina row 1-->
+        </form>
+
+        <hr class="border-secondary border-1">
+        <h5 class="mb-4">&nbsp;&nbsp;&nbsp;&nbsp;Tareas del Servicio</h5>
+        <!--Comienza row 2-->
+        <div class="row">
+          <!-- Row 2 / Columna 1 -->
+          <div id="ServiceDeatils-Left-Column" class="col-md-4">
+            <div class="mb-3">
+              
+              <input type="text" name="serviceType" (input)="onInput($event)" [(ngModel)]="serviceType" class="form-control col-form-label" id="serviceType" placeholder="Tipo de Servicio" (blur)="onInputBlur('serviceType',serviceType)" />
+              <div *ngIf="(!serviceTypeIsValid && serviceType == undefined) || (!serviceTypeIsValid && serviceType && serviceType.length <= 0) " class="text-danger">
+                Campo requerido
+              </div>
+              
+            </div>
+            <div class="mb-3">
+              
+              <input type="text"  name="quantity"  (input)="onInput($event,'is-number')" [(ngModel)]="quantity"  class="form-control col-form-label" id="quantity" placeholder="Cantidad de Unidades"  (blur)="onInputBlur('quantity',quantity)"/>
+              <div *ngIf="!quantityIsValid && !quantity && typeof quantity !== 'number'" class="text-danger">
+                Campo requerido
+              </div>
+              <div *ngIf="!quantityIsValid && quantity && typeof quantity !== 'number'" class="text-danger">
+                '{{quantity}}' no es numero
+              </div>
+            </div>
+
+          </div><!---->
+          <div id="ServiceDeatils-Middle-Column" class="col-md-4">
+            <div class="mb-3">
+              
+              <input type="text" name="description"  (input)="onInput($event)"[(ngModel)]="description" class="form-control col-form-label" id="description" placeholder="Descripci&oacute;n" (blur)="onInputBlur('description',description)"/>
+              <div *ngIf="(!descriptionIsValid && description == undefined) || (!descriptionIsValid && description && description.length <= 0)" class="text-danger">
+                Campo requerido
+              </div>
+            </div>
+            <div class="mb-3">
+              
+              <input type="text" name="price"  (input)="onInput($event,'is-number')" [(ngModel)]="price" class="form-control col-form-label" placeholder="Precio" (blur)="onInputBlur('price',price)" />
+              <div *ngIf="!priceIsValid && !price && typeof price !== 'number'" class="text-danger">
+                Campo requerido
+              </div>
+              <div *ngIf="!priceIsValid && price && typeof price !== 'number'" class="text-danger">
+                '{{price}}' no es numero
+              </div>
+            </div>
+
+          </div><!---->
+
+          <!-- Row 2 /  Columna 2 -->
+          <div id="ServiceDeatils-Right-Column" class="col-md-4">
+            <div class="mb-3">
+              <input type="text" name="unitMeasurement" (input)="onInput($event)" [(ngModel)]="unitMeasurement" class="form-control col-form-label" id="unitMeasurement" placeholder="Unidad de Medida"  (blur)="onInputBlur('unitMeasurement',unitMeasurement)"/>
+              <div *ngIf="(!unitMeasurementIsValid && unitMeasurement == undefined) || (!unitMeasurementIsValid && unitMeasurement && unitMeasurement.length <= 0)" class="text-danger">
+                Campo requerido
+              </div>
+            </div>
+
+            
+            <div class="mb-3 ">
+              <label for="asdf" class=""></label>
+              <div class="input-group-append">
+                <div class="text-end">
+                  <button [disabled]="disableDetailsButton()" type="button" class="btn btn-sm btn-outline-info" (click)="onAddDetails()">Agregar Tarea</button>
+                  <button type="submit" form="serviceFormId" class="btn btn-sm btn-outline-primary" [disabled]="isUpdateBtnDisabled">{{serviceButton}}</button>
+                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="onCancel()">Cancelar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--Termina row 2-->
+      <!--/form-->
+    </div>
+  </div>
+  <!-- **************** T E R M I N A   E L   T A B   D E   S E R V I C I O S **************** -->
+</div>  
