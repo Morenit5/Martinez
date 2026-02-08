@@ -33,6 +33,11 @@ export class ServiceDto {
     @IsString()
     price: string;
 
+
+    @IsOptional()
+    @IsBoolean()
+    isQuote: boolean;
+
     @IsOptional()
     @IsObject()    
     @Type(()=>ClientDto) 
@@ -81,6 +86,9 @@ export class CreateServiceDto {
 
     @IsBoolean()
     isExtra: boolean;
+
+    @IsBoolean()
+    isQuote: boolean;
   
 }
 

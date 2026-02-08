@@ -20,6 +20,11 @@ export class  ControllerService {
     return this.serviceService.findAll();
   }
 
+  @Get('/quotes')
+  findAllQuotes(): Promise<ServiceDto[]> {
+    return this.serviceService.findAllQuotes();
+  }
+
   @Get('/enabled')
   findAllEnabled(): Promise<ServiceDto[]> {
     return this.serviceService.findAllEnabled();
@@ -57,6 +62,11 @@ export class  ControllerService {
 
     let resp = this.serviceService.getAutoInvoiceStatus();
     return resp;
+  }
+
+  @Get('/enabled/quotes')
+  findAllEnabledQuotes(): Promise<ServiceDto[]> {
+    return this.serviceService.findAllEnabledQuotes();
   }
 
   @Get(':id')
