@@ -1234,11 +1234,13 @@ export class ServiceComponent implements OnInit {
 
   findByService(): ServiceEntity[] {
 
-    let searchResults: ServiceEntity[] = this.originalValues.filter(item => item.serviceName.includes(this.serviceEntitiyToGet));
+    let searchResults: ServiceEntity[] = this.originalValues.filter(item => item.serviceName.toLowerCase().normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '').includes(this.serviceEntitiyToGet.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''))); 
 
     //si no encontramos nada atraves de nombre buscamos atraves de nombre
     if (searchResults.length <= 0) {
-      searchResults = this.originalValues.filter(item => item.client.name.includes(this.serviceEntitiyToGet));
+      searchResults = this.originalValues.filter(item => item.client.name.toLowerCase().normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '').includes(this.serviceEntitiyToGet.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''))); 
     }
     return searchResults;
   }
@@ -1246,11 +1248,13 @@ export class ServiceComponent implements OnInit {
   pagosFindByCientService(): ServiceEntity[] {
 
     //buscamos primero por cliente de lo contrario nos movemos a buscar por services
-    let searchResults: ServiceEntity[] = this.originalClientServicesValues.filter(item => item.client.name.includes(this.clientEntitiyToGet));
+    let searchResults: ServiceEntity[] = this.originalClientServicesValues.filter(item => item.client.name.toLowerCase().normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '').includes(this.clientEntitiyToGet.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''))); 
 
     //si no encontramos nada atraves de nombre buscamos atraves de nombre
     if (searchResults.length <= 0) {
-      searchResults = this.originalClientServicesValues.filter(item => item.serviceName.includes(this.clientEntitiyToGet));
+      searchResults = this.originalClientServicesValues.filter(item => item.serviceName.toLowerCase().normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '').includes(this.clientEntitiyToGet.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''))); 
     }
     return searchResults;
   }
