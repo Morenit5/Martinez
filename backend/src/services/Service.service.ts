@@ -72,6 +72,9 @@ export class ServiceService {
      relations: {
         client: true,
         serviceDetail:true,
+        invoice: {
+          payment:true,
+        }
       },
        where: [{ 
         enabled: true,

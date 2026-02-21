@@ -25,7 +25,7 @@ export class DashboardComponent implements OnInit {
   datasetsClientType: number[] = [];
   datasetsClientXMonth: number[] = [];
   evClient: number[] = [];
-  fixClient: number[] = [];;
+  fixClient: number[] = [];
   valorEC: number;
   valorFC: number;
   isReady: boolean = false;
@@ -36,6 +36,7 @@ export class DashboardComponent implements OnInit {
   serviceList: ServiceEntity[] = [];
   service: ServiceEntity;
   quantityService: number[] = [];
+  currentYear = new Date().getFullYear();
 
   constructor(private readonly serviceInstance: ServicesInstances) {
     this.getAllDataClients();
@@ -125,7 +126,7 @@ export class DashboardComponent implements OnInit {
     this.serviceInstance.getAllEnabled().subscribe({
       next: (servList) => {
         this.serviceList = servList;
-        //console.log('ServiceList: '+this.serviceList[0].serviceName);
+        //console.log('ServiceList: '+this.serviceList[0].serviceDate);
       },
       error: (error) => {
         console.error(error);
@@ -141,7 +142,11 @@ export class DashboardComponent implements OnInit {
     this.numericMonths.forEach((n: number) => {
       const searchResults: ServiceEntity[] = this.serviceList.filter(item => {
         const itemDate = item.serviceDate instanceof Date ? item.serviceDate : new Date(item.serviceDate);
-        return itemDate.getMonth() + 1 == n;
+
+        return (
+        itemDate.getFullYear() === this.currentYear &&
+        itemDate.getMonth() + 1 === n
+      );
       });
       this.quantityService.push(searchResults.length > 0 ? searchResults.length : 0);
     });
@@ -162,7 +167,10 @@ export class DashboardComponent implements OnInit {
     this.numericMonths.forEach((n: number) => {
       const searchResults: ClientEntity[] = this.clients.filter(item => {
         const itemDate = item.registryDate instanceof Date ? item.registryDate : new Date(item.registryDate);
-        return itemDate.getMonth() + 1 == n;
+         return (
+        itemDate.getFullYear() === this.currentYear &&
+        itemDate.getMonth() + 1 === n
+      );
       });
       this.datasetsClientXMonth.push(searchResults.length > 0 ? searchResults.length : 0);
     });
@@ -173,7 +181,10 @@ export class DashboardComponent implements OnInit {
     this.numericMonths.forEach((n: number) => {
       const searchResults: ClientEntity[] = this.eventualClient.filter(item => {
         const itemDate = item.registryDate instanceof Date ? item.registryDate : new Date(item.registryDate);
-        return itemDate.getMonth() + 1 == n;
+         return (
+        itemDate.getFullYear() === this.currentYear &&
+        itemDate.getMonth() + 1 === n
+      );
       });
       this.evClient.push(searchResults.length > 0 ? searchResults.length : 0);
     });
@@ -184,7 +195,10 @@ export class DashboardComponent implements OnInit {
     this.numericMonths.forEach((n: number) => {
       const searchResults: ClientEntity[] = this.fixedClient.filter(item => {
         const itemDate = item.registryDate instanceof Date ? item.registryDate : new Date(item.registryDate);
-        return itemDate.getMonth() + 1 == n;
+        return (
+        itemDate.getFullYear() === this.currentYear &&
+        itemDate.getMonth() + 1 === n
+      );
       });
       this.fixClient.push(searchResults.length > 0 ? searchResults.length : 0);
     });

@@ -10,7 +10,9 @@ export class EmailService {
 
   // we can now access environment.apiUrl
   apiUrlSend = environment.apiUrl + '/mail/send';
+  apiUrlSendQuote= environment.apiUrl + '/mail/sendQuote';
   apiUrlDown = environment.apiUrl + '/mail/download';
+  apiUrlQuote = environment.apiUrl + '/mail/downloadQuote';
   apiUrlInvoice = environment.apiUrl + '/mail/invoice';
   apiUrlEnable = environment.apiUrl + '/mail/notify';
   apiUrlEnableStatus = environment.apiUrl + '/mail/notify/status';
@@ -25,6 +27,13 @@ export class EmailService {
     return this.http.post(this.apiUrlSend, service, { params: myparams });
   }
 
+  sendEmailQuote(service: ServiceEntity, quoteName: string): Observable<any> {
+    let myparams = new HttpParams();
+    myparams = myparams.append('quoteName', quoteName);
+
+    return this.http.post(this.apiUrlSendQuote, service, { params: myparams });
+  }
+
   async generateInvoice(service: ServiceEntity, invoiceIndex: number): Promise<Observable<any>> {
 
     let myparams = new HttpParams();
@@ -32,6 +41,22 @@ export class EmailService {
     
 
     let variable = this.http.post(this.apiUrlDown, service, {
+      responseType: 'blob', // Important: Set responseType to 'blob'
+      headers: {
+        'Accept': 'application/pdf' // Optional: Indicate preference for PDF
+      },
+      params: myparams
+    });
+    return variable;
+  }
+
+  async generateQuote(service: ServiceEntity, invoiceIndex: number): Promise<Observable<any>> {
+
+    let myparams = new HttpParams();
+    myparams = myparams.append('invoiceIndex', invoiceIndex);
+    myparams = myparams.append('accion', 'QUOTE'); // Este es el titulo de la Cotización
+
+    let variable = this.http.post(this.apiUrlQuote, service, {
       responseType: 'blob', // Important: Set responseType to 'blob'
       headers: {
         'Accept': 'application/pdf' // Optional: Indicate preference for PDF

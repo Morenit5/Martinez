@@ -20,6 +20,23 @@
   </div>
 </ngb-toast>
 
+<ngb-toast
+  *ngIf="showToastWarningQuote"
+  [autohide]="false"
+  class="toastQuote"><!--text-dark border border-dark-->
+  <div class="d-flex flex-column">
+    <strong class="mb-2">{{ toastWarningMessage }}</strong>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-outline-primary btn-sm me-2" (click)="generateService()" ><!---->
+        Sí
+      </button> &nbsp;&nbsp;&nbsp;
+      <button class="btn btn-outline-secondary btn-sm" (click)="cancelarToast()">
+        No
+      </button>
+    </div>
+  </div>
+</ngb-toast>
   </div>
   <!-- **************** C O M I E N Z A   E L   T A B   D E   C O N S U L T A **************** -->
   <div *ngIf="recivedTabIndex==0" class="containerService ">
@@ -27,13 +44,13 @@
       <h3 class="mb-4">Cotizaciones</h3>
   
       <div class="table-responsive"> <!--Navigation Menu-->
-        <input type="text" class="form-control" placeholder="Buscar por Cotizaci&oacute;n" (keyup)="onSearchServiceKeyUp($event)" [(ngModel)]="serviceEntitiyToGet">
+        <input type="text" class="form-control" placeholder="Buscar por Cliente" (keyup)="onSearchServiceKeyUp($event)" [(ngModel)]="quoteEntitiyToGet">
         <div class="table-responsive">
           <table class="table table-bordered table-striped">
             <thead>
               <tr>
                 <th>Cliente</th>
-                <th>Cotizaci&oacute;n</th>
+                <th>Servicio</th>
                 <th>Fecha Cotizaci&oacute;n</th>
                 <!--<th>Estado</th>-->
                 <th>Acciones</th>
@@ -59,9 +76,10 @@
                     {{ parentItem.status }}</td>-->
                   <td>
                     <ng-container>
+                      <button class="btn btn-sm btn-outline-info" (click)="generateInvoice(parentItem,i)" ngbTooltip="Vista previa Cotizaci&oacute;n"><i class="bi bi-receipt"></i></button>&nbsp;
+                      <button class="btn btn-sm btn-outline-info" (click)="sendEmailQuote(parentItem)" ngbTooltip="Enviar Cotizaci&oacute;n"><i class="bi bi-envelope-at"></i></button>&nbsp;
+                      <button class="btn btn-sm btn-outline-secondary" (click)="generateQuoteConfirmation(parentItem)" ngbTooltip="Aprobar Cotizaci&oacute;n"><i class="bi bi-check2-circle"></i></button>&nbsp;
                       <button class="btn btn-sm btn-outline-primary " (click)="updateServiceDetail(parentItem)" ngbTooltip="Actualizar Cotizaci&oacute;n"><i class="bi bi-pencil"></i></button>&nbsp;
-                      <button class="btn btn-sm btn-outline-info" (click)="updateSendMailAndCloseStatus(parentItem,i)" ngbTooltip="Enviar Cotizaci&oacute;n"><i class="bi bi-envelope-at"></i></button>&nbsp;
-                      <button class="btn btn-sm btn-outline-secondary" (click)="createService(parentItem,i)" ngbTooltip="Generar Servicio"><i class="bi bi-check2-circle"></i></button>&nbsp;
                       <button class="btn btn-sm btn-outline-danger " (click)="preguntarEliminar(parentItem)" ngbTooltip="¿Eliminar Cotizaci&oacute;n?"><i class="bi bi-trash"></i></button>
                     </ng-container>
                   </td>
@@ -160,17 +178,12 @@
                 Campo requerido
               </div>
             </div>
-            <!--<div class="mb-3">
-              <label for="status" class="form-label">&nbsp;Estado del Servicio</label>
-               <div *ngIf="extraValue == 'Extra' || extraValue == 'Eventual'" >
-                  <input type="text" readonly  class="form-control col-form-label" formControlName="status" id="status" />
-              </div>
-             
-              <div *ngIf="extraValue == 'Fijo'"  class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" [ngModelOptions]="{standalone: true}" id="flexSwitchCheckRecurrente" [(ngModel)]="isRecurrentService" (change)="onRecurrentSwitchChange()" ngbTooltip="Activar/Desactivar">
-                <label class="form-check-label" for="flexSwitchCheckRecurrente">Habilitar Servicio Recurrente</label>
-               </div>
-            </div>-->
+            <div class="mb-3">
+              &nbsp; % Impuesto
+              <input type="text" class="form-control col-form-label" id="taxAmount" [(ngModel)]="taxPercentage" [ngModelOptions]="{standalone: true}" />
+              
+            </div>
+            
           </div>
 
           <div *ngIf="serviceDetails.length > 0" id="Botton-Column" class="col-md-12">

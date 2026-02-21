@@ -24,6 +24,12 @@ export class EmailController {
     return this.appService.sendMail(ServiceDto, invoiceIndex);
   }
 
+    @Post('/sendQuote')
+  sendEmailQuote(@Body() ServiceDto: ServiceDto, @Query('quoteName') quoteName: string) {
+
+    return this.appService.sendMailQuote(ServiceDto, quoteName);
+  }
+
   @Get('/invoice')
   async getClientInvoice(@Query('name') name: string, @Res() res: Response) {
     const pdfBuffer = await this.appService.getClientInvoice(name);
@@ -44,6 +50,17 @@ export class EmailController {
   @Post('/download')
   async generateInvoice(@Body() entity: ServiceDto, @Query('invoiceIndex') invoiceIndex: number, @Res() res: Response) {
     const pdfBytes = await this.appService.generateInvoice(entity, invoiceIndex);
+
+
+    res.setHeader('Content-Type', 'application/pdf');
+    //res.setHeader('Content-Disposition', 'attachment; filename='+ entity.invoice?.invoiceName);
+    res.send(Buffer.from(pdfBytes));
+
+  }
+
+  @Post('/downloadQuote')
+  async generateQuote(@Body() entity: ServiceDto, @Query('invoiceIndex') invoiceIndex: number,@Query('accion') accion: string, @Res() res: Response) {
+    const pdfBytes = await this.appService.generateInvoice(entity, invoiceIndex, accion);
 
 
     res.setHeader('Content-Type', 'application/pdf');

@@ -283,7 +283,8 @@ export class ToolComponent implements OnInit {
   onKeyUp(event: KeyboardEvent) {
     if (event.key === 'Enter') {
       if(this.toolEntitiyToGet == undefined || this.toolEntitiyToGet.trim().length===0 ){return;}
-      const searchResults: ToolEntity[] = this.originalValues.filter(item => item.name.includes(this.toolEntitiyToGet));
+      const searchResults: ToolEntity[] = this.originalValues.filter(item => item.name.toLowerCase().normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '').includes(this.toolEntitiyToGet.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')));
 
       if (searchResults.length !== 0) {
         this.tools = searchResults;

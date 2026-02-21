@@ -82,6 +82,15 @@ export class ServicesInstances {
         );
     }
 
+    getAllQuotes() {
+
+        return this.servicesListService.getAllQuotes().pipe(
+            map((response) =>
+                response.map((service: any) => plainToInstance(ServiceEntity, service)),
+            ),
+        );
+    }
+
      getAllClosedServicesBy(clientFirst?:string,clientLast?:string,month?:string) {
         return this.servicesListService.getAllClosedServicesBy(clientFirst,clientLast,month).pipe(
             map((response) =>
@@ -164,6 +173,12 @@ class servicesService {
         }
         //console.log('vamos a llamar esto' + clientType)
         return this.http.get<any>(serviceUrl + '/type',{ params: params });
+        //.subscribe(data => { console.log(data); });
+    }
+
+    getAllQuotes() {
+               
+        return this.http.get<any>(serviceUrl + '/quotes');
         //.subscribe(data => { console.log(data); });
     }
 
