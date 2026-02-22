@@ -30,6 +30,10 @@ function postgresFactory(dbUtil: DbUtilService_Cls) {
         ssl: {
             rejectUnauthorized: false, // 🔴 obligatorio para Supabase
         },
+        extra: {
+            //  fuerza IPv4
+            host: dbUtil.getHost()?.replace(/\[.*\]/, ''),
+        },
         retryAttempts: 10,
         retryDelay: 3000, // 3 segundos
         connectTimeoutMS: 30000, // 30 segundos
