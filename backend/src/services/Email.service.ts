@@ -22,6 +22,14 @@ enum EmailOptions {
   signature = 'Warm regards, <br> Omar Martínez.'
 }
 
+enum EmailOptionsQuote {
+  subject = "Martinez Gardening Quote",
+  text = "Please find attached the PDF document outlining the requested quote. It includes all the relevant details regarding prices and details of each service.",
+  html = '<p>Please find attached the PDF document outlining the requested quote. It includes all the relevant details regarding prices and details of each service.<br><br></p>',
+  greetings = '<p>Thank you for choosing Martínez Gardening. <br> We appreciate the opportunity to work with you!<br><br><br></p>',
+  signature = 'Warm regards, <br> Omar Martínez.'
+}
+
 enum EmailReminderOptions {
   subject = 'Friendly Reminder: Upcoming Service Due ',
   html1 = '<p>Hello<br></p>',
@@ -235,6 +243,42 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
     return { message: 'Factura enviada', info };
 
   }
+  async sendMailQuote(entity: ServiceDto, quoteName:string) {
+      
+    const invoiceName: string=  quoteName;
+
+    try {
+      await this.getClientInvoice(invoiceName);
+    } catch (error: unknown) {
+      //console.log(error)
+      if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+
+        return { message: 'No se encontro la cotizacion, favor de volver a generarla' };
+
+      } else {
+        return { message: 'Error al tratar de obtener la cotizacion, favor de volver a generarla' };
+      }
+    }
+
+    const info = await this.transporter.sendMail({
+      from: this.emailConfig,
+      to: entity.client.email,
+      subject: EmailOptionsQuote.subject,
+      //text: EmailOptions.text,
+      bcc: this.emailConfig,
+      html: EmailOptionsQuote.html + EmailOptionsQuote.greetings + EmailOptionsQuote.signature,
+      attachments: [
+        {
+          filename: invoiceName, //'YeseniaRejon-20250824.pdf',
+          path: path.join(__dirname, '..', 'invoices', invoiceName), // Ruta absoluta
+          contentType: 'application/pdf',
+        },
+      ],
+    });
+
+    return { message: 'Cotizacion enviada', info };
+
+  }
 
   getClientInvoice(fileName: string) {
     const filePath = path.join(__dirname, '..', 'invoices', fileName); // Or any other desired directory
@@ -242,12 +286,14 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
   }
 
 
-  async generateInvoice(service: ServiceDto,invoiceIndex:number) {
+  async generateInvoice(service: ServiceDto,invoiceIndex:number, accion:string ='INVOICE') {
 
     configuration: EntityConfiguration;
     let resp:{status:string, message:any} = {status:'', message:''};
     const inv =  service.invoice? service.invoice[invoiceIndex] : undefined;
 
+    const headerA =accion.substring(0,1);
+    const headerB = accion.substring(1);
     
     /*if(inv == undefined){
       resp = {status:'error', message:'El invoice no fue encontrado, para poder generar la factura'};
@@ -288,11 +334,13 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
     });
 
     // === Encabezado ===
-    page.drawText('I', {
-      x: margin + 310, y: pageHeight - margin, size: 45, color: rgb(128 / 255, 128 / 255, 128 / 255),/*rgb(0, 0.6, 0),*/ font: timesRomanBold // verde
+    let headerPositionA = accion=='QUOTE'?340:310;
+    let headerPositionB = accion=='QUOTE'?375:330;
+    page.drawText(headerA, {
+      x: margin + headerPositionA, y: pageHeight - margin, size: 45, color: rgb(128 / 255, 128 / 255, 128 / 255),/*rgb(0, 0.6, 0),*/ font: timesRomanBold // verde
     });
-    page.drawText('NVOICE', {
-      x: margin + 330, y: pageHeight - margin, size: 35, color: rgb(128 / 255, 128 / 255, 128 / 255),/*rgb(0, 0.6, 0),*/ font: timesRomanBold // verde
+    page.drawText(headerB, {
+      x: margin + headerPositionB, y: pageHeight - margin, size: 35, color: rgb(128 / 255, 128 / 255, 128 / 255),/*rgb(0, 0.6, 0),*/ font: timesRomanBold // verde
     });
 
     // Línea verde bajo el título
@@ -322,8 +370,9 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
     let fechaActual = mesActual + ` ${fecha.getDate()}, ${fecha.getFullYear()}`;
 
     y -= 60;
+    let title = accion=='QUOTE'?'QUOTE TO:':'INVOICE TO:';
     // === Datos del cliente ===
-    page.drawText("INVOICE TO:", { x: 70, y, size: 12, font: timesRomanBold });
+    page.drawText(title, { x: 70, y, size: 12, font: timesRomanBold });
     y -= 15;
     page.drawText("Client: " + service.client?.name + ' ' + service.client.lastName/**/, { x: 70, y, size: 10, font: timesRoman });
     y -= 15;
@@ -331,20 +380,23 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
     y -= 15;
     page.drawText("Address: " + service.client.address, { x: 70, y, size: 10, font: timesRoman });
     y -= 15;
-    page.drawText("Invoice Date: " + fechaActual, { x: 70, y, size: 10, font: timesRoman });
+    page.drawText("Date: " + fechaActual, { x: 70, y, size: 10, font: timesRoman });
 
     // Assuming you have a UUID string
     const invoiceNumber = inv?.invoiceNumber.substring(inv?.invoiceNumber.lastIndexOf('-') + 1, inv?.invoiceNumber.length);
+    const serviceIdNumber = service.serviceId;
 
     // === Datos de la empresa ===
     y -= -60;//40;
+    let numeroFolio = accion=='QUOTE'?'Quote Number: ':'Invoice Number: ';
+    let valorNumeroFolio = accion=='QUOTE'?serviceIdNumber:invoiceNumber;
     page.drawText("COMPANY:", { x: 415, y, size: 12, font: timesRomanBold });
     y -= 15;
     page.drawText("MARTINEZ GARDENING", { x: 415, y, size: 10, font: timesRoman });
     y -= 15;
     page.drawText("License number: 68741"/*+ configuration.licenseNumber*/ , { x: 415, y, size: 10, font: timesRoman });
     y -= 15;
-    page.drawText("Invoice Number: " + invoiceNumber, { x: 415, y, size: 10, font: timesRoman });
+    page.drawText(numeroFolio + valorNumeroFolio/*invoiceNumber*/, { x: 415, y, size: 10, font: timesRoman });
 
     page.drawRectangle({
       x: 70,
@@ -420,6 +472,7 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
     let firstTime: boolean = true;
     let fontSize = 9;
 
+    let quoteSubtotal=0;
     service.serviceDetail.forEach((p: ServiceDetailDto) => {
       if (firstTime == true) { firstTime = false; }
 
@@ -433,6 +486,7 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
         p.quantity,
         `$${p.price.toFixed(2)}`,
       ];
+      quoteSubtotal =quoteSubtotal+p.price;
 
       currentX = startX;
       column.forEach((cell, i) => {
@@ -462,13 +516,25 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
     let tax = inv?.payment[0].taxAmount;
     if (tax == null) { tax = 0; }
 
-    // === Totales ===
-    y -= 50;
+    //console.log('Tax Amount '+ inv?.payment[0].taxAmount);
+    // === Totales ===    
+    if(accion!='QUOTE')
+    {
+      y -= 50;
     page.drawText("Subtotal: $" + inv?.payment[0].paymentAmount.toFixed(2), { x: 440, y, size: 12, font: timesRoman });
+    }
     y -= 15;
-    page.drawText("Tax:        $" + tax.toFixed(2), { x: 440, y, size: 12, font: timesRoman });
+    page.drawText('Tax:        $' + tax.toFixed(2), { x: 440, y, size: 12, font: timesRoman });
+
+    let totalPayment: any;
+    if (accion != 'QUOTE') {
+      totalPayment = inv?.totalAmount.toFixed(2);
+    }
+    else {
+      totalPayment = (quoteSubtotal + tax).toFixed(2);
+    }
     y -= 15;
-    page.drawText("Total:     $" + inv?.totalAmount.toFixed(2), { x: 440, y, size: 12, color: rgb(0, 0, 0), font: timesRomanBold });
+    page.drawText("Total:     $" + totalPayment, { x: 440, y, size: 12, color: rgb(0, 0, 0), font: timesRomanBold });
 
    
     let method = inv? inv.payment[0].paymentMethod:'Transferencia';
@@ -485,7 +551,7 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
     }
 
     if (tax != undefined || tax != null) {
-      if (tax > 0) {
+      if (tax > 0 && accion=='INVOICE') {
 
         y -= 15;
         page.drawText(`Payment made through: ${traducirMetodoPago(method)}.`,
@@ -495,13 +561,25 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
     else {
       y -= 15;
       page.drawText(" ");
+
+      //“This quote is valid for 30 days from the date of issuance
     }
 
+    if (accion == 'QUOTE') {
+      y -= 60;
+      page.drawText(`*This quote is valid for 7 days from the date of issuance.`,
+        { x: 70, y, size: 8, color: rgb(0, 0, 0), font: timesRoman });
+      /*y -= 15;
+      page.drawText(`*This quote does not include tax payment.`,
+            { x: 70, y, size: 8, color: rgb(0, 0, 0), font: timesRoman });*/
+    }
+     
     // Guardar PDF
+    let quotename = 'quote_'+service.client?.name.trim().replaceAll(' ','_')+ service.serviceId+'.pdf';
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes as unknown as ArrayBuffer], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
-    const fileName = inv? inv.invoiceName : 'example.pdf';
+    const fileName = inv? accion!='QUOTE'? inv.invoiceName : quotename: 'no_quote.pdf';
 
     const uploadDir: string = path.join(__dirname, '..', 'invoices'); // Or any other desired directory
 

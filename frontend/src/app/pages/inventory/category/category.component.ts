@@ -23,7 +23,8 @@ export class CategoryComponent {
         {
           return;
         }
-      const searchResults: CategoryEntity[] = this.originalValues.filter(item => item.name.includes(this.categoryEntitiyToGet)); // || item.email.includes(this.userEntitiyToGet));
+      const searchResults: CategoryEntity[] = this.originalValues.filter(item => item.name.toLowerCase().normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '').includes(this.categoryEntitiyToGet.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''))); // || item.email.includes(this.userEntitiyToGet));
 
       if (searchResults.length !== 0) {
         this.categories = searchResults;

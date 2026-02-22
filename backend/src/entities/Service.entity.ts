@@ -38,5 +38,8 @@ export class EntityService {
     @Column({ type: 'boolean', default: false })
     /*@IsBoolean({ message: 'El campo "activo" debe ser verdadero o falso' })*/
     isExtra: boolean;
+
+    @Column({ type: 'boolean', default: false })
+    isQuote: boolean;
   
 }

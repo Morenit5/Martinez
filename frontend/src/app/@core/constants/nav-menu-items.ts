@@ -39,6 +39,13 @@ export const webSidebarMenuItems: NavMenuItem[] = [
     roles: [ROLE.ADMIN,ROLE.USER],
     subItems: [
       {
+        href: '/quote',
+        title: 'Cotización', 
+        icon: 'receipt',
+        active: false,
+        roles: [ROLE.ADMIN,ROLE.USER],
+      },
+      {
         href: '/service',
         title: 'Servicio', 
         icon: 'list-check',

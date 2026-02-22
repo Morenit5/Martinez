@@ -107,9 +107,13 @@ export class ClientComponent implements OnInit {
           },
           error: (err) => {
             let errorMessage = err.error;
-            /*if (errorMessage.startsWith('"Error:')) {
-              errorMessage = errorMessage.slice(7, errorMessage.length - 1);
-            }*/
+            if (typeof errorMessage === 'object' && errorMessage !== null) {
+              errorMessage = errorMessage.error;
+              if (errorMessage.startsWith('"Error:')) {
+                errorMessage = errorMessage.slice(7, errorMessage.length - 1);
+              }/**/
+            }
+           
             errorMessage = errorMessage.toString().slice(0, errorMessage.length - 1);
             this.toast.showToast(errorMessage/*'Error al registar la categoria!!'*/, 3000, 'x-circle', false);
           },
@@ -228,7 +232,8 @@ export class ClientComponent implements OnInit {
         {
           return;
         }
-        const searchResults: ClientEntity[] = this.originalValues.filter(item => item.name.includes(this.clientEntitiyToGet)); 
+        const searchResults: ClientEntity[] = this.originalValues.filter(item => item.name.toLowerCase().normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '').includes(this.clientEntitiyToGet.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''))); 
   
         if (searchResults.length !== 0) {
           this.clients = searchResults;

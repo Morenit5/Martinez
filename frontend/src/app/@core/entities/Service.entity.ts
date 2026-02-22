@@ -16,6 +16,7 @@ export class ServiceEntity {
     invoice:InvoiceEntity[];
     isExtra: boolean;
     enabled: boolean;
+    isQuote: boolean;
 }
 
 
