@@ -26,6 +26,12 @@ function postgresFactory(dbUtil: DbUtilService_Cls): TypeOrmModuleOptions {
         entities: dbUtil.getEntities(),
         synchronize: false,
         autoLoadEntities: false,
+        ssl: {
+            rejectUnauthorized: false, // 🔴 obligatorio para Supabase
+        },
+        retryAttempts: 10,
+        retryDelay: 3000, // 3 segundos
+        connectTimeoutMS: 30000, // 30 segundos
         //logging: true,
         poolErrorHandler: async (err) => {
             const reconnection = setInterval(async () => {
