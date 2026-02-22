@@ -31,7 +31,7 @@ function postgresFactory(dbUtil: DbUtilService_Cls) {
             rejectUnauthorized: false, // 🔴 obligatorio para Supabase
         },
         extra: {
-            // ⚡ fuerza IPv4
+            //  fuerza IPv4
             host: dbUtil.getHost()?.replace(/\[.*\]/, ''),
         },
         retryAttempts: 10,
