@@ -25,8 +25,14 @@ function postgresFactory(dbUtil: DbUtilService_Cls) {
         cli: {
             migrationsDir: dbUtil.getMigrationsDir()
         },
-        synchronize: true,//false,
+        synchronize: false,
         autoLoadEntities: true, //false,
+        ssl: {
+            rejectUnauthorized: false, // 🔴 obligatorio para Supabase
+        },
+        retryAttempts: 10,
+        retryDelay: 3000, // 3 segundos
+        connectTimeoutMS: 30000, // 30 segundos
 
         poolErrorHandler: async (err) => {
           const reconnection = setInterval(async () => {
