@@ -82,7 +82,8 @@ export class ListComponent implements OnInit {
       if(this.userEntitiyToGet == undefined || this.userEntitiyToGet.trim().length === 0) {return; }
       this.userEntitiyToGet.trim();
       
-      const searchResults: UserEntity[] = this.usersList.filter(item => item.firstname.includes(this.userEntitiyToGet)); // || item.email.includes(this.userEntitiyToGet));
+      const searchResults: UserEntity[] = this.usersList.filter(item => item.firstname.toLowerCase().normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '').includes(this.userEntitiyToGet.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''))); 
 
       if (searchResults.length !== 0) {
         
