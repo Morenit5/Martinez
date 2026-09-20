@@ -586,15 +586,18 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
     // Create the directory if it doesn't exist
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
+    }else {
+      console.error(`ya existia el dir en dist/invoices : ${uploadDir}` );
     }
+
 
     const filePath: string = path.join(uploadDir, fileName);
 
     try {
       fs.writeFileSync(filePath, pdfBytes);
-      //console.log(`PDF document "${fileName}" saved successfully to ${filePath}`);
+      console.log(`PDF document "${fileName}" saved successfully to ${filePath}`);
     } catch (error) {
-      //console.error(`Error saving PDF document: ${error}`);
+      console.error(`Error saving PDF document: ${error}`);
     }
     return pdfBytes;
   }
