@@ -579,7 +579,9 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes as unknown as ArrayBuffer], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
-    const fileName = inv? accion!='QUOTE'? inv.invoiceName : quotename: 'no_quote.pdf';
+    //const fileName = inv? (accion!='QUOTE'? ((inv.invoiceName)) : ((quotename)) ): ('no_quote.pdf');
+    
+    const fileName = accion=='QUOTE'? quotename : inv? inv.invoiceName : 'no_invoice.pdf';
 
     const uploadDir: string = path.join(__dirname, '..', 'invoices'); // Or any other desired directory
 
