@@ -665,7 +665,7 @@ cliente;
         }
         else
         {
-          this.toast.showToast('Cotización generada exitosamente!!', 3000, 'check2-circle', true);
+          this.toast.showToast('Servicio generado exitosamente!!', 3000, 'check2-circle', true);
         }
       },
       error: (err) => {
@@ -675,7 +675,7 @@ cliente;
         }
         else
         {
-          this.toast.showToast('Error al generar la Cotización!!' + err, 3000, 'x-circle', false);
+          this.toast.showToast('Error al generar el Servicio!!' + err, 3000, 'x-circle', false);
         }
       },
       complete: () => {
