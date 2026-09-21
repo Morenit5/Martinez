@@ -278,7 +278,7 @@
               <label for="asdf" class=""></label>
               <div class="input-group-append">
                 <div class="text-end">
-                  <button [disabled]="disableDetailsButton()" type="button" class="btn btn-sm btn-outline-info" (click)="onAddDetails()">Agregar Tarea</button>
+                  <button [disabled]="disableDetailsButton()" type="button" class="btn btn-sm btn-outline-info" (click)="onAddDetails()">{{serviceButton}} Tarea</button>
                   <button type="submit" form="serviceFormId" class="btn btn-sm btn-outline-primary" [disabled]="isUpdateBtnDisabled">{{serviceButton}}</button>
                   <button type="button" class="btn btn-sm btn-outline-danger" (click)="onCancel()">Cancelar</button>
                 </div>
