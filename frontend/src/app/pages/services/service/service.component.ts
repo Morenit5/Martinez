@@ -87,6 +87,7 @@ export class ServiceComponent implements OnInit {
 
   serviceLabel: string = 'Registro de Servicios';
   serviceButton: string = 'Registrar';
+  addOrUpdateTask: string = 'Agregar';
   serviceForm: FormGroup;
 
   /*PDF*/
@@ -730,7 +731,7 @@ export class ServiceComponent implements OnInit {
 
     this.serviceLabel = 'Registro de Servicios';
     this.serviceButton = 'Registrar'
-
+    this.addOrUpdateTask = 'Agregar'
 
     this.isReadOnly = false; //enable de regreso el field cliente
     //go back to consulta tab
@@ -972,7 +973,8 @@ export class ServiceComponent implements OnInit {
     this.recivedTabIndex = 1;
     this.reqTabId = 1;
     this.serviceLabel = 'Actualizar Servicio';
-    this.serviceButton = 'Actualizar'
+    this.serviceButton = 'Actualizar';
+    this.addOrUpdateTask = 'Actualizar';
     this.isReadOnly = true; //disable el campo de cliente
     this.isUpdating = true; //el cliente en este momento esta actualizando, puede que le de click a actualizar de nuevo por eso se require controlar con esta bandera
 
@@ -1098,16 +1100,21 @@ export class ServiceComponent implements OnInit {
   }
 
   disableDetailsButton(): boolean {
-    if (this.inputLength <= 0) { return true; }
+    if (this.serviceButton == 'Registrar' && this.inputLength <= 0) { return true; }
 
     if (this.serviceType == undefined || this.quantity == undefined || this.description == undefined || this.price == undefined || this.unitMeasurement == undefined) {
       return true;
     }
-    return this.serviceTypeIsValid == false ||
+
+    if(this.serviceButton && this.serviceButton != 'Actualizar'){
+      return this.serviceTypeIsValid == false ||
       this.quantityIsValid == false ||
       this.descriptionIsValid == false ||
       this.priceIsValid == false ||
       this.unitMeasurementIsValid == false ? true : false;
+    }
+
+    return false; // para que se ponga como disabled=false lo que significa q esta hablitado 
   }
 
   onInput(event: Event, type: string = 'is-string'): void {
