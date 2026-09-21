@@ -579,22 +579,27 @@ constructor(@InjectRepository(EntityService) private serviceRepository: Reposito
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes as unknown as ArrayBuffer], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
-    const fileName = inv? accion!='QUOTE'? inv.invoiceName : quotename: 'no_quote.pdf';
+    //const fileName = inv? (accion!='QUOTE'? ((inv.invoiceName)) : ((quotename)) ): ('no_quote.pdf');
+    
+    const fileName = accion=='QUOTE'? quotename : inv? inv.invoiceName : 'no_invoice.pdf';
 
     const uploadDir: string = path.join(__dirname, '..', 'invoices'); // Or any other desired directory
 
     // Create the directory if it doesn't exist
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
+    }else {
+      console.error(`ya existia el dir en dist/invoices : ${uploadDir}` );
     }
+
 
     const filePath: string = path.join(uploadDir, fileName);
 
     try {
       fs.writeFileSync(filePath, pdfBytes);
-      //console.log(`PDF document "${fileName}" saved successfully to ${filePath}`);
+      console.log(`PDF document "${fileName}" saved successfully to ${filePath}`);
     } catch (error) {
-      //console.error(`Error saving PDF document: ${error}`);
+      console.error(`Error saving PDF document: ${error}`);
     }
     return pdfBytes;
   }
