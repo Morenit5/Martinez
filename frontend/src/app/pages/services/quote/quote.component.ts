@@ -62,6 +62,7 @@ cliente;
   unitMeasurementIsValid: boolean = true;
   isReadOnly: boolean = false; //inidicamos si el cliente esta activo, -Debe ser true para el actualizar, ya que no podra cambiar al cliente -
   showToast = false;
+  addOrUpdateTask: string = 'Agregar Tarea';
 
   /*Paginacion*/
   services: ServiceEntity[] = [];// se crea un array vacio de la interfaz
@@ -499,6 +500,7 @@ cliente;
 
     this.serviceLabel = 'Cotización';
     this.serviceButton = 'Registrar'
+    this.addOrUpdateTask='Agregar Tarea';
 
 
     this.isReadOnly = false; //enable de regreso el field cliente
@@ -694,6 +696,7 @@ cliente;
     this.serviceButton = 'Actualizar'
     this.isReadOnly = true; //disable el campo de cliente
     this.isUpdating = true; //el cliente en este momento esta actualizando, puede que le de click a actualizar de nuevo por eso se require controlar con esta bandera
+    this.addOrUpdateTask = 'Actualizar Tarea';
 
     this.client = serviceDTO.client;
 
@@ -775,6 +778,7 @@ cliente;
   }
 
   onAddDetails(action: string = 'registrar') {
+   
     let servDetail: ServiceDetailEntity = new ServiceDetailEntity();
     servDetail.serviceDetailsId = this.serviceDetailsId;
     servDetail.serviceType = this.serviceType;
@@ -828,16 +832,19 @@ cliente;
   }
 
   disableDetailsButton(): boolean {
-    if (this.inputLength <= 0) { return true; }
+    if (this.serviceButton == 'Registrar' && this.inputLength <= 0) { return true; }
 
     if (this.serviceType == undefined || this.quantity == undefined || this.description == undefined || this.price == undefined || this.unitMeasurement == undefined) {
       return true;
     }
+    if(this.serviceButton && this.serviceButton != 'Actualizar'){
     return this.serviceTypeIsValid == false ||
       this.quantityIsValid == false ||
       this.descriptionIsValid == false ||
       this.priceIsValid == false ||
       this.unitMeasurementIsValid == false ? true : false;
+    }
+    return false;
   }
 
   onInput(event: Event, type: string = 'is-string'): void {
