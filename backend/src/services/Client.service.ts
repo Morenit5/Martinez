@@ -80,7 +80,7 @@ export class ServiceClient {
         return await this.clientRepository.save(newClient);
       } catch (e: any) {
         // Postgres
-        if (e.code === '23505') throw new ConflictException('El cliente ya está registrado.');
+        if (e.code === '23505') throw new ConflictException('Ya existe un cliente con el número de teléfono y correo electrónico capturado.');
         throw e;
       }
     }
